@@ -7,8 +7,8 @@ function make_navbar($nav_conf , $nav_links){
     $div_conf = $nav_conf["div_conf"];
     $title_conf = $nav_conf["title_conf"];
 
-    // Starting to echo out the HTML for the navigation bar
-    echo ("
+    // Starting to $ret .=  out the HTML for the navigation bar
+    $ret = ("
     <nav class=\"navbar $navtag_conf\">    
         <div class=\"$div_conf\">
             <a class=\"$title_conf[title_class]\" href=\"$title_conf[title_href]\">
@@ -21,11 +21,11 @@ function make_navbar($nav_conf , $nav_links){
             <div>");
     // Looping through each navigation link item
     if($nav_conf ["links"] === true){
-        echo("
+        $ret .= ("
                 <ul class=\"$nav_links[ul_class]\">
         ");
         foreach($nav_links["li_items"] as $item){
-            echo(   //gets the li_class and a_class from the array and sets
+            $ret .= (   //gets the li_class and a_class from the array and sets
                     //those items to the class attribute of the li and a tags
                     "
                     <li class=\"$item[li_class]\">
@@ -43,13 +43,14 @@ function make_navbar($nav_conf , $nav_links){
             ");
         }
     }   
-    echo("
+    $ret .= ("
                     </ul>  <!-- End of the list for the navigation links -->
             </div>
             <div
         </div>
     </nav>  <!-- End of the navigation bar -->
     ");
+    return $ret;
 }   
 
 function active_link($item, $nav_conf){

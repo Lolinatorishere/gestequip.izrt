@@ -5,63 +5,81 @@ function make_form($form_config , $form_action , $form_method , $form_inputs){
     $form_class = $form_config["form_class"];
     $form_title_class = $form_config["form_title_class"];
     $form_title = $form_config["form_title"];
-
-    echo("
-    <form 
-    class=\"$form_class\" 
-    action=\"$form_action\" 
-    method=\"$form_method\"
-    >");
-    if(isset($form_title)){
-        echo("
-        <h1 
-        class=\"$form_title_class\">
-            $form_title
-        </h1>");
-    }
-    if(isset($form_inputs["form_input"])){
-        foreach($form_inputs["form_input"] as $input){
-            echo("
-            <label 
-                for=\"$input[label_for]\"
-                class=\"$input[label_class]\"
-            >
-                $input[label_text]
-            </label>
-            <div class=\"form-floating-mb2\">
-                <input ");
-                if(isset($input["input_type"]))
-                    echo("type=\"$input[input_type]\"");
-                if(isset($input["input_id"]))
-                    echo("id=\"$input[input_id]\"");  
-                if(isset($input["input_class"]))
-                    echo("class=\"$input[input_class]\"");
-                if(isset($input["input_placeholder"]))
-                    echo("placeholder=\"$input[input_placeholder]\"");
-                if(isset($input["input_required"]))
-                    echo("required=\"$input[input_required]\"");
-                if(isset($input["input_maxlength"]))
-                    echo("maxlength=\"$input[input_maxlength]\"");
-                if(isset($input["input_autofocus"]))
-                    echo("autofocus=\"$input[input_autofocus]\"");
-                echo(">");
+    $form_container = $form_config["form_container"];
+    $ret = ("
+    <div class=\"$form_container> <!-- This is the container for the form -->
+        <form 
+        class=\"$form_class\" 
+        action=\"$form_action\" 
+        method=\"$form_method\"
+        >");
+        if(isset($form_title)){
+            $ret .= ("
+            <h1 
+            class=\"$form_title_class\">
+                $form_title
+            </h1>");
         }
-    }
-    if(isset($form_inputs["button"])){
-        foreach($form_inputs["button"] as $buttons){
-            echo("
-            <button
-                href=\"$buttons[button_href]\"
-                class=\"$buttons[button_class]\"
-                type=\"$buttons[button_type]\"
-                name=\"$buttons[button_name]\"
-                value=\"$buttons[button_value]\"
-            >
-                $buttons[button_text]
-            </button>
+        if(isset($form_inputs["form_input"])){
+            $ret .=("
+            <div class=\"$form_inputs[input_seperator]\">
+            ");
+            foreach($form_inputs["form_input"] as $input){
+                $ret .= ("
+                <label 
+                    for=\"$input[label_for]\"
+                    class=\"$input[label_class]\"
+                >
+                    $input[label_text]
+                </label>
+                <div class=\"form-floating-mb2\">
+                    <input ");
+                    if(isset($input["input_type"]))
+                        $ret .= ("type=\"$input[input_type]\"");
+                    if(isset($input["input_id"]))
+                        $ret .= ("id=\"$input[input_id]\"");  
+                    if(isset($input["input_class"]))
+                        $ret .= ("class=\"$input[input_class]\"");
+                    if(isset($input["input_placeholder"]))
+                        $ret .= ("placeholder=\"$input[input_placeholder]\"");
+                    if(isset($input["input_required"]))
+                        $ret .= ("required=\"$input[input_required]\"");
+                    if(isset($input["input_maxlength"]))
+                        $ret .= ("maxlength=\"$input[input_maxlength]\"");
+                    if(isset($input["input_autofocus"]))
+                        $ret .= ("autofocus=\"$input[input_autofocus]\"");
+                    $ret .= (">
+                </div>");
+            }
+            $ret .= ("
+            </div>
             ");
         }
-    }
+        if(isset($form_inputs["button"])){
+            $ret .= ("
+                <div class=\"$form_inputs[button_seperator]\">
+            ");
+            foreach($form_inputs["button"] as $buttons){
+                $ret .= ("
+                    <button
+                        href=\"$buttons[button_href]\"
+                        class=\"$buttons[button_class]\"
+                        type=\"$buttons[button_type]\"
+                        name=\"$buttons[button_name]\"
+                        value=\"$buttons[button_value]\"
+                    >
+                        $buttons[button_text]
+                    </button>
+                ");
+            }
+            $ret .= ("
+                </div> 
+            ");
+        }
+    $ret .= ("
+        </div> 
+    ");
+    return $ret;
 }
 
 function make_form_inputs($inputs){

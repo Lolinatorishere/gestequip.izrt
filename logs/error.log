@@ -62,3 +62,4 @@
 [Thu Mar 14 09:26:59.793314 2024] [php:warn] [pid 880] [client 192.168.122.1:42536] PHP Warning:  Undefined variable $form_action in /var/www/html/gestequip.izrt/public_html/index.php on line 33
 [Thu Mar 14 09:26:59.793320 2024] [php:warn] [pid 880] [client 192.168.122.1:42536] PHP Warning:  Undefined variable $form_method in /var/www/html/gestequip.izrt/public_html/index.php on line 33
 [Thu Mar 14 09:26:59.793324 2024] [php:warn] [pid 880] [client 192.168.122.1:42536] PHP Warning:  Undefined variable $inputs in /var/www/html/gestequip.izrt/public_html/index.php on line 33
+[Thu Mar 14 16:53:08.118116 2024] [php:error] [pid 884] [client 192.168.122.1:45560] PHP Parse error:  syntax error, unexpected token "echo", expecting "," or ";" in /var/www/html/gestequip.izrt/public_html/index.php on line 59

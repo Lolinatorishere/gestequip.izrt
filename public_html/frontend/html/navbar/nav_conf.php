@@ -33,8 +33,4 @@ $nav_conf = [
         "profile_pfp" => ""
     ),
 ];
-
-
-
-
 ?>
