@@ -81,3 +81,7 @@
 192.168.122.1 - - [12/Mar/2024:11:45:03 +0000] "GET /frontend/css/style.css HTTP/1.1" 404 492 "http://192.168.122.69/" "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0"
 192.168.122.1 - - [12/Mar/2024:11:45:05 +0000] "GET / HTTP/1.1" 200 1135 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0"
 192.168.122.1 - - [12/Mar/2024:11:45:05 +0000] "GET /frontend/css/style.css HTTP/1.1" 404 492 "http://192.168.122.69/" "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0"
+192.168.122.1 - - [14/Mar/2024:09:26:59 +0000] "GET / HTTP/1.1" 200 1220 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0"
+192.168.122.1 - - [14/Mar/2024:09:26:59 +0000] "GET /frontend/css/index.css HTTP/1.1" 200 279 "http://192.168.122.69/" "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0"
+192.168.122.1 - - [14/Mar/2024:09:26:59 +0000] "GET /favicon.ico HTTP/1.1" 404 492 "http://192.168.122.69/" "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0"
+192.168.122.1 - - [14/Mar/2024:09:32:50 +0000] "GET /favicon.ico HTTP/1.1" 404 493 "http://192.168.122.69/" "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0"
