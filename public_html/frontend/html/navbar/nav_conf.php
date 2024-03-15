@@ -21,10 +21,10 @@
 //    );
 
 $nav_conf = [
-    "navtag_conf" => "navbar navbar-expand-lg navbar-dark  bg-dark",
+    "navtag_conf" => "nav-height navbar navbar-expand-lg navbar-dark  bg-dark",
     "div_conf" => "container-fluid",
     "title_conf" => array(
-        "title_class" => "navbar-brand mt-2 mt-lg-2 mb-2 mb-lg-2",
+        "title_class" => "navbar-brand nav-text-config",    
         "title_href" => "",
         "title_text" => "Gestor de Equipamentos"
     ),

@@ -11,9 +11,11 @@ function make_navbar($nav_conf , $nav_links){
     $ret = ("
     <nav class=\"navbar $navtag_conf\">    
         <div class=\"$div_conf\">
-            <a class=\"$title_conf[title_class]\" href=\"$title_conf[title_href]\">
-                $title_conf[title_text]  <!-- This is where the title of the navigation bar goes -->
-            </a>
+            <div class=\"container \">
+                <a class=\"$title_conf[title_class]\" href=\"$title_conf[title_href]\">
+                    $title_conf[title_text]  <!-- This is where the title of the navigation bar goes -->
+                </a>
+            </div>
             <div 
                 class=\"collapse navbar-collapse\"
                 id=\"navbarCollapse\">
@@ -79,12 +81,12 @@ function make_li_items($links){
     $li_items = array();
     if(isset($links["text"])){
         for($i = 0; $i < count($links["text"]); $i++){
-            if($links["a_class"][$i] === ""){
+            if(!isset($links["li_class"][$i]))  
                 $links["a_class"][$i] = "nav-link";
-            }
-            if($links["li_class"][$i] === ""){
+            if(!isset($links["a_class"][$i]))
                 $links["li_href"][$i] = "nav-item";
-            }
+            if(!isset($links["href"][$i]))
+                $links["href"][$i] = "#";
             $li_items[$i] = array(
                 "li_class" => $links["li_class"][$i],
                 "a_class" => $links["a_class"][$i],

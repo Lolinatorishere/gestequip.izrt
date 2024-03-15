@@ -1,14 +1,13 @@
 <?php
-$form_title_class = "h3 mb-3 font-weight-normal";
 function make_form($form_config , $form_action , $form_method , $form_inputs){
     
     $form_class = $form_config["form_class"];
     $form_title_class = $form_config["form_title_class"];
     $form_title = $form_config["form_title"];
-    $form_container = $form_config["form_container"];
-    $ret = ("
-    <div class=\"$form_container> <!-- This is the container for the form -->
-        <form 
+    $button_div_class = $form_config["button_div_class"];
+    $form_div_class = $form_config["form_div_class"];
+
+    $ret = ("<form 
         class=\"$form_class\" 
         action=\"$form_action\" 
         method=\"$form_method\"
@@ -22,7 +21,7 @@ function make_form($form_config , $form_action , $form_method , $form_inputs){
         }
         if(isset($form_inputs["form_input"])){
             $ret .=("
-            <div class=\"$form_inputs[input_seperator]\">
+            <div class=\"$form_div_class\">
             ");
             foreach($form_inputs["form_input"] as $input){
                 $ret .= ("
@@ -32,7 +31,7 @@ function make_form($form_config , $form_action , $form_method , $form_inputs){
                 >
                     $input[label_text]
                 </label>
-                <div class=\"form-floating-mb2\">
+                <div class=\"form-floating-mb2 pb-2\">
                     <input ");
                     if(isset($input["input_type"]))
                         $ret .= ("type=\"$input[input_type]\"");
@@ -57,7 +56,7 @@ function make_form($form_config , $form_action , $form_method , $form_inputs){
         }
         if(isset($form_inputs["button"])){
             $ret .= ("
-                <div class=\"$form_inputs[button_seperator]\">
+                <div class=\"$button_div_class\"> 
             ");
             foreach($form_inputs["button"] as $buttons){
                 $ret .= ("
@@ -77,7 +76,7 @@ function make_form($form_config , $form_action , $form_method , $form_inputs){
             ");
         }
     $ret .= ("
-        </div> 
+        </form>
     ");
     return $ret;
 }

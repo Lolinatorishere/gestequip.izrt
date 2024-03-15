@@ -2,7 +2,7 @@
 function make_head($language , $page_name , $csspath){
     echo ("
     <!DOCTYPE html>
-    <html lang=\"$language\"
+    <html lang=\"$language\">
 
     <head>
         <meta charset=\"UTF-8\">

@@ -1,0 +1,27 @@
+/*div-center centers the content inside the div */
+.nav-text-config {
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+}
+.div-center {
+    justify-content: center;
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.nav-height {
+    height: 10vh;
+}
+
+.body-height {
+    height: 90vh;
+}
+
+.custom-login-height{
+    height: 30%;
+}
