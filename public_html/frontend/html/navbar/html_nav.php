@@ -1,62 +1,52 @@
 <?php
 // This function generates a navigation bar with given configurations and links
-function make_navbar($nav_conf , $nav_links){
+function make_navbar($navbar_content){
     
-    // Extracting configuration for navigation tag, div and title from the passed configuration array
-    $navtag_conf = $nav_conf["navtag_conf"];
-    $div_conf = $nav_conf["div_conf"];
-    $title_conf = $nav_conf["title_conf"];
-
     // Starting to $ret .=  out the HTML for the navigation bar
     $ret = ("
-    <nav class=\"navbar $navtag_conf\">    
-        <div class=\"$div_conf\">
-            <div class=\"container \">
-                <a class=\"$title_conf[title_class]\" href=\"$title_conf[title_href]\">
-                    $title_conf[title_text]  <!-- This is where the title of the navigation bar goes -->
-                </a>
-            </div>
-            <div 
-                class=\"collapse navbar-collapse\"
-                id=\"navbarCollapse\">
-            </div>
-            <div>");
-    // Looping through each navigation link item
-    if($nav_conf ["links"] === true){
-        $ret .= ("
-                <ul class=\"$nav_links[ul_class]\">
-        ");
-        foreach($nav_links["li_items"] as $item){
-            $ret .= (   //gets the li_class and a_class from the array and sets
-                    //those items to the class attribute of the li and a tags
-                    "
-                    <li class=\"$item[li_class]\">
-                        <a class=\"$item[a_class]
-                        ". 
-                        // This function checks if the current link is the active link
-                        active_link($item, $nav_conf) 
-                        .
-                        // prints the link and the text
-                        " 
-                        \" href=\"$item[a_href]\">
-                            $item[a_text]  
-                        </a>
-                    </li>
+    <nav class=\"navbar\">
+            <div class=\"navdiv\">");
+        for($i = 0 ; $i < count($navbar_content); $i++){
+            $ret .=("
+                $navbar_content[$i]
             ");
         }
-    }   
     $ret .= ("
-                    </ul>  <!-- End of the list for the navigation links -->
             </div>
-            <div
-        </div>
     </nav>  <!-- End of the navigation bar -->
     ");
+return $ret;
+}
+    // Looping through each navigation link item
+function make_links($list_links){
+    $current_link = $list_links["current_link"];
+    $ret = ("<ul class=\"$list_links[ul_class]\">");
+    foreach($list_links["li_items"] as $item){
+        $ret .= (   
+            //gets the li_class and a_class from the array and sets
+            //those items to the class attribute of the li and a tags
+            "
+            <li class=\"$item[li_class]\">
+                <a class=\"$item[a_class]
+                "
+                . 
+                // This function checks if the current link is the active link
+                active_link($item, $current_link) 
+                .
+                // prints the link and the text
+                " 
+                \" href=\"$item[a_href]\">
+                    $item[a_text]  
+                </a>
+            </li>
+        ");
+    }
+    $ret .= ("</ul>");
     return $ret;
 }   
 
-function active_link($item, $nav_conf){
-    if($item["a_text"] === $nav_conf["current_link"]){
+function active_link($item, $current_link){
+    if($item["a_text"] === $current_link){
         return("active");
     }
 }

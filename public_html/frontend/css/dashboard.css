@@ -1,0 +1,48 @@
+*{
+    text-decoration: none;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.navbar{
+    height: 10vh;
+    background-color: #f8f9fa;
+    font-family: "Roboto Slab", serif;
+    font-weight: 700;
+    padding-left: 3%;
+    padding-right: 3%;
+}
+
+.navdiv{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navdiv h1{
+    font-size: 2.2rem;
+    color: #343a40;
+}
+
+.navdiv li{
+    list-style: none;
+    display: inline;
+    padding: 10px;
+}
+.navlink {
+    color: #343a40;
+    font-size: 1.2rem;
+    font-weight: 500;
+} 
+
+.profile{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

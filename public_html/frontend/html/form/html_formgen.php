@@ -6,7 +6,7 @@ function make_form($form_config , $form_action , $form_method , $form_inputs){
     $form_title = $form_config["form_title"];
     $button_div_class = $form_config["button_div_class"];
     $form_div_class = $form_config["form_div_class"];
-
+    $input_list_class = $form_config["input_list_class"];
     $ret = ("<form 
         class=\"$form_class\" 
         action=\"$form_action\" 
@@ -31,7 +31,6 @@ function make_form($form_config , $form_action , $form_method , $form_inputs){
                 >
                     $input[label_text]
                 </label>
-                <div class=\"form-floating-mb2 pb-2\">
                     <input ");
                     if(isset($input["input_type"]))
                         $ret .= ("type=\"$input[input_type]\"");
@@ -47,8 +46,7 @@ function make_form($form_config , $form_action , $form_method , $form_inputs){
                         $ret .= ("maxlength=\"$input[input_maxlength]\"");
                     if(isset($input["input_autofocus"]))
                         $ret .= ("autofocus=\"$input[input_autofocus]\"");
-                    $ret .= (">
-                </div>");
+                    $ret .= (">");
             }
             $ret .= ("
             </div>
