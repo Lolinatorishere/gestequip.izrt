@@ -17,7 +17,7 @@ function make_navbar($navbar_content){
     ");
 return $ret;
 }
-    // Looping through each navigation link item
+
 function make_links($list_links){
     $current_link = $list_links["current_link"];
     $ret = ("<ul class=\"$list_links[ul_class]\">");
