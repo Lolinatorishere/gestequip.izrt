@@ -14,13 +14,15 @@ body{
     flex-direction: column;
     height: 100%;
 }
+
 .navbar{
     height: fit-content;
     background-color: rgb(239, 239, 239);
     font-family: "Roboto Slab", serif;
+    min-height: 3.5rem;
     font-weight: 700;
-    padding-left: 5px;
-    padding-right: 3%;
+    padding-left: 0.4rem;
+    padding-right: 3rem;
 }
 
 .navdiv{
@@ -28,17 +30,6 @@ body{
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.navdiv h1{
-    font-size: 2.2rem;
-    color: #343a40;
-}
-
-.navdiv li{
-    list-style: none;
-    display: inline;
-    padding: 10px;
 }
 
 .navlink {
@@ -56,9 +47,9 @@ body{
 }
 
 .search-bar{
-    max-width: 174px;
-    height: 30px;
-    border-radius: 10px;
+    max-width: 11rem;
+    height: 2rem;
+    border-radius: 0.6rem;
     font-size: 1.2rem;
 }
 
@@ -66,43 +57,66 @@ body{
     background-color: #6c757d;
     color: white;
     border: none;
-    border-radius: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
+    border-radius: 0.6rem;
+    padding: 0.7rem;
 }
 
 .search-button:hover{
     background-color: #343a40;
 }
 
-.profile{
+.profile-div{
     display: flex;
-    flex-direction: row;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
 }
 
-.profile-name{
-    font-size: 1.2rem;
+.profile-username{
+    margin: 0px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 2rem;
     font-weight: 500;
     color: #343a40;
 }
 
-.logout-button{
+.profile-dropdown{
+    display: none;
+    position:absolute;
     background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 7px;
-    padding-left: 15px;
-    padding-right: 15px;
-    margin-left: 10px;
+    border-radius: 0.4rem  0.4rem 0.4rem 0.4rem;
+    box-shadow: 3px 3px 5px #222629;
+    top: 3rem; 
 }
 
-.logout-button:hover{
+.profile-dropdown p{
+    margin: 0px;
+}
+
+.profile-dropdown-item{
+    user-select: none;
+    display: block;
+    color: white;
+    font-size: 0.8rem;
+    padding: 0.5rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+
+
+.profile-dropdown-item:hover{
     background-color: #343a40;
+}
+
+#profile-user-type:hover{
+    cursor: default;
+    background-color: #6c757d;
+    border-radius: 0.4rem;
+}
+
+#profile-logout-button:hover{
+    background-color: #803636;
+    border-radius: 0px 0px 0.4rem 0.4rem;
 }
 
 .under-navbar-content{
@@ -113,26 +127,47 @@ body{
 
 .sidebar{
     background-color: rgb(239, 239, 239);
-    max-width: 250px;
     color: white;
-    width: 250px;
+    width: 16rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
 }
 
-.sidebar a{
+.sidebar p{
     color: #343a40;
     text-decoration: none;
 }
 
 .sidebar-item{
-    padding-top: 10px;
-    padding-bottom: 10px;
-    font-size: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    font-size: 1.3rem;
     font-weight: 500;
 }
 
 #first-sidebar-item{
-    padding-top: 30px;
+    padding-top: 2rem;
+}
+
+.sidebar-content{
+    padding-left: 1.75rem;
+    padding-right: 3.5rem;
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 1.5rem;
+}
+
+.sidebar-content-icon{
+    padding-right: 1rem;
+    color: #343a40;
+}
+.main-content{
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
 }

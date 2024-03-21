@@ -5,13 +5,18 @@ frontend: ui and the respective links
   [x] add hover effect to login button
   [] change the look to be more professional.
   [x] set up the buttons to work properly in terms of sending a form
-[] dashboard
-  [] "functional" navbar
+  that searches for the component the person was looking for
+[x] dashboard
+  [x] "functional" navbar
     [x] profile component in correct orientation
     Username closer to the center and logout to the side
     [x] profile logout
     [x] search bar
   [x] "functional" sidebar
+    [x] links "working"
+    [x] specific icons per page
+  [] Page content
+    [] appear on the 
 [] profile page 
   [] shows the username
   [] shows the email registered
@@ -31,3 +36,8 @@ frontend: ui and the respective links
   [] shows the groups and their currunt users
   (this only applies to certain levels of access, a user with little to no permissions
   can only see the groups they are part of meanwhile admins can see all the groups)
+[] Users 
+  shows all the users in the system or which are inside the groups the user is part of.
+[] Equipment
+  [] shows a page that allows people with the correct permissions to see the equipment list
+  and search for specifics
