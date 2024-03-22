@@ -16,7 +16,9 @@ frontend: ui and the respective links
     [x] links "working"
     [x] specific icons per page
   [] Page content
-    [] appear on the 
+    [] appear the users name with a greeting like hello "username"
+    [] a small tab with the ammount of notifications the user has and how many are "critical"
+    []
 [] profile page 
   [] shows the username
   [] shows the email registered
@@ -41,3 +43,13 @@ frontend: ui and the respective links
 [] Equipment
   [] shows a page that allows people with the correct permissions to see the equipment list
   and search for specifics
+  [] depending on the users type, they can add new types of equipment into the system and
+  new individual items to the specific 
+[] Reports
+  [] Registration Report: Generates a report detailing the complete details of each piece of equipment,
+    including model, serial number, acquisition date, and other relevant additional information.
+  [] Assignment Report: facilitates the assignment of specific equipment to people in the company,
+    associating them with corresponding employees or departments.
+  []  History Report: Generates a detailed record of all equipment assignments,
+    allowing tracking of when a piece of equipment was assigned,
+    to whom, and for how long.

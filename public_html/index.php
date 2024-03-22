@@ -6,6 +6,7 @@
     $language = "en";
     $page_name = "Gestor Equipamentos";
     $css_path = "/frontend/css/index.css";
+    $js_path = ""; // not necessary to input because this page doesnt require js files
 
     $form_action = "/pages/dashboard.php";
     $form_method = "post";
@@ -49,7 +50,7 @@
     );
 
 // website starts here:
-make_head($language , $page_name , $css_path);
+make_head($language , $page_name , $css_path , $js_path);
     echo("<body>");
         echo(make_div(
             $div_conf = "form-positioner" ,

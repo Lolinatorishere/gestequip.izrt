@@ -7,7 +7,7 @@ include_once __DIR__."/../frontend/html/form/html_formgen.php";
 $language = "en";
 $page_name = "Dashboard";
 $css_path = "../frontend/css/dashboard.css";
-
+$js_path = "";
 $profile = ("
     <div class=\"profile-div\">
         <p class=\"profile-username\">Username </p>
@@ -15,7 +15,6 @@ $profile = ("
             <p href=\"\" class=\"profile-dropdown-item\" id=\"profile-user-type\">
                 UserType
             </p>
-            <a href=\"\" class=\"profile-dropdown-item\">Profile</a>
             <a href=\"\" class=\"profile-dropdown-item\">Settings</a>
             <a href=\"\" class=\"profile-dropdown-item\">Help</a>
             <a href=\"\" class=\"profile-dropdown-item\" id=\"profile-logout-button\">
@@ -23,45 +22,21 @@ $profile = ("
             </a>
         </a>
     </div>
-    <script>
-    var dropdown = document.querySelector('.profile-dropdown');
-    var profileUsername = document.querySelector('.profile-username');
-    
-    profileUsername.addEventListener('click', function(event) {
-        event.stopPropagation();
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    });
-    
-    document.addEventListener('click', function(event) {
-        var isClickInside = profileUsername.contains(event.target) || dropdown.contains(event.target);
-        if (!isClickInside) {
-            dropdown.style.display = 'none';
-        }
-    });
-    </script>
-");
+    ");
 
 $form_config = array(
-    "form_container" => "",
     "form_class" => "search-form",
-    "form_title_class" => "",
-    "form_title" => "",
     "form_div_class" => "form-input-container",
     "button_div_class" => "button-input-container",
 );
 
 $form_input_array = array(
-    "label_for" => array(""),
-    "label_class" => array("" , ""),
-    "label_text" => array("" ,""),
     "label_for" => array("input-search"),
     "input_type" => array("text"),
     "input_id" => array("input-search"),
     "input_class" => array("search-bar"),
-    "input_placeholder" => array(""),
     "input_required" => array("false"),
     "input_maxlength" => array("50"),
-    "input_autofocus" => array("") 
 );
 
 $form_button_array = array(
@@ -76,8 +51,6 @@ $form_button_array = array(
 $form_inputs =  array(
     "form_input" => make_form_inputs($form_input_array),
     "button" => make_form_buttons($form_button_array),
-    "input_seperator" => "",
-    "button_seperator" => ""
 );
 
 $search = make_form(
@@ -87,13 +60,15 @@ $search = make_form(
     $form_inputs
 );
 
+
 $navbar = array($search , $profile);
-make_head($language , $page_name , $css_path);
+make_head($language , $page_name , $css_path , $js_path);
 ?>
     <body>
     <div class="body-container">
         <?php 
         echo(make_navbar($navbar));
+        echo("<script src=\"../frontend/js/navbar/profile_dropdown.js\"></script>");
         ?>
         <div class="under-navbar-content">
             <div class="sidebar">
@@ -160,8 +135,86 @@ make_head($language , $page_name , $css_path);
                 </div>
             </div>
             <div class="main-content">
-                <p>content chop</p>
+                <div class="main-content-top">
+                    <div class="main-content-positioner-top-left">
+                        <div class="top-left-userinfo">
+                            <div 
+                            class="top-left-item-userinfo"
+                            id = "first-top-left-item-userinfo">
+                                <div class="top-left-item-icon-userinfo">
+                                    <span class="material-symbols-outlined">
+                                        account_circle
+                                    </span>
+                                </div>
+                                <div class="top-left-item-text-userinfo">
+                                    <p class="top-right-item-text-title">
+                                        Users
+                                    </p>
+                                    <p class="top-left-item-text-number">
+                                        0
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="main-content-positioner-top-right">
+                        <div class="top-right-notifications"
+                        id="notification-bar">
+                            <div class="top-right-notifications-title">
+                                <span class="material-symbols-outlined">
+                                    notifications
+                                </span>
+                                <p class="top-right-notifications-title-text">
+                                    Notifications
+                            </div>
+                        </div>
+                        <div class="top-right-totals">
+                            <div class="top-right-totals-title">
+                                    Totals 
+                            </div>
+                            <div 
+                            class="top-right-item-totals"
+                            id = "first-top-right-item-totals">
+                                <div class="top-right-item-icon-totals">
+                                    <span class="material-symbols-outlined">
+                                        account_circle
+                                    </span>
+                                </div>
+                                <div class="top-right-item-text-totals">
+                                    <p class="text-totals-name">
+                                        Users
+                                    </p>
+                                    <p class="text-totals-number">
+                                        0
+                                    </p>
+                                </div>
+                            </div> 
+                            <div class="top-right-item-totals">
+                                <div class="top-right-item-icon">
+                                    <span class="material-symbols-outlined">
+                                        computer
+                                    </span>
+                                </div>
+                                <div class="top-right-item-text-totals">
+                                    <p class="top-right-item-text-title">
+                                        Equipment
+                                    </p>
+                                    <p class="top-right-item-text-number">
+                                        0
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-content-bottom">
+                    <div class="main-content-bottom-positioner">
+                        <div class="bottom-temporary">
+                            content chop
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
     </body>
 </html>
