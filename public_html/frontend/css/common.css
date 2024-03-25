@@ -1,0 +1,28 @@
+*{
+    text-decoration: none;
+}
+
+body{
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    min-height: fit-content;
+}
+
+.body-container{
+    display: flex;
+    flex-direction: column;
+    min-height: fit-content;
+    height: 100%;
+}
+
+.main-content{
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+

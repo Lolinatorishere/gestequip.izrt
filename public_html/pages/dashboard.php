@@ -4,7 +4,8 @@ include_once __DIR__."/../frontend/html/navbar/html_nav.php";
 
 $language = "en";
 $page_name = "Dashboard";
-$css_path = array("../frontend/css/pages/dashboard.css",
+$css_path = array("../frontend/css/common.css",
+                  "../frontend/css/pages/dashboard.css",
                   "../frontend/css/sidebar/sidebar.css",
                   "../frontend/css/navbar/navbar.css");
 $js_path = "";
