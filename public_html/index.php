@@ -48,16 +48,12 @@
         "input_seperator" => "",
         "button_seperator" => ""
     );
+?>
 
-// website starts here:
-make_head($language , $page_name , $css_path , $js_path);
-    echo("<body>");
-        echo(make_div(
-            $div_conf = "form-positioner" ,
-            make_form($form_config , $form_action , $form_method , $form_inputs)
-    ));
-    echo("
+<?=make_head($language , $page_name , $css_path , $js_path)?>
+    <body>
+        <div class="form-positioner">
+            <?=make_form($form_config , $form_action , $form_method , $form_inputs)?>
+        </div>
     </body>
 </html>
-");
-?>

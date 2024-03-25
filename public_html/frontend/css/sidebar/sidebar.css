@@ -1,0 +1,47 @@
+.sidebar{
+    background-color: rgb(239, 239, 239);
+    color: white;
+    width: 16rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar p{
+    text-decoration: none;
+}
+
+.sidebar-item{
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+#first-sidebar-item{
+    padding-top: 2rem;
+}
+
+.sidebar-content{
+    margin-left: 1rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 1.5rem;
+    color: #343a40;
+}
+
+.sidebar-content-icon{
+    padding-right: 0.5rem;
+}
+
+#current-page{
+    margin-left: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 0.3rem;
+    background-color: rgb(170, 170, 170);
+    color: rgb(255, 255, 255);
+}

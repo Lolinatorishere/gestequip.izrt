@@ -6,7 +6,9 @@ include_once __DIR__."/../frontend/html/form/html_formgen.php";
 
 $language = "en";
 $page_name = "Dashboard";
-$css_path = "../frontend/css/dashboard.css";
+$css_path = array("../frontend/css/pages/dashboard.css",
+                  "../frontend/css/sidebar/sidebar.css",
+                  "../frontend/css/navbar/navbar.css");
 $js_path = "";
 $profile = ("
     <div class=\"profile-div\">
@@ -66,74 +68,10 @@ make_head($language , $page_name , $css_path , $js_path);
 ?>
     <body>
     <div class="body-container">
-        <?php 
-        echo(make_navbar($navbar));
-        echo("<script src=\"../frontend/js/navbar/profile_dropdown.js\"></script>");
-        ?>
+        <?=make_navbar($navbar)?>
+        <?="<script src=\"../frontend/js/navbar/profile_dropdown.js\"></script>"?>
         <div class="under-navbar-content">
-            <div class="sidebar">
-                <div class="sidebar-item" id="first-sidebar-item">
-                    <a href="">
-                    <div 
-                    class="sidebar-content">
-                        <span class="material-symbols-outlined sidebar-content-icon">
-                            dashboard
-                        </span>
-                        <p class="sidebar-content-text">Dashboard</p>                    
-                    </div>
-                    </a>
-                </div>
-                <div class="sidebar-item"> 
-                    <a href="">
-                    <div class="sidebar-content">
-                        <span class="material-symbols-outlined sidebar-content-icon">
-                            account_circle
-                        </span>
-                        <p class="sidebar-content-text">Profile</p>
-                    </div>
-                    </a>
-                </div>
-                <div class="sidebar-item"> 
-                    <a href="">
-                    <div class="sidebar-content">
-                        <span class="material-symbols-outlined sidebar-content-icon">
-                            notifications
-                        </span>
-                        <p class="sidebar-content-text">Notifications</p>
-                    </div>
-                    </a>
-                </div>
-                <div class="sidebar-item"> 
-                    <a href="">
-                    <div class="sidebar-content">
-                        <span class="material-symbols-outlined sidebar-content-icon">
-                            event_list
-                        </span>
-                        <p class="sidebar-content-text">Groups</p>
-                    </div>
-                    </a>
-                </div>
-                <div class="sidebar-item"> 
-                    <a href="">
-                    <div class="sidebar-content">
-                        <span class="material-symbols-outlined sidebar-content-icon">
-                            group
-                        </span>
-                        <p class="sidebar-content-text">Users</p>
-                    </div>
-                    </a>
-                </div>
-                <div class="sidebar-item"> 
-                    <a href="">
-                    <div class="sidebar-content">
-                        <span class="material-symbols-outlined sidebar-content-icon">
-                            computer 
-                        </span>
-                        <p class="sidebar-content-text">Equipment</p>
-                    </div>
-                    </a>
-                </div>
-            </div>
+            <?php include_once __DIR__."/../frontend/html/sidebar/sidebar.php"?>
             <div class="main-content">
                 <div class="main-content-top">
                     <div class="main-content-positioner-top-left">
