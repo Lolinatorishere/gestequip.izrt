@@ -12,12 +12,18 @@ $js_path = "";
 make_head($language , $page_name , $css_path , $js_path);
 $navbar = "default";
 ?>
-<body>
-<div class="body-container">
-        <?=make_navbar($navbar)?>
-        <?="<script src=\"../frontend/js/navbar/profile_dropdown.js\"></script>"?>
-        <div class="under-navbar-content">
-            <?php include_once __DIR__."/../frontend/html/sidebar/sidebar.php"?>
+
+    <body>
+        <div class="body-container">
+            <?=make_navbar($navbar)?>
+            <?="<script src=\"../frontend/js/navbar/profile_dropdown.js\"></script>"?>
+            <div class="under-navbar-content">
+                <?php include_once __DIR__."/../frontend/html/sidebar/sidebar.php"?>
+                <div class="main-content-corner">
+                    <div class="main-content">
+
+                </div>
+            </div>
         </div>
     </body>
 </html>

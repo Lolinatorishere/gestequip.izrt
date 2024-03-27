@@ -101,10 +101,3 @@
     background-color: #803636;
     border-radius: 0px 0px 0.4rem 0.4rem;
 }
-
-.under-navbar-content{
-    background-color: rgb(229, 228, 228);
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-}
