@@ -1,7 +1,8 @@
 <?php
-    require_once __dir__."/frontend/html/html_head.php";
-    require_once __dir__."/frontend/html/form/html_formgen.php";
-    require_once __dir__."/frontend/html/div_gen.php";
+    require_once __DIR__."/backend/login/session_login.php";
+    require_once __DIR__."/frontend/html/html_head.php";
+    require_once __DIR__."/frontend/html/form/html_formgen.php";
+    require_once __DIR__."/frontend/html/div_gen.php";
 
     $language = "en";
     $page_name = "Gestor Equipamentos";
@@ -53,7 +54,34 @@
 <?=make_head($language , $page_name , $css_path , $js_path)?>
     <body>
         <div class="form-positioner">
-            <?=make_form($form_config , $form_action , $form_method , $form_inputs)?>
+            <form class="sign-in-form" action="<?=htmlspecialchars($_SERVER["PHP_SELF"])?>" method="post">
+                <h1 class="form-title">
+                    Please sign in
+                </h1>
+                <div class="form-input-container">
+                    <label for="inputEmail" class="">
+                    </label>
+                        <input type="text" name="email" id="inputEmail" class="form-input" placeholder="Email address" required="true" maxlength="50 " autofocus="true ">
+                        <label for="inputPassword" class="">
+                    </label>
+                        <input type="password" name="password" id="inputPassword" class="form-input" placeholder="Password" required="true" maxlength="" autofocus="">
+                </div>
+                <div class="button-input-container"> 
+                    <button href="" class="login-button" type="submit" name="submit" value="submit">
+                        Sign in
+                    </button>
+                </div> 
+                <?php
+                    if(!empty($error_message))
+                    echo("
+                        <div class=\"error-message\">
+                            <p>
+                                $error_message
+                            </p>
+                        </div>
+                    ");
+                ?>
+           </form>
         </div>
     </body>
 </html>

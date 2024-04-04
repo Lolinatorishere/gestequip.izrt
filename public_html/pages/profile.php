@@ -23,7 +23,7 @@ make_head($language , $page_name , $css_path , $js_path);
             <div class="main-content-corner">
                 <div class="main-content">
                     <div class="profile-content">
-
+                        
                     </div>
                 </div>
             </div>
