@@ -64,8 +64,7 @@ function login_check($pdo , $errors , $email , $password ){
     $username = $row["username"];
     $users_name = $row["users_name"];
     if(!(password_verify($password , $hashed_password)))
-        return $login_err . $hashed_password;
-
+        return $login_err;
     session_start();
     $_SESSION["logged_in"] = true;
     $_SESSION["id"] = $id;

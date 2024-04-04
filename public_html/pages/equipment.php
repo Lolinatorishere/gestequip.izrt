@@ -1,4 +1,5 @@
 <?php
+include_once __DIR__."/../backend/session/check.php";
 include_once __DIR__."/../frontend/html/html_head.php";
 include_once __DIR__."/../frontend/html/navbar/html_nav.php";
 

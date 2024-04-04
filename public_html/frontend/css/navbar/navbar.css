@@ -97,6 +97,10 @@
     border-radius: 0.4rem;
 }
 
+#first-profile-item:hover{
+    border-radius: 0.4rem 0.4rem 0px 0px;
+}
+
 #profile-logout-button:hover{
     background-color: #803636;
     border-radius: 0px 0px 0.4rem 0.4rem;

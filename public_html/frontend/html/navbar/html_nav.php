@@ -5,14 +5,23 @@ include_once __DIR__."/../form/html_formgen.php";
 function defaults(){
 $profile = ("
     <div class=\"profile-div\">
-        <p class=\"profile-username\">Username </p>
-        <div class=\"profile-dropdown\">
-            <p href=\"\" class=\"profile-dropdown-item\" id=\"profile-user-type\">
-                UserType
-            </p>
-            <a href=\"\" class=\"profile-dropdown-item\">Settings</a>
+        <p class=\"profile-username\">" . $_SESSION["users_name"] . "</p>
+        <div class=\"profile-dropdown\">");
+            if(isset($_SESSION["user_type"])){
+                $profile .= ("
+                    <p href=\"\" class=\"profile-dropdown-item\" id=\"profile-user-type\">
+                        " . $_SESSION["user_type"] . "
+                    </p>
+                ");
+            }
+            $profile .= ("
+            <a href=\"\" class=\"profile-dropdown-item\" ");
+            if(!(isset($_SESSION["user_type"]))){
+                $profile .= ("id=\"first-profile-item\"");
+            }
+            $profile .= (">Settings</a>
             <a href=\"\" class=\"profile-dropdown-item\">Help</a>
-            <a href=\"\" class=\"profile-dropdown-item\" id=\"profile-logout-button\">
+            <a href=\"\..\backend\session\uncheck.php\" class=\"profile-dropdown-item\" id=\"profile-logout-button\">
                 Sign out
             </a>
         </a>
