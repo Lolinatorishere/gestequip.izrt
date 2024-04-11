@@ -1,12 +1,11 @@
 <?php
-include_once __DIR__."/../backend/session/check.php";
 include_once __DIR__."/../frontend/html/html_head.php";
 include_once __DIR__."/../frontend/html/navbar/html_nav.php";
 include_once __DIR__."/../frontend/html/div_gen.php";
 include_once __DIR__."/../frontend/html/form/html_formgen.php";
 
 $language = "en";
-$page_name = "Dashboard";
+$page_name = "Groups";
 $css_path = array("../frontend/css/common.css",
                   "../frontend/css/sidebar/sidebar.css",
                   "../frontend/css/navbar/navbar.css");

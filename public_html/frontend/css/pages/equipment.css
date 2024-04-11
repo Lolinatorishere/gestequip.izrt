@@ -1,0 +1,14 @@
+
+.main-content-top{
+    display: flex;
+    direction: row;
+    width: 100%;
+    height: 50%;
+}
+
+.main-content-bottom{
+    display: flex;
+    direction: row;
+    width: 100%;
+    height: 50%;
+}

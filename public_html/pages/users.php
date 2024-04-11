@@ -1,10 +1,9 @@
 <?php
-include_once __DIR__."/../backend/session/check.php";
 include_once __DIR__."/../frontend/html/html_head.php";
 include_once __DIR__."/../frontend/html/navbar/html_nav.php";
 
 $language = "en";
-$page_name = "Dashboard";
+$page_name = "Users";
 $css_path = array("../frontend/css/common.css",
                   "../frontend/css/sidebar/sidebar.css",
                   "../frontend/css/navbar/navbar.css");

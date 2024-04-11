@@ -4,4 +4,24 @@
     width: 97.5%;
     border-radius: 0.5rem;
     background-color: white;
+    display: flex;
+    flex-direction: row;
+}
+
+.content-first{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    height: 100%;
+    width: 50%;
+}
+
+.top-profile{
+    margin-top: 1rem;
+    margin-left: 1rem;
+    height: 35%;
+    background-color: #dcf0ff;
+    border-radius: 1rem;
+    box-shadow: 10;
+    width: 10px 10px 5px grey;
 }

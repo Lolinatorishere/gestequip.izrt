@@ -1,10 +1,9 @@
 <?php
-include_once __DIR__."/../backend/session/check.php";
 include_once __DIR__."/../frontend/html/html_head.php";
 include_once __DIR__."/../frontend/html/navbar/html_nav.php";
 
 $language = "en";
-$page_name = "Dashboard";
+$page_name = "Profile";
 $css_path = array("../frontend/css/common.css",
                   "../frontend/css/pages/profile.css",
                   "../frontend/css/sidebar/sidebar.css",
@@ -24,7 +23,14 @@ make_head($language , $page_name , $css_path , $js_path);
             <div class="main-content-corner">
                 <div class="main-content">
                     <div class="profile-content">
-                        
+                        <div class="content-first">
+                            <div class="top-profile">
+                                <?php
+                                    // print_r($_SESSION);
+
+                                ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

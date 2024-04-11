@@ -9,6 +9,7 @@ $error_message = "";
 $email = "";
 $password = "";
 $errors[2];
+
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty(trim($_POST["email"]))){
         $errors[0] = "Please enter an Email";
@@ -27,7 +28,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 }
 
 function login_check($pdo , $errors , $email , $password ){
-    $login_err = "Invalid Username or Password";
+
+    $login_err = "Invalid Email or Password";
     $sql_error = "Well thats weird, Something didnt go well.<br> Try again Later.";
     $param_email = $_POST["email"];
     $sql ="SELECT id, email, pass, account_status, username, users_name
@@ -44,7 +46,8 @@ function login_check($pdo , $errors , $email , $password ){
         return $sql_error;
     
     $statement->bindParam(1 , $param_email, PDO::PARAM_STR);
-    $param_email = trim($_POST["email"]); $statement->execute();
+    $param_email = trim($_POST["email"]);
+    $statement->execute();
 
     if(!$statement)
         return $sql_error;
@@ -52,26 +55,44 @@ function login_check($pdo , $errors , $email , $password ){
         return $login_err;
 
     $row = $statement->fetch();
+
     if(!$row)
         return $sql_error;
-
     if($row["account_status"] == 0)
         return "Your User has been Deactivated\n Call Support if you Think this was an Error";
 
-    $id = $row["id"];
-    $email = $row["email"];
     $hashed_password = $row["pass"];
-    $username = $row["username"];
-    $users_name = $row["users_name"];
     if(!(password_verify($password , $hashed_password)))
         return $login_err;
-    session_start();
+    $statement->execute();
+
+    $id = $row["id"];
+    $email = $row["email"];
+    $username = $row["username"];
+    $users_name = $row["users_name"];
+
+    $sql = "SELECT * FROM sudo_group WHERE id_user = ?";
+    $statement = $pdo->prepare($sql);
+    if(!$statement)
+        return $sql_error;
+    $statement->bindParam(1 , $id, PDO::PARAM_STR);
+    $statement->execute();
+
+    if($statement->rowCount() == 1){
+        $row = $statement->fetch();
+        if($row["admin_status"] == 1){
+            $is_admin = 1;
+        }
+    }
+        session_start();
     $_SESSION["logged_in"] = true;
     $_SESSION["id"] = $id;
     $_SESSION["email"] = $email;
     $_SESSION["username"] = $username;
     $_SESSION["users_name"] = $users_name;
-
+    if($is_admin == 1){
+        $_SESSION["user_type"] = "Admin";
+    }
     header("Location: /pages/dashboard.php");
 }
 ?>
