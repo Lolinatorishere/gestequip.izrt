@@ -1,0 +1,80 @@
+-- INSERT INTO equipment (
+--     registration_lock,
+--     equipment_type,
+--     delivery_status,
+--     purchase_date,
+--     brand,
+--     serial_number,
+--     equipment_status
+--   )
+-- VALUES (
+--     '1',
+--     1,
+--     1,
+--     '2009-04-20',
+--     'lenovo',
+--     'LeN5a90e2j22i99',
+--     0
+--   );
+
+-- INSERT INTO computers (
+    -- equipment_id,
+    -- business_unit,
+    -- computer_model,
+    -- computer_type,
+    -- os,
+    -- has_battery,
+    -- ram,
+    -- psu,
+    -- cpu,
+    -- drives,
+    -- gpu,
+    -- mac_address
+  -- )
+-- VALUES (
+    -- 5,
+    -- 'Izertis Es',
+    -- 'Lenovo ThinkPad SL510',
+    -- 1,
+    -- 'windows 7',
+    -- '1',
+    -- '3gb,ddr3',
+    -- 'external power charger 80w',
+    -- 'intel core,i5-3317U Dual Core',
+    -- '320GB,hdd',
+    -- 'intel HD Graphics 1000',
+    -- '4736816c67e9'
+  -- );
+
+-- INSERT INTO users_inside_groups_equipments (
+    -- user_id,
+    -- group_id,
+    -- equipment_id,
+    -- user_permission_level,
+    -- `status`
+  -- )
+-- VALUES (
+    -- 1,
+    -- 1,
+    -- 3,
+    -- 0,
+    -- 0
+  -- );
+
+-- INSERT INTO user_groups ( group_name, group_type, group_status)
+-- VALUES (
+--     'The Industrial Revolution',
+--     2,
+--     1
+--   );
+
+-- INSERT INTO users_inside_groups (
+--     user_id,
+--     group_id,
+--     user_permission_level
+--   )
+-- VALUES (
+--     1,
+--     2,
+--     3
+--   );

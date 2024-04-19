@@ -1,3 +1,20 @@
+CREATE table if not EXISTS equipment(
+    id int NOT NULL AUTO_INCREMENT,
+    registration_date datetime DEFAULT CURRENT_TIMESTAMP,
+    registration_lock tinyint(1) DEFAULT NULL,
+    equipment_type int NOT NULL,
+    -- 0 delivered, 1 is in storage, 2 is ordered, 3 to be ordered
+    delivery_status int DEFAULT NULL,
+    purchase_date date DEFAULT NULL,
+    brand varchar(255) DEFAULT NULL,
+    serial_number text NOT NULL,
+    -- 0 is active the higher the int the closer to retirement
+    equipment_status int NOT NULL,
+    serial_md5 char(32) AS (md5(serial_number)) unique not null,
+    PRIMARY KEY (id),
+    CONSTRAINT equipment_ibfk_1 FOREIGN KEY (equipment_type) REFERENCES equipment_types (id)
+);
+
 create table if NOT EXISTS computers(
     id int not null auto_increment,
     equipment_id int not null unique,
@@ -70,24 +87,24 @@ CREATE TABLE IF NOT EXISTS user_groups(
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS users_groups(
-    id INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS users_inside_groups(
     user_id INT,
     group_id INT,
     user_permission_level INT NOT NULL,
-    PRIMARY KEY (id),
+    PRIMARY KEY (user_id, group_id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (group_id) REFERENCES user_groups(id)
 );
 
-CREATE TABLE IF NOT EXISTS users_groups_equipment(
-    id INT NOT NULL AUTO_INCREMENT,
-    usersgroups_id INT,
+CREATE TABLE IF NOT EXISTS users_inside_groups_equipments(
+    user_id INT,
+    group_id INT,
     equipment_id INT,
     user_permission_level INT NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (usersgroups_id) REFERENCES users_groups(id),
-    FOREIGN KEY (equipment_id) REFERENCES equipment(id)
+    status INT NOT NULL,
+    PRIMARY KEY (user_id, group_id , equipment_id),
+    constraint users_inside_groups_fk FOREIGN KEY (user_id, group_id) REFERENCES users_inside_groups(user_id, group_id),
+    constraint fk_equipment foreign key (equipment_id) references equipment(id)
 );
 
 CREATE TABLE IF NOT EXISTS user_logs(
@@ -98,3 +115,54 @@ CREATE TABLE IF NOT EXISTS user_logs(
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE OR REPLACE VIEW computer_equipment AS
+    SELECT 
+          e.id,
+          e.registration_date,
+          e.registration_lock,
+          e.equipment_type,
+          e.delivery_status,
+          e.purchase_date,
+          e.brand,
+          e.serial_number,
+          e.equipment_status,
+          c.id as computer_id,
+          c.business_unit,
+          c.computer_model,
+          c.computer_type,
+          c.os,
+          c.has_battery,
+          c.ram,
+          c.psu,
+          c.cpu,
+          c.drives,
+          c.gpu,
+          c.mac_address
+    from equipment e, computers c
+    where e.id = c.equipment_id;
+
+CREATE OR REPLACE VIEW phone_equipment AS
+    SELECT 
+          e.id,
+          e.registration_date,
+          e.registration_lock,
+          e.equipment_type,
+          e.delivery_status,
+          e.purchase_date,
+          e.brand,
+          e.serial_number,
+          e.equipment_status,
+          p.equipment_id,
+          p.holder,
+          p.phone_model,
+          p.phone_number,
+          p.country_code,
+          p.IMEI,
+          p.opperator,
+          p.mobile_data,
+          p.phone_plan_cost,
+          p.currency,
+          p.roaming
+    from equipment e, phones p
+    where e.id = p.equipment_id;

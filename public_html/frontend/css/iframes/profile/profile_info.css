@@ -1,0 +1,206 @@
+
+.profile-users-names{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 30%;
+}
+
+.profile-name{
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+}
+
+.profile-user-username{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.profile-user-username p{
+    font-family: "Roboto", sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0px;
+}
+
+.internal-title-name{
+    font-family: "Roboto", sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0px;
+    width: 35%;
+}
+
+.internal-name-horizontal{
+    font-family: "Roboto", sans-serif;
+    font-size: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
+.internal-name-vertical{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.internal-title-username{
+    font-family: "Roboto", sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0px;
+    width: 35%;
+}
+
+.internal-username-horizontal{
+    padding-top: 0.5rem;
+    font-family: "Roboto", sans-serif;
+    font-size: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}   
+
+.internal-username-vertical{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.profile-email-vertical{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 12%;
+}
+
+.profile-email{
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+}
+
+.internal-title-email{
+    font-family: "Roboto", sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 0px;
+    width: 35%;
+}
+
+.internal-email-horizontal{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 65%;
+}
+
+.internal-email-vertical{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.profile-phone-vertical{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 12%;
+}
+
+.profile-phone{
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+}
+
+.internal-title-phone{
+    font-family: "Roboto", sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 0px;
+    width: 35%;
+}
+
+.internal-phone-horizontal{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 65%;
+}
+
+.internal-phone-vertical{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.profile-acc-status-vertical{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 12%;
+}
+
+.profile-acc-status{
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+}
+
+.internal-title-acc-status{
+    font-family: "Roboto", sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0px;
+    width: 35%;
+    text-align: center;
+}
+
+.internal-acc-status-horizontal{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 65%;
+}
+
+.internal-acc-status-vertical{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.profile-reg-date{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 34%;
+}
+
+.internal-title-registration{
+    font-family: "Roboto", sans-serif;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.internal-reg-date{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
