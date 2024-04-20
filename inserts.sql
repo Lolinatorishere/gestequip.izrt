@@ -78,3 +78,67 @@
 --     2,
 --     3
 --   );
+
+-- INSERT INTO equipment_types (equipment_type)
+-- VALUES ( 'phone');
+
+-- INSERT INTO equipment (
+--     registration_lock,
+--     equipment_type,
+--     delivery_status,
+--     purchase_date,
+--     brand,
+--     serial_number,
+--     equipment_status
+--   )
+-- VALUES (
+--     '1',
+--     2,
+--     0,
+--     '2024-03-11',
+--     'Samsung',
+--     'Kw3Teuzfx7Fa4EXVEafD',
+--     0
+--   );
+
+-- INSERT INTO phones (
+--     equipment_id,
+--     holder,
+--     phone_model,
+--     phone_number,
+--     country_code,
+--     IMEI,
+--     opperator,
+--     mobile_data,
+--     phone_plan_cost,
+--     currency,
+--     roaming
+--   )
+-- VALUES (
+--     8,
+--     'somebody',
+--     'a52G',
+--     '133769420',
+--     '+351',
+--     '981109432344721',
+--     'meo',
+--     '5gb',
+--     '15',
+--     'euro',
+--     '1'
+--   );
+
+-- INSERT INTO users_inside_groups_equipments (
+--     user_id,
+--     group_id,
+--     equipment_id,
+--     user_permission_level,
+--     `status`  
+--   )
+-- VALUES (
+--   1,
+--   1,
+--   8,
+--   0,
+--   0
+--   );

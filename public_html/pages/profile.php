@@ -45,7 +45,10 @@ make_head($language, $page_name, $css_path, $js_path);
                                     </div>
                                 </div>
                             </div>
-    
+                            <?php 
+                                //todo fix the css for the items and then remove this reminder
+                                //why is it in php because i dont want it to be shown in the website
+                            ?>
                             <div class="groups-align-vertical">
                                 <div class="groups-align-horizontal">
                                     <div class="groups-profile">
@@ -55,7 +58,15 @@ make_head($language, $page_name, $css_path, $js_path);
                                     </div>
                                 </div>
                             </div>
-    
+                        </div>
+                        <div class="content-second">
+                            <div class="equipment-align-vertical">
+                                <div class="equipment-align-horizontal">
+                                    <div class="equipment-profile">
+                                        <iframe src="/frontend/iframes/profile/equipment_info.php" frameborder="0"></iframe>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div> 
                 </div>

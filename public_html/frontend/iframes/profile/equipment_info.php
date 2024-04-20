@@ -6,13 +6,13 @@ $language = "en";
 $page_name = "Profile";
 $css_path = array(
     "../../css/common.css",
-    "../../css/iframes/profile/profile_info.css"
+    "../../css/iframes/profile/equipment_info.css"
 );
 
 $js_path = "";
 
 make_head($language, $page_name, $css_path, $js_path);
-
+$user_equipment = get_user_equipments();
 $user_info = request_info();
 
 ?>
