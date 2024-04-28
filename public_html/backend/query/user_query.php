@@ -1,5 +1,7 @@
 <?php 
 
+// this function obtains the basic information of the user 
+
 function request_info(){
     require __DIR__."/../config/pdo_config.php";
     $sql_error = "";
@@ -32,6 +34,11 @@ function request_info(){
     $username = $profile["username"];
     $email = $profile["email"];
     $acc_status = $profile["account_status"];
+
+    // checks for if the phone number and regional indicator are set
+    // if they are set it concatenates the values to be easily readable by
+    // the frontend and returns "not set" if the either values arent set
+
     if(isset($profile["regional_indicator"]) && isset($profile["phone_number"])){
         $phone_number = $profile["regional_indicator"] .= " ";
         $phone_number .= strval($profile["phone_number"]);
@@ -40,10 +47,18 @@ function request_info(){
     }
     $reg_date = $profile["date_created"];
 
-    $ret = array('name' => $name , 'username' => $username , 'email' => $email , 'acc_status' => $acc_status , 'phone_number' => $phone_number , 'reg_date' => $reg_date );
+    $ret = array('name' => $name
+                ,'username' => $username 
+                ,'email' => $email 
+                ,'acc_status' => $acc_status 
+                ,'phone_number' => $phone_number 
+                ,'reg_date' => $reg_date );
     unset($pdo);
     return($ret);
 }
+
+// uses a query to get the groups of which the user is part of and then 
+// returns the results 
 
 function get_the_users_groups(){
     require __DIR__."/../config/pdo_config.php";
@@ -83,6 +98,9 @@ function get_the_users_groups(){
             FROM user_groups
             WHERE id = ?";
 
+    // creates an array containing each of the variables i want in a group and pushes it into a return
+    // value 
+
     foreach($groups as $group ){
         $statement = $pdo->prepare($sql);
         if(!$statement){
@@ -104,10 +122,14 @@ function get_the_users_groups(){
     return $group_info;
 }
 
+// returns the equipments allocated to the user 
+
 function get_user_equipments(){
     require __DIR__."/../config/pdo_config.php";
     $ret = array();
     $sql_error = "";
+    // the reason this table exists is because it simplifies the querying 
+    // of the equipments of a group or its users
     $sql ="SELECT *
            FROM users_inside_groups_equipments
            WHERE user_id = ?";
@@ -158,6 +180,9 @@ function get_user_equipments(){
             unset($pdo);
             return $sql_error;
         }
+
+        // todo create a metafunction that allows the switch case 
+        // to search all possible equipments inside the DB
 
         $sql = "SELECT *
                 FROM ";

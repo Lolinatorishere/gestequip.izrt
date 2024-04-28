@@ -15,6 +15,12 @@ CREATE table if not EXISTS equipment(
     CONSTRAINT equipment_ibfk_1 FOREIGN KEY (equipment_type) REFERENCES equipment_types (id)
 );
 
+CREATE TABLE equipment_types (
+    id int NOT NULL AUTO_INCREMENT,
+    equipment_type varchar(255) NOT NULL,
+    PRIMARY KEY (id)
+);
+
 create table if NOT EXISTS computers(
     id int not null auto_increment,
     equipment_id int not null unique,
@@ -116,6 +122,30 @@ CREATE TABLE IF NOT EXISTS user_logs(
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS users (
+  id int NOT NULL AUTO_INCREMENT,
+  username varchar(256) DEFAULT NULL,
+  pass char(255) NOT NULL,
+  users_name varchar(256) DEFAULT NULL,
+  email varchar(256) DEFAULT NULL,
+  phone_number bigint DEFAULT NULL,
+  regional_indicator varchar(10) DEFAULT NULL,
+  date_created datetime DEFAULT CURRENT_TIMESTAMP,
+  account_status int DEFAULT NULL,
+  active_directory_user tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS sudo_group (
+  id int NOT NULL AUTO_INCREMENT,
+  id_user int NOT NULL,
+  admin_status tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY id (id),
+  UNIQUE KEY id_user (id_user),
+  FOREIGN KEY (id_user) REFERENCES users (id)
+);
+ 
 CREATE OR REPLACE VIEW computer_equipment AS
     SELECT 
           e.id,
