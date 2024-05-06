@@ -108,3 +108,4 @@ function make_navbar($input){
     ");
 return $ret;
 }
+?>
