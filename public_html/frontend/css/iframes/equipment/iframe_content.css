@@ -34,3 +34,8 @@
     flex-direction: column;
     justify-content: center;
 }
+
+#current-tab{
+    background-color: rgb(216, 237, 255);
+    border-color: aliceblue;
+}

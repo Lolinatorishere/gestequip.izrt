@@ -44,7 +44,7 @@ frontend: ui and the respective links
 [x] Equipment
   [x] shows a tabbar with all the possibilities the user has
     [x] tabbar simple functionality 
-      [] simple highlighting of the current page
+      [x] simple highlighting of the current tab 
       [] correct page information (simple like page 1 to n as a test)
     [] advanced page information
       [] will write after previous tasks complete
