@@ -61,11 +61,6 @@ function make_tabbar(){
             </div>
         </div>";
     $equipment_tabbar .="
-    </div>
-
-    <div class=\"tab-content\">
-        tent
-    </div>
     </div>";
     return $equipment_tabbar;
 };

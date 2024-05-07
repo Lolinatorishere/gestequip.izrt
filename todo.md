@@ -38,16 +38,25 @@ frontend: ui and the respective links
 [] Groups
   [] shows the groups and their currunt users
   (this only applies to certain levels of access, a user with little to no permissions
-  can only see the groups they are part of meanwhile admins can see all the groups)
+  can only see the groups they are part of meanwhile managers can see all the groups they 
+  are part of and admins can see all the groups)
 [] Users 
   shows all the users in the system or which are inside the groups the user is part of.
+    [] show this tab if the user is a manager or an admin because normal users 
+    should not have access to this tab without being those
 [x] Equipment
   [x] shows a tabbar with all the possibilities the user has
     [x] tabbar simple functionality 
       [x] simple highlighting of the current tab 
-      [] correct page information (simple like page 1 to n as a test)
-    [] advanced page information
-      [] will write after previous tasks complete
+      [x] correct page information (simple like page 1 to n as a test)
+    [] advanced tab information
+      [] tab your_equipments
+        [] loading ui (to avoid issues)
+        [] simple ui
+          [] 70/30 split with equipments to the left and equipment info to the right
+            [] equipment loading reads all the equipment on top with item controls 
+
+        []
 [] Reports
   [] Registration Report: Generates a report detailing the complete details of each piece of equipment,
     including model, serial number, acquisition date, and other relevant additional information.

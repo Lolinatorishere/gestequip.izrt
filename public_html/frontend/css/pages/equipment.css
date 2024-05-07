@@ -2,7 +2,7 @@
 .equipment-content{
     height: 97.5%;
     width: 97.5%;
-    border-radius: 0.5rem;
+    border-radius: 1rem;
     background-color: white;
     display: flex;
     flex-direction: column;
