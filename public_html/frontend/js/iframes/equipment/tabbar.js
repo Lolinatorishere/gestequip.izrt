@@ -31,7 +31,7 @@ async function createEquipmentContent(){
     div.innerHTML = tabbar_conent;
     iframe.contentDocument.body.appendChild(div);
     div = document.createElement('div');
-    div.className = 'tabcontent';
+    div.className = 'tab-content';
     div.id = 'tab-content';
     div.innerHTML = tab_conent;
     iframe.contentDocument.body.appendChild(div);

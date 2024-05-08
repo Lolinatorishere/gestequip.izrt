@@ -1,9 +1,9 @@
 <?php 
-
 // this function obtains the basic information of the user 
+define('profile_pdo_config' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
 
 function request_info(){
-    require __DIR__."/../config/pdo_config.php";
+    require profile_pdo_config;
     $sql_error = "";
     $sql ="SELECT email, account_status, username, users_name, phone_number, regional_indicator, date_created
            FROM users
@@ -52,7 +52,7 @@ function request_info(){
                 ,'email' => $email 
                 ,'acc_status' => $acc_status 
                 ,'phone_number' => $phone_number 
-                ,'reg_date' => $reg_date );
+                ,'reg_date' => $reg_date);
     unset($pdo);
     return($ret);
 }
@@ -61,7 +61,7 @@ function request_info(){
 // returns the results 
 
 function get_the_users_groups(){
-    require __DIR__."/../config/pdo_config.php";
+    require profile_pdo_config;
     $group_info = array();
     $sql_error = "";
     $sql = "SELECT *
@@ -125,7 +125,7 @@ function get_the_users_groups(){
 // returns the equipments allocated to the user 
 
 function get_user_equipments(){
-    require __DIR__."/../config/pdo_config.php";
+    require profile_pdo_config;
     $ret = array();
     $sql_error = "";
     // the reason this table exists is because it simplifies the querying 
@@ -175,17 +175,17 @@ function get_user_equipments(){
         }
 
         $equipment = $statement->fetch();
- 
         if(!$statement){
             unset($pdo);
             return $sql_error;
         }
 
+        $sql = "SELECT *
+                FROM ";
+
         // todo create a metafunction that allows the switch case 
         // to search all possible equipments inside the DB
 
-        $sql = "SELECT *
-                FROM ";
         switch($equipment["equipment_type"]){
             case 1:
                 $sql .= "computers";

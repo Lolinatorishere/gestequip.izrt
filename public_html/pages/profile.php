@@ -1,7 +1,7 @@
 <?php
 include_once __DIR__ . "/../frontend/html/html_head.php";
 include_once __DIR__ . "/../frontend/html/navbar/html_nav.php";
-include_once __DIR__ . "/../backend/query/user_query.php";
+include_once __DIR__ . "/../backend/crud/read/user_query.php";
 
 $language = "en";
 $page_name = "Profile";

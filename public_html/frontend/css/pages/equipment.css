@@ -1,7 +1,9 @@
-
+.main-content{
+background-color: white;
+}
 .equipment-content{
-    height: 97.5%;
-    width: 97.5%;
+    height: 100%;
+    width: 100%;
     border-radius: 1rem;
     background-color: white;
     display: flex;
@@ -12,5 +14,7 @@
 .equipment-content iframe{
     height: 100%;
     width: 100%;
-    border-radius: 1rem 1rem 1rem 1rem;
+    border-style: none none none solid;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
 }

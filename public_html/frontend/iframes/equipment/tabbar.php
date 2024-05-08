@@ -5,7 +5,7 @@ function make_tabbar(){
     $equipment_tabbar = "
     <div class=\"equipment-tabbar\">
         <div class = \"tabbar-item\">
-            <div class = \"tabbar-content\">
+            <div id=\"first-tab\" class = \"tabbar-content\">
                 <div id = \"your_equipment\">
                     your equipment
                 </div>
@@ -20,15 +20,7 @@ function make_tabbar(){
             </div>
         </div>
 
-        <div class = \"tabbar-item\">
-            <div class = \"tabbar-content\">
-                <div id = \"all_equipment\">
-                    all equipment
-                </div>
-            </div>
-        </div>
-
-        <div class = \"tabbar-item\">
+       <div class = \"tabbar-item\">
             <div class = \"tabbar-content\">
                 <div id = \"search\">
                 search
@@ -41,6 +33,14 @@ function make_tabbar(){
             <div class = \"tabbar-content\">
                 <div id = \"add_equipment\">
                     add equipment
+                </div>
+            </div>
+        </div>
+
+        <div class = \"tabbar-item\">
+            <div class = \"tabbar-content\">
+                <div id = \"all_equipment\">
+                    all equipment
                 </div>
             </div>
         </div>
