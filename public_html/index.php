@@ -1,5 +1,5 @@
 <?php
-    require_once __DIR__."/backend/login/login.php";
+    require_once __DIR__."/backend/auth/login.php";
 ?>
 
     <head>

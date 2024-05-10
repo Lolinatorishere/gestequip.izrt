@@ -51,13 +51,13 @@ async function addTabbarFunctionality(){
                   ,'remove_equipment'
                   ,'logs']
 
-       ,request = ['yur_eq'
-                  ,'grp_eq'
-                  ,'sch_eq'
-                  ,'all_eq'
-                  ,'add_eq'
-                  ,'rem_eq'
-                  ,'log_eq'];
+        ,tab = ['yur_eq'
+               ,'grp_eq'
+               ,'sch_eq'
+               ,'all_eq'
+               ,'add_eq'
+               ,'rem_eq'
+               ,'log_eq'];
         
         for(let i = 0 ; i < buttons.length ; i++){
             let button = document.getElementById(buttons[i]);
@@ -68,8 +68,8 @@ async function addTabbarFunctionality(){
                 setTabHighlight(button);
                 // fetches the correct tab ui on click
                 fetch_url = '/backend/controlers/equipment/tab_controler.php'
-                          + '?request=' 
-                          + request[i] 
+                          + '?tab=' 
+                          + tab[i] 
                           + '&type=usri';
                 let response = await fetch(fetch_url);
                 let  userInterface = await response.json();
@@ -77,13 +77,13 @@ async function addTabbarFunctionality(){
                 // fetch first time tab info
                 fetch_url = 
                           '/backend/controlers/equipment/tab_controler.php'
-                          + '?request='
-                          + request[i]
+                          + '?tab='
+                          + tab[i]
                           + '&type=data'
                           + '&crud=read';
                 response = await fetch(fetch_url);
                 let tab_information = await response.json();
-                console.log(tab_information);
+                
             });   
         }
    }

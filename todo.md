@@ -68,9 +68,8 @@ frontend: ui and the respective links
                 [] default return value should be an associative array 
                 the value success should be by default false to allow for
                 logic flow
-                [] should return the total number of items assigned
-                  [] based of the total number should return total pages of items
-                  [] if there are no items 
+                [x] should return the total number of items assigned
+                  [] if there are no items return "no items"
                   [] should accept a page number through $_GET
                     [] if page requested > total set it to the last page
                     [] if page is a neg number set page to n1 

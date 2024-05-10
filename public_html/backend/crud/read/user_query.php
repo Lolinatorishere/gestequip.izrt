@@ -2,7 +2,7 @@
 // this function obtains the basic information of the user 
 define('profile_pdo_config' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
 
-function request_info(){
+function user_info(){
     require profile_pdo_config;
     $sql_error = "";
     $sql ="SELECT email, account_status, username, users_name, phone_number, regional_indicator, date_created

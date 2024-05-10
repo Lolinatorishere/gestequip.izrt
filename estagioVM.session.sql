@@ -145,54 +145,56 @@ CREATE TABLE IF NOT EXISTS sudo_group (
   UNIQUE KEY id_user (id_user),
   FOREIGN KEY (id_user) REFERENCES users (id)
 );
- 
-CREATE OR REPLACE VIEW computer_equipment AS
-    SELECT 
-          e.id,
-          e.registration_date,
-          e.registration_lock,
-          e.equipment_type,
-          e.delivery_status,
-          e.purchase_date,
-          e.brand,
-          e.serial_number,
-          e.equipment_status,
-          c.id as computer_id,
-          c.business_unit,
-          c.computer_model,
-          c.computer_type,
-          c.os,
-          c.has_battery,
-          c.ram,
-          c.psu,
-          c.cpu,
-          c.drives,
-          c.gpu,
-          c.mac_address
-    from equipment e, computers c
-    where e.id = c.equipment_id;
 
-CREATE OR REPLACE VIEW phone_equipment AS
-    SELECT 
-          e.id,
-          e.registration_date,
-          e.registration_lock,
-          e.equipment_type,
-          e.delivery_status,
-          e.purchase_date,
-          e.brand,
-          e.serial_number,
-          e.equipment_status,
-          p.equipment_id,
-          p.holder,
-          p.phone_model,
-          p.phone_number,
-          p.country_code,
-          p.IMEI,
-          p.opperator,
-          p.mobile_data,
-          p.phone_plan_cost,
-          p.currency,
-          p.roaming
-    from equipment e, phones p
-    where e.id = p.equipment_id;
+-- 
+-- CREATE OR REPLACE VIEW computer_equipment AS
+    -- SELECT 
+        --   e.id,
+        --   e.registration_date,
+        --   e.registration_lock,
+        --   e.equipment_type,
+        --   e.delivery_status,
+        --   e.purchase_date,
+        --   e.brand,
+        --   e.serial_number,
+        --   e.equipment_status,
+        --   c.id as computer_id,
+        --   c.business_unit,
+        --   c.computer_model,
+        --   c.computer_type,
+        --   c.os,
+        --   c.has_battery,
+        --   c.ram,
+        --   c.psu,
+        --   c.cpu,
+        --   c.drives,
+        --   c.gpu,
+        --   c.mac_address
+    -- from equipment e, computers c
+    -- where e.id = c.equipment_id;
+-- 
+-- CREATE OR REPLACE VIEW phone_equipment AS
+    -- SELECT 
+        --   e.id,
+        --   e.registration_date,
+        --   e.registration_lock,
+        --   e.equipment_type,
+        --   e.delivery_status,
+        --   e.purchase_date,
+        --   e.brand,
+        --   e.serial_number,
+        --   e.equipment_status,
+        --   p.equipment_id,
+        --   p.holder,
+        --   p.phone_model,
+        --   p.phone_number,
+        --   p.country_code,
+        --   p.IMEI,
+        --   p.opperator,
+        --   p.mobile_data,
+        --   p.phone_plan_cost,
+        --   p.currency,
+        --   p.roaming
+    -- from equipment e, phones p
+    -- where e.id = p.equipment_id;
+-- 

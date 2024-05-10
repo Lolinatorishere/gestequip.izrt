@@ -34,7 +34,7 @@ make_head($language, $page_name, $css_path, $js_path);
                             <div class="profile-align-vertical">
                                 <div class="profile-align-horizontal">
                                     <div class="top-profile">
-                                        <?php $user_info = request_info();?>
+                                        <?php $user_info = user_info();?>
                                         <div class="profile-vertical-align">
                                             <div class="profile-horizontal-align">
                                                 <div class="profile-tab">
