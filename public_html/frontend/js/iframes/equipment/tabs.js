@@ -3,6 +3,23 @@ async function createEquipmentContent(){
        ,div = document.createElement('div')
        ,link = document.createElement('link')
        ,script = document.createElement('script')
+       ,tabs = {
+            buttons:['your_equipment'
+                    ,'groups_equipment'
+                    ,'search'
+                    ,'all_equipment'
+                    ,'add_equipment'
+                    ,'remove_equipment'
+                    ,'logs'],
+
+                tab:['yur_eq'
+                    ,'grp_eq'
+                    ,'sch_eq'
+                    ,'all_eq'
+                    ,'add_eq'
+                    ,'rem_eq'
+                    ,'log_eq']
+        }
        ,tab_conent = undefined
        ,tabbar_conent = undefined;
     await fetch('/frontend/iframes/equipment/tabbar.php')
@@ -25,7 +42,7 @@ async function createEquipmentContent(){
     link.rel = 'stylesheet';
     link.href = '/frontend/css/iframes/equipment/iframe_content.css';
     iframe.contentDocument.head.appendChild(link);
-    script.src = '/frontend/js/iframes/equipment/tabbar_functionality.js';
+    script.src = '/frontend/js/iframes/equipment/tab_controler.js';
     iframe.contentDocument.head.appendChild(script);
     div.className = 'tabbar';
     div.innerHTML = tabbar_conent;
@@ -36,6 +53,6 @@ async function createEquipmentContent(){
     div.innerHTML = tab_conent;
     iframe.contentDocument.body.appendChild(div);
     script.addEventListener('load' , () => {
-        iframe.contentWindow.addTabbarFunctionality();
+        iframe.contentWindow.addTabFunctionality(tabs);
     })
 }

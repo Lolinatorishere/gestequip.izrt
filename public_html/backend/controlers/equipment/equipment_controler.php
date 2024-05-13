@@ -134,7 +134,8 @@ function data_request($tab , $pdo , $user_id){
     if($crud === 0)
         return $ret;
     if($crud === 2) //read info
-        $data = tab_fetch_data($tab , $user_id); 
+        $data = tab_fetch_data($tab , $user_id);
+    
     else{
         $auth = request_crud_authentication($pdo , $user_id);
     }
@@ -155,6 +156,22 @@ function tab_auth_handle($auth_level){
     return 0;
 } 
 
+// function equipment_parser(&$data){
+//     foreach($data["items"] as $equipment){
+//         foreach($equipment as $middle){
+//         $j = 1;
+//             foreach($middle as $key => $items){
+//                 if($j%2==1){
+//                     error_log(print_r($key , true)); 
+//                     error_log(print_r($items , true)); 
+//                 }
+//                 $j++;
+//             }
+//         }
+//     error_log(" ");
+//     }
+// }
+
 function request_handle($tab_valid , $tab , $type_valid){
     // validity guard clause
     if($tab_valid === 0 || $type_valid === 0)
@@ -162,13 +179,15 @@ function request_handle($tab_valid , $tab , $type_valid){
     // auth guard clause
     if(tab_auth_handle($tab_valid) === 0)
         return array("error");
-    // checks if the type_valid is equivilent to dat;a
+    // checks if the type_valid is equivilent to data
     if($type_valid === 2){
         require_once pdo_config_dir;
         $user_id = $_SESSION["id"];
         $ret = data_request($tab , $pdo , $user_id);
+        // equipment_parser($ret);
         unset($pdo);
-        error_log(print_r($ret , true));
+        if(isset($ret["error"]))
+            return array("unavailable" , $ret);
         return array("success" , $ret);
     }
     return array("success" , load_ui($tab));
@@ -177,12 +196,14 @@ function request_handle($tab_valid , $tab , $type_valid){
 $req_tab = tab_request_validation($tab_request);
 $req_type = type_validation($request_type);
 $ret = request_handle($req_tab , $tab_request , $req_type);
+
 if($req_type === 1){
-    echo json_encode(array('success' => $ret[0]
+    echo json_encode(array('ui' => $ret[0]
                           ,'html' => $ret[1]));
 }
 if($req_type === 2){
-    echo json_encode(array('success' => $ret[0]
+    echo json_encode(array('data' => $ret[0]
+                          ,'tab' => $tab_request
                           ,'information' => $ret[1]));
 unset($pdo);
 }

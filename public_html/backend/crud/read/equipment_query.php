@@ -49,14 +49,30 @@ function page_check(&$request){
     return $pages; 
 }
 
-function handle_equipment(){
-
+function convert_equipment_to_single_array($equipment , $equipment_spec){
+    $combined = array();
+    $i = 1;
+    foreach($equipment as $key => $standard){
+        if($i%2 !== 0){
+            $combined[$key] = $standard;
+        }
+        $i++;
+    }
+    $i = 1;
+    foreach($equipment_spec as $key => $standard){
+        if($i%2 !== 0){
+            $combined[$key] = $standard;
+        }
+        $i++;
+    }
+    return $combined;
 }
+
 function get_equipments($request){
     require pdo_config_dir;
     $query_pages = 0;
     $page_limit = 20;
-    $sql_error = array("success" => "error");
+    $sql_error = array("error" => "error");
 
     if(isset($request["error"]))
         return $sql_error;
@@ -161,9 +177,7 @@ function get_equipments($request){
             unset($pdo);
             return $sql_error;
         }
-        
-        array_push($individual_equipment , $equipment , $equipment_spec);
-        array_push($equipment_all , $individual_equipment);
+        array_push($equipment_all , convert_equipment_to_single_array($equipment , $equipment_spec));
     };
     $ret["items"] = $equipment_all;
     $ret["pages"] = $query_pages;

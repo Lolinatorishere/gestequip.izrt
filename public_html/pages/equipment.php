@@ -9,7 +9,7 @@ $css_path = array("../frontend/css/common.css"
                  ,"../frontend/css/sidebar/sidebar.css"
                  ,"../frontend/css/navbar/navbar.css");
 
-$js_path = array("../frontend/js/iframes/equipment/tabbar.js");
+$js_path = array("../frontend/js/iframes/equipment/tabs.js");
 
 $navbar = "default";
 
