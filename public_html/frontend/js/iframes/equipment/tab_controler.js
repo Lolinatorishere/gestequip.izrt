@@ -10,6 +10,33 @@ async function isFirstTab(string){
     }
 }
 
+async function setTabHighlight(tab_node){
+    let previous_tab = document.getElementById('current-tab');
+    await unsetPreviousHighlight(previous_tab , tab_node);
+    tab_node.parentNode.id = 'current-tab';
+}
+
+async function setTabUI(tab_html_content){
+    div = document.getElementById('tab-content');
+    div.innerHTML = tab_html_content.html;
+}
+
+
+async function urlCreateBackendRequest(request){
+    let page_controler = request.page + '/' + request.page +'_controler.php?'
+       ,i = 0;
+    url = '/backend/controlers/' 
+        + page_controler; 
+    for(let [key , value] of Object.entries(request.custom)){
+        if(i !== 0){
+            url += '&';
+        }
+        url += key + '=' + value;
+        i++;
+    }
+    return url;
+} 
+
 async function unsetPreviousHighlight(previous_tab , tab_node){
     let first_tab = 1;
     if(previous_tab === null) 
@@ -21,17 +48,6 @@ async function unsetPreviousHighlight(previous_tab , tab_node){
     if(first_tab === 1) 
         return;
     previous_tab.id = 'first-tab';
-}
-
-async function setTabHighlight(tab_node){
-    let previous_tab = document.getElementById('current-tab');
-    await unsetPreviousHighlight(previous_tab , tab_node);
-    tab_node.parentNode.id = 'current-tab';
-}
-
-async function setTabUI(tab_html_content){
-    div = document.getElementById('tab-content');
-    div.innerHTML = tab_html_content.html;
 }
 
 function controlsHtml(data){
@@ -155,7 +171,6 @@ function controlsFunctionality(data){
             }   
             response = await fetch(await urlCreateBackendRequest(request));
             tab_information = await response.json();
-
             await setTabContent(tab_information);
         });
         for(let i = 1 ; i <= 6 ; i++){
@@ -168,7 +183,6 @@ function controlsFunctionality(data){
         }
     }
     page_controls.forEach(page => {
-        console.log(page);
         page.addEventListener('click' , async function(){
             // fetch first time tab info
             request.custom = {
@@ -177,14 +191,12 @@ function controlsFunctionality(data){
                ,crud: 'read'
                ,page: page.innerHTML.trim()
             }   
-            console.log(data);
             response = await fetch(await urlCreateBackendRequest(request));
             tab_information = await response.json();
             await setTabContent(tab_information);
         });
     });
 }
-
 
 function setControls(data , append_to){
     let totalDiv = document.createElement('div')
@@ -203,26 +215,26 @@ function setControls(data , append_to){
     controlsFunctionality(data);
 }
 
-function setItems(items , append_to){
-    let itemDiv
-       ,itemsDiv = document.createElement('div');
-    if(items.data !== "success"){
-        itemDiv.className = 'info-message';
-        itemDiv.innerHTML = `
+function itemsHtml(data){
+    let itemsDiv = document.createElement('div')
+       ,info = data.information;
+    if(data.data !== "success"){
+        itemsDiv.className = 'info-message';
+        itemsDiv.innerHTML = `
             no equipment is available
         `;
-        return;
+        return itemsDiv;
     }else{
         //equipment type, brand, model, purchase_date, equipment state
-        for(let i = 0 ; i < items.information.total_items ; i++){
-            let item = items.information.items[i];
-            itemDiv = document.createElement('div');
-            itemDiv.className = 'item-eq';
+        for(let i = 0 ; i < info.total_items ; i++){
+            let item = info.items[i];
+            let items = document.createElement('div');
+            items.className = 'item-eq';
             if(i%2 !== 0){
-                itemDiv.className = 'item-eq highlight';
+                items.className = 'item-eq highlight';
             }
-            itemDiv.id = 'item' + i;
-            itemDiv.innerHTML = `
+            items.id = 'item-' + i;
+            items.innerHTML = `
                 <div class="equipment-type">
                     ${item.equipment_type}
                 </div>
@@ -239,42 +251,52 @@ function setItems(items , append_to){
                     ${item.equipment_status}
                 </div>
             `
-            itemsDiv.appendChild(itemDiv);
+            itemsDiv.appendChild(items);
         }
-        append_to.innerHTML = itemsDiv.innerHTML;
     }
-    return;
+    return itemsDiv;
 }
 
-function itemsFunctionality(data){
+function itemDetailsHtml(info){
+    let html = ``;
+        Object.keys(info).forEach(key => {
+            let value = info[key];
+            html +=`
+            <div id=${key}>
+                ${value}
+            </div>
+            ` 
+        });
+    return html;
+}
 
+function itemsFunctionality(data , append_details){
+    let info = data.information; 
+    for(let i = 0 ; i < info.total_items ; i++){
+        document.getElementById('item-' + i)
+        .addEventListener('click' ,  function(){
+            append_details.innerHTML = itemDetailsHtml(data.information.items[i]);
+        });
+    }
+}
+
+function setItems(data , append_to , append_details){
+        append_to.innerHTML = itemsHtml(data).innerHTML;;
+        if(append_details !== null || append_details !== undefined){
+            itemsFunctionality(data , append_details);
+        }
 }
 
 async function setTabContent(data){
-    let controls_html = document.getElementById("items-controls")
-       ,items_html = document.getElementById("items-content");
     switch(data.tab){
         case 'yur_eq':
-            setControls(data , controls_html);
-            setItems(data , items_html);
+            setControls(data , document.getElementById("items-controls"));
+            setItems(data , document.getElementById("items-content") , document.getElementById("info-selected"));
+            break;
+        default:
             break;
     }
 }
-
-async function urlCreateBackendRequest(request){
-    let page_controler = request.page + '/' + request.page +'_controler.php?'
-       ,i = 0;
-    url = '/backend/controlers/' 
-        + page_controler; 
-    for(let [key , value] of Object.entries(request.custom)){
-        if(i !== 0){
-            url += '&';
-        }
-        url += key + '=' + value;
-        i++;
-    }
-    return url;
-} 
 
 async function tabbarFunctionality(button , tab){
     let request = {
