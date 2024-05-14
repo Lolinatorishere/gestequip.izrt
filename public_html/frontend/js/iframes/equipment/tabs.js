@@ -53,6 +53,6 @@ async function createEquipmentContent(){
     div.innerHTML = tab_conent;
     iframe.contentDocument.body.appendChild(div);
     script.addEventListener('load' , () => {
-        iframe.contentWindow.addTabFunctionality(tabs);
+        iframe.contentWindow.tabFunctionality(tabs);
     })
 }

@@ -34,13 +34,13 @@ async function setTabUI(tab_html_content){
     div.innerHTML = tab_html_content.html;
 }
 
-function createControls(data){
+function controlsHtml(data){
     let html = ''; 
     if(data.current_page > 1){
         //render reversing pages
         let page_render;
         for(let i = 1 ; i <= 6 ; i++){
-            if(data.current_page - i > 1){
+            if(data.current_page - i >= 1){
                 page_render--;
             }
         }
@@ -49,16 +49,30 @@ function createControls(data){
                 <
             </div>  
             `
+        if(data.current_page >= 7){
+        html + `
+            <div id="first-page">
+                1
+           </div> 
+           `
+            if(data.current_page > 7){
+                html + `
+                <div id="dots">
+                    ...
+                </div>
+                `
+            }
+        }
         for(let i = page_render ; i < data.current_page ; i++){
             html + `
-            <div id="control-page">
+            <div id="control-page-${i}">
                 ${i}
             </div>
             `    
         }
     }
     html += `
-    <div id="control-page">
+    <div id="control-page-${data.current_page}">
         ${data.current_page}
     </div>
     `;
@@ -66,13 +80,27 @@ function createControls(data){
         //dont render forwarding pages controls
         for(let i = data.current_page+1 ; i < data.pages ; i++){
             html + `
-            <div id="control-page">
+            <div id="control-page-${i}">
                 ${i}
             </div>
             `    
         }
+        if(data.current_page+6 < data.pages){
+            if(data.current_page+6 < data.pages-1){
+                html + `
+                <div id="dots">
+                    ...
+                </div>
+                `
+            }
+            html + `
+            <div id="last-page">
+                ${data.pages}
+            </div>
+            `
+        }
         html + `
-            <div class="control-arrow" id="control-arrow-foreward">
+            <div class="control-arrow" id="control-arrow-forward">
                 >
             </div>  
             `
@@ -80,7 +108,85 @@ function createControls(data){
     return html;
 }
 
-function setPageControls(data , append_to){
+function controlsFunctionality(data){
+    let current_page = data.information.current_page
+       ,page_max = data.information.pages
+       ,page_controls = []
+       ,arrow_backward
+       ,arrow_forward;
+        let request = {
+            page: 'equipment'
+           ,custom: undefined
+        }
+        
+    if(current_page !== 1){
+        document.getElementById('control-arrow-backward')
+        .addEventListener('click' , async function(){
+            // fetch first time tab info
+            request.custom = {
+                tab: data.tab
+               ,type: 'data' 
+               ,crud: 'read'
+               ,page: current_page-1
+            }   
+            response = await fetch(await urlCreateBackendRequest(request));
+            tab_information = await response.json();
+            await setTabContent(tab_information);
+        });
+        for(let i = 1 ; i <= 6 ; i++){
+            if(current_page - i >= 1){
+                page_controls.push(document.getElementById('control-page-' + i));
+            }
+        }
+        if(current_page > 6){
+            page_controls.push(document.getElementById('first-page'));
+        }
+    }
+    page_controls.push(document.getElementById('control-page-' + current_page));
+    if(current_page !== page_max){
+        document.getElementById('control-arrow-forward')
+        .addEventListener('click' , async function(){
+            // fetch first time tab info
+            request.custom = {
+                tab: data.tab
+               ,type: 'data' 
+               ,crud: 'read'
+               ,page: current_page+1
+            }   
+            response = await fetch(await urlCreateBackendRequest(request));
+            tab_information = await response.json();
+
+            await setTabContent(tab_information);
+        });
+        for(let i = 1 ; i <= 6 ; i++){
+            if(current_page + i <= page_max){
+                page_controls.push(document.getElementById('control-page-' + i));
+            }
+        }
+        if(current_page+6 < page_max){
+            page_controls.push(document.getElementById('last-page'));
+        }
+    }
+    page_controls.forEach(page => {
+        console.log(page);
+        page.addEventListener('click' , async function(){
+            // fetch first time tab info
+            request.custom = {
+                tab: data.tab
+               ,type: 'data' 
+               ,crud: 'read'
+               ,page: page.innerHTML.trim()
+            }   
+            console.log(data);
+            response = await fetch(await urlCreateBackendRequest(request));
+            tab_information = await response.json();
+            await setTabContent(tab_information);
+        });
+    });
+}
+
+
+function setControls(data , append_to){
     let totalDiv = document.createElement('div')
        ,controlDiv = document.createElement('div')
        ,controls = document.createElement('div');
@@ -90,15 +196,16 @@ function setPageControls(data , append_to){
         Total: ${info.total_items}
     `
     controlDiv.className = 'controls';
-    controlDiv.innerHTML = createControls(info);
+    controlDiv.innerHTML = controlsHtml(info);
     controls.appendChild(totalDiv);
     controls.appendChild(controlDiv);
     append_to.innerHTML = controls.innerHTML;
+    controlsFunctionality(data);
 }
 
 function setItems(items , append_to){
-    let itemDiv 
-       ,item_info = undefined;
+    let itemDiv
+       ,itemsDiv = document.createElement('div');
     if(items.data !== "success"){
         itemDiv.className = 'info-message';
         itemDiv.innerHTML = `
@@ -106,7 +213,6 @@ function setItems(items , append_to){
         `;
         return;
     }else{
-        console.log(items);
         //equipment type, brand, model, purchase_date, equipment state
         for(let i = 0 ; i < items.information.total_items ; i++){
             let item = items.information.items[i];
@@ -133,10 +239,15 @@ function setItems(items , append_to){
                     ${item.equipment_status}
                 </div>
             `
-            append_to.appendChild(itemDiv);
+            itemsDiv.appendChild(itemDiv);
         }
+        append_to.innerHTML = itemsDiv.innerHTML;
     }
     return;
+}
+
+function itemsFunctionality(data){
+
 }
 
 async function setTabContent(data){
@@ -144,7 +255,7 @@ async function setTabContent(data){
        ,items_html = document.getElementById("items-content");
     switch(data.tab){
         case 'yur_eq':
-            setPageControls(data , controls_html);
+            setControls(data , controls_html);
             setItems(data , items_html);
             break;
     }
@@ -192,7 +303,7 @@ async function tabbarFunctionality(button , tab){
     });
 }
 
-async function addTabFunctionality(tabs){
+async function tabFunctionality(tabs){
     for(let i = 0 ; i < tabs.buttons.length ; i++){
         let button = document.getElementById(tabs.buttons[i]);
         if(button === null || button === undefined)
