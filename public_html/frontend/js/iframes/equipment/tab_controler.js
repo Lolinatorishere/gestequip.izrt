@@ -21,7 +21,6 @@ async function setTabUI(tab_html_content){
     div.innerHTML = tab_html_content.html;
 }
 
-
 async function urlCreateBackendRequest(request){
     let page_controler = request.page + '/' + request.page +'_controler.php?'
        ,i = 0;
@@ -126,6 +125,7 @@ function controlsHtml(data){
 
 function controlsFunctionality(data){
     let current_page = data.information.current_page
+       ,total_items = data.information.total_items
        ,page_max = data.information.pages
        ,page_controls = []
        ,arrow_backward
@@ -144,6 +144,7 @@ function controlsFunctionality(data){
                ,type: 'data' 
                ,crud: 'read'
                ,page: current_page-1
+               ,t_i: total_items
             }   
             response = await fetch(await urlCreateBackendRequest(request));
             tab_information = await response.json();
@@ -168,6 +169,7 @@ function controlsFunctionality(data){
                ,type: 'data' 
                ,crud: 'read'
                ,page: current_page+1
+               ,t_i: total_items
             }   
             response = await fetch(await urlCreateBackendRequest(request));
             tab_information = await response.json();
@@ -190,6 +192,7 @@ function controlsFunctionality(data){
                ,type: 'data' 
                ,crud: 'read'
                ,page: page.innerHTML.trim()
+               ,t_i: total_items
             }   
             response = await fetch(await urlCreateBackendRequest(request));
             tab_information = await response.json();
@@ -292,6 +295,8 @@ async function setTabContent(data){
         case 'yur_eq':
             setControls(data , document.getElementById("items-controls"));
             setItems(data , document.getElementById("items-content") , document.getElementById("info-selected"));
+            break;
+        case'grp_eq':
             break;
         default:
             break;

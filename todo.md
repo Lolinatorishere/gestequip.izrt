@@ -62,30 +62,27 @@ frontend: ui and the respective links
     [] advanced tab information
       [] tab your_equipments
         [x] 70/30 split with equipments to the left and equipment info to the right
-          [] equipment loading reads all the equipment on top with item controls 
-            [] create controler functions to support this request 
-              [] should return an array *controler
-                [] default return value should be an associative array 
+          [x] equipment loading places all the equipment on top with item controls 
+            [x] create controler functions to support this request 
+              [x] should return an array *controler
+                [x] default return value should be an associative array 
                 the value success should be by default false to allow for
                 logic flow
                 [x] should return the total number of items assigned
                   [] if there are no items return "no items"
-                  [] should accept a page number through $_GET
-                    [] if page requested > total set it to the last page
-                    [] if page is a neg number set page to n1 
-                
+                  [x] should accept a page number through $_GET
+                    [x] if page requested > total set it to the last page
+                    [x] if page is a neg number set page to n1 
             [] if no items says "no equipments assigned"
-            [] if less than one page of equipments exist shows only 1 page and no 
-            controls
-            [] else if less than 3 pages away from either begining or end shows all pages to the closses like 1... n-3 n-2 n-1 n n+1 n+max and vice versa
-            [] to the side of the page controls should show the total ammount of 
-            equipments assigned
+            [x] if less than one page of equipments exist shows only 1 page and no controls
+            [x] else if less than 3 pages away from either begining or end shows all pages to the closses like 1... n-3 n-2 n-1 n n+1 n+max and vice versa
+            [x] to the side of the page controls should show the total ammount of equipments assigned
             [] allow for the showing of a single type of equipment 
-          [] equipment item loaded
-            [] should show basic information like date assigned name of equipment
-                the items state and a notification icon
-            [] clicking on the item should load the side panel with the items info
-                and notifications on the bottom part with the most recent one 
+          [x] equipment item loaded
+            [x] should show basic information like date assigned name of equipment etc..
+            [] should load the items state and a notification icon
+            [x] clicking on the item should load the side panel with the items info
+            [] load notifications on the bottom part of a seleected item with the most recent one on top
         [] tab group_equipments
           [] 20% top reserved for group selection controls
             [] default to group 1 

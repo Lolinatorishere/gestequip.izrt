@@ -1,12 +1,17 @@
 <?php
 session_start();
-// defines pdo dir 
-// (to avoid other files from working without the controler)
+// defines section 
+// to avoid other files from working without the controler
 if(!defined('pdo_config_dir'))
     define('pdo_config_dir' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
+
+if(!defined('sql_queries_dir'))
+    define('sql_read_queries_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/sql_queries/read_queries.php');
+
 // authentication code
 include_once "/var/www/html/gestequip.izrt/public_html/backend/auth/user_auth.php";
 include_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/equipment_query.php";
+include_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/user_query.php";
 
 // base get requests 
 $tab_request = $_GET["tab"];
@@ -98,27 +103,61 @@ function request_crud_authentication($pdo , $user_id){
     $group_permissions;
 }
 
-function tab_data_request_creator($tab){
+function set_tab_request($tab , &$data_request , $user_id){
+    $request = array();
+    $group_ids = '';
     switch($tab){
         case "yur_eq":
-            return array("type" => "user");
-            break;
+            $request["fetch"] = " * ";
+            $request["specific"] = "user_id = " . $user_id;
+            $request["table"] = "users_inside_groups_equipments";
+            $data_request = $request;
+            return;
         case "grp_eq":
-            return array("type" => "user");
-            break;
+            $request["fetch"] = " * ";
+            $request["specific"] = "user_id = " . $user_id;
+            $request["table"] = "users_inside_groups";
+            $request["counted"] = 1;
+            $group_info = get_user_groups($request);
+            for($i = 0 ; $i < $group_info["total_items"] ; $i++){
+                $group_ids .= $group_info["all_groups"][$i];
+                if($i !== $group_info["total_items"]-1)
+                    $group_ids .= ', ';
+            }
+            $request = array();
+            $request["fetch"] = " equipment_id , group_id ";
+            $request["specific"] = "group_id IN ( " . $group_ids . " ) "; 
+            $request["table"] = "users_inside_groups_equipments";
+            $request["counted"] = 1;
+            $all_equipment = get_group_equipments($request);
+            error_log(print_r($all_equipment , true));
+            return;
     }
-    return array("error" => "error");
+    $data_request["error"] = "error";
+    return;
 }
 
 // gets the correct requests for each tab
 function tab_fetch_data($tab , $user_id){
-    $data_request = tab_data_request_creator($tab);
-    if(isset($_get["page"])){
-        $page = preg_replace('/[^0-9]/s' , '' , $_get["page"]); 
+    $data_request = array();
+    set_tab_request($tab , $data_request , $user_id);
+    if(isset($_GET["page"])){
+        $page = preg_replace('/[^0-9]/s' , '' , $_GET["page"]); 
         $data_request["page"] = $page;
     }
-    $data_request["id"] = $user_id;
-    return get_equipments($data_request); 
+    if(isset($_GET["t_i"])){
+        $total_items = preg_replace('/[^0-9]/s' , '' , $_GET["t_i"]); 
+        $data_request["total_items"] = $total_items;
+    }
+    if(isset($_GET["pgng"])){
+        $paging = preg_replace('/[^0-9]/s' , '' , $_GET["pgng"]); 
+        $data_request["paging"] = $paging;
+    }
+    $equipment = get_equipments($data_request);
+    if(isset($data_request["multiple"])){
+
+    }
+    return $equipment;
 }
 
 
@@ -127,7 +166,6 @@ function data_request($tab , $pdo , $user_id){
     //default return value
     $ret = array(
         'success' => 'false');
-        
     if(!isset($_GET["crud"]))
         return $ret;
     $crud = request_crud_validation();
@@ -156,25 +194,9 @@ function tab_auth_handle($auth_level){
     return 0;
 } 
 
-// function equipment_parser(&$data){
-//     foreach($data["items"] as $equipment){
-//         foreach($equipment as $middle){
-//         $j = 1;
-//             foreach($middle as $key => $items){
-//                 if($j%2==1){
-//                     error_log(print_r($key , true)); 
-//                     error_log(print_r($items , true)); 
-//                 }
-//                 $j++;
-//             }
-//         }
-//     error_log(" ");
-//     }
-// }
-
 function request_handle($tab_valid , $tab , $type_valid){
     // validity guard clause
-    if($tab_valid === 0 || $type_valid === 0)
+    if($tab_valid === 0)
         return array("error");
     // auth guard clause
     if(tab_auth_handle($tab_valid) === 0)
@@ -202,6 +224,7 @@ if($req_type === 1){
                           ,'html' => $ret[1]));
 }
 if($req_type === 2){
+    error_log(print_r($ret[0] , true));
     echo json_encode(array('data' => $ret[0]
                           ,'tab' => $tab_request
                           ,'information' => $ret[1]));

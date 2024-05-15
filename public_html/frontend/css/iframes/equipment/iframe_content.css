@@ -102,6 +102,16 @@
     border-width: 2px;
 }
 
+.group-items {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 70%;
+    border-style: none solid solid none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
 .items-controls{
     display: flex;
     flex-direction: column;

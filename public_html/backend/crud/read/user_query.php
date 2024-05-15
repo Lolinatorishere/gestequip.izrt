@@ -1,9 +1,58 @@
 <?php 
 // this function obtains the basic information of the user 
-define('profile_pdo_config' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
+// define('profile_pdo_config' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
+
+include_once sql_read_queries_dir;
+
+function get_user_search(){
+
+}
+
+function get_user_groups($request){
+    require pdo_config_dir;
+    $sql_error = "";
+    $sql = common_select_query($request);
+    $statement = $pdo->prepare($sql);
+    if(!$statement){
+        unset($pdo);
+        return $sql_error;
+    }
+    $statement->execute();
+    if(!$statement){
+        unset($pdo);
+        return $sql_error;
+    }
+    $groups =  $statement->fetchAll();
+    $user_groups = array("auth" => array()
+                        ,"own_auth" => array()
+                        ,"de_auth" => array()
+                        ,"all_groups" => array()
+                        ,"total_items" => 0);
+    foreach($groups as $group){
+        switch($group["user_permission_level"]){
+            case 0: // user is a group manager
+                array_push($user_groups["auth"] , $group["group_id"])  ;
+                array_push($user_groups["all_groups"] , $group["group_id"]);
+                break;
+            case 1: // user is permited to alter own equipment
+                array_push($user_groups["own_auth"] , $group["group_id"]);
+                array_push($user_groups["all_groups"] , $group["group_id"]);
+                break;
+            case 2: // user is only permited to view own equipment
+                array_push($user_groups["de_auth"] , $group["group_id"]);
+                array_push($user_groups["all_groups"] , $group["group_id"]);
+                break;
+            default:
+                continue;
+        }
+        $user_groups["total_items"]++;
+    }
+    unset($pdo);
+    return $user_groups;
+}
 
 function user_info(){
-    require profile_pdo_config;
+    require pdo_config_dir;
     $sql_error = "";
     $sql ="SELECT email, account_status, username, users_name, phone_number, regional_indicator, date_created
            FROM users
@@ -61,7 +110,7 @@ function user_info(){
 // returns the results 
 
 function get_the_users_groups(){
-    require profile_pdo_config;
+    require pdo_config_dir;
     $group_info = array();
     $sql_error = "";
     $sql = "SELECT *
@@ -125,7 +174,7 @@ function get_the_users_groups(){
 // returns the equipments allocated to the user 
 
 function get_user_equipments(){
-    require profile_pdo_config;
+    require pdo_config_dir;
     $ret = array();
     $sql_error = "";
     // the reason this table exists is because it simplifies the querying 
