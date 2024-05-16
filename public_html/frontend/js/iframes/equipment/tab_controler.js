@@ -326,6 +326,7 @@ async function tabbarFunctionality(button , tab){
         }
         response = await fetch(await urlCreateBackendRequest(request));
         tab_information = await response.json();
+        console.log(tab_information);
         await setTabContent(tab_information);
     });
 }

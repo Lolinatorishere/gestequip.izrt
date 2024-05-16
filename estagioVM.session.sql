@@ -38,7 +38,6 @@ create table if NOT EXISTS computers(
     primary key (id),
     foreign key (equipment_id) references equipment(id)
 );
-
 create table if NOT EXISTS phones(
     id int not null auto_increment,
     equipment_id int not null unique,

@@ -1,6 +1,6 @@
 <?php
 
-include_once sql_read_queries_dir;
+include_once query_generator_dir;
 
 // todo later
 
@@ -24,27 +24,7 @@ function page_check(&$request){
     return;
 }
 
-function convert_equipment_to_single_array($equipment , $equipment_spec){
-    $combined = array();
-    $i = 1;
-    foreach($equipment as $key => $standard){
-        if($i%2 !== 0){
-            $combined[$key] = $standard;
-        }
-        $i++;
-    }
-    $i = 1;
-    foreach($equipment_spec as $key => $standard){
-        if($i%2 !== 0){
-            $combined[$key] = $standard;
-        }
-        $i++;
-    }
-    return $combined;
-}
-
-function get_group_equipments($request){
-    require pdo_config_dir;
+function get_group_equipments($request , $pdo){
     $sql_error = array("error" => "error");
     if(isset($request["error"]))
         return $sql_error;
@@ -54,19 +34,16 @@ function get_group_equipments($request){
         return $sql_error;
     $statement = $pdo->prepare($sql);
     $statement->execute();
-    if(!$statement){
-        unset($pdo);
+    if(!$statement)
         return $sql_error;
-    }
-    $total_item_ids = $statement->fetchAll();
-    error_log(print_r($total_item_ids , true));
-    unset($pdo);
+    $ids = $statement->fetchAll();
+    $ret["success"] = "success";
+    $ret["items"] = $ids;
     return $ret;
 } 
 
 // gets all the equipments from certain ids
-function get_equipments($request){
-    require pdo_config_dir;
+function get_equipments($request , $pdo){
     $request["limit"] = 20;
     $sql_error = array("error" => "error");
     if(isset($request["error"]))
@@ -77,15 +54,14 @@ function get_equipments($request){
     // of the equipments of a group or its users
     page_check($request);
     $sql = common_select_query($request);
+    error_log($sql);
     // request is unavailable
     if($sql == "")
         return $sql_error;
     $statement = $pdo->prepare($sql);
     $statement->execute();
-    if(!$statement){
-        unset($pdo);
+    if(!$statement)
         return $sql_error;
-    }
     if(!isset($request["total_items"])){
         $rows_in_query = $statement->fetch();
         $request["total_items"] = $rows_in_query[0];
@@ -98,26 +74,19 @@ function get_equipments($request){
     }
     $equipment_ids = $statement->fetchAll();
     foreach($equipment_ids as $eq_ids){
-        $individual_equipment = array();
         $sql = "SELECT *
                 from equipment
                 where id = ?";
         $statement = $pdo->prepare($sql);
-        if(!$statement){
-            unset($pdo);
+        if(!$statement)
             return $sql_error;
-        }
         $statement->bindParam(1 , $eq_ids["equipment_id"] , PDO::PARAM_INT);
         $statement->execute();
-        if(!$statement){
-            unset($pdo);
+        if(!$statement)
             return $sql_error;
-        }
         $equipment = $statement->fetch();
-        if(!$statement){
-            unset($pdo);
+        if(!$statement)
             return $sql_error;
-        }
         $sql = "SELECT *
                 FROM ";
         // todo create a metafunction that allows the switch case 
@@ -135,29 +104,24 @@ function get_equipments($request){
         }
         $sql .= " WHERE equipment_id = ?";
         $statement = $pdo->prepare($sql);
-        if(!$statement){
-            unset($pdo);
+        if(!$statement)
             return $sql_error;
-        }
         $statement->bindParam(1 , $equipment["id"] , PDO::PARAM_INT);
         $statement->execute();
-        if(!$statement){
-            unset($pdo);
+        if(!$statement)
             return $sql_error;
-        }
         $equipment_spec = $statement->fetch();
-        if(!$statement){
-            unset($pdo);
+        if(!$statement)
             return $sql_error;
-        }
-        array_push($equipment_all , convert_equipment_to_single_array($equipment , $equipment_spec));
+        $item = array();
+        array_push($item, $equipment , $equipment_spec);
+        array_push($equipment_all , merge_array($item));
     };
     $ret["items"] = $equipment_all;
     $ret["pages"] = $request["total_pages"];
     $ret["current_page"] = $request["page"];
     $ret["paging"] = 1; 
     $ret["total_items"] = $request["total_items"];
-    unset($pdo);
     return($ret);   
 }
 ?>
