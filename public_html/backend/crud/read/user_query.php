@@ -8,7 +8,7 @@ function get_user_search(){
 
 }
 
-function get_user_groups($request , $pdo){
+function get_userinfo_groups($request , $pdo){
     $sql_error = "";
     $sql = common_select_query($request);
     $statement = $pdo->prepare($sql);

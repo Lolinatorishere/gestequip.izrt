@@ -1,12 +1,11 @@
 <?php
 
-
 function common_select_query($request){
-    //this funciton will create the sql query that does:
-    // returns total ammount of items from a table
+    //this function will create the sql query that does:
+    // returns total amount of items from a table
     // or the items with the specific requirements 
     $sql = " SELECT ";
-    // allows me to do request paging 
+    // allows request paging 
     // this should ask the mysql server how many of the query exists
     if(!isset($request["counted"]) && !isset($request["total_items"]))
         $sql .= (" COUNT(*)");
@@ -24,5 +23,4 @@ function common_select_query($request){
     }
     return $sql;
 }
-
 ?>

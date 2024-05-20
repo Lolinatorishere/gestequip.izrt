@@ -1,8 +1,8 @@
 <?php
 
 include_once query_generator_dir;
-
-function get_from_groups($request){
+// requires more stuff to compensate
+function get_groups($request){
     require pdo_config_dir;
     $sql_error = "";
     $sql = common_select_query($request);

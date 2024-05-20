@@ -1,4 +1,3 @@
-
 async function isFirstTab(string){
     let parser = new DOMParser()
        ,doc = parser.parseFromString(string , 'text/html')
