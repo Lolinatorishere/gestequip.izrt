@@ -11,6 +11,7 @@ CREATE table if not EXISTS equipment(
     -- 0 is active the higher the int the closer to retirement
     equipment_status int NOT NULL,
     serial_md5 char(32) AS (md5(serial_number)) unique not null,
+    business_unit text,
     PRIMARY KEY (id),
     CONSTRAINT equipment_ibfk_1 FOREIGN KEY (equipment_type) REFERENCES equipment_types (id)
 );
@@ -24,7 +25,6 @@ CREATE TABLE equipment_types (
 create table if NOT EXISTS computers(
     id int not null auto_increment,
     equipment_id int not null unique,
-    business_unit text,
     hwid varchar(255) unique,
     computer_model text,
     computer_type int,
@@ -38,6 +38,7 @@ create table if NOT EXISTS computers(
     primary key (id),
     foreign key (equipment_id) references equipment(id)
 );
+
 create table if NOT EXISTS phones(
     id int not null auto_increment,
     equipment_id int not null unique,

@@ -1,14 +1,23 @@
 <?php 
+
+if(!defined('query_generator_dir'))
+    define('query_generator_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/query_generator.php');
+
+if(!defined('pdo_config_dir'))
+    define('pdo_config_dir' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
+ 
 session_start();
 
 if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] === true)
     header("Location: /pages/dashboard.php");
 
-require_once __DIR__."/../config/pdo_config.php";
+require_once pdo_config_dir;
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_query.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/auth/user_auth.php";
 $error_message = "";
 $email = "";
 $password = "";
-$errors[2];
+$errors[2] = array("" , "");
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty(trim($_POST["email"]))){
@@ -32,6 +41,7 @@ function login_check($pdo , $errors , $email , $password ){
     $login_err = "Invalid Email or Password";
     $sql_error = "Well thats weird, Something didnt go well.<br> Try again Later.";
     $param_email = $_POST["email"];
+    $auth = 0;
     $sql ="SELECT id, email, pass, account_status, username, users_name
       FROM users
       WHERE email = ?";
@@ -71,26 +81,17 @@ function login_check($pdo , $errors , $email , $password ){
     $username = $row["username"];
     $users_name = $row["users_name"];
 
-    
-    //checks if is a manager
-    $sql = "SELECT * FROM users_inside_groups WHERE user_id = ?";
-    $statement = $pdo->prepare($sql);
-    if(!$statement)
-        return $sql_error;
-    $statement->bindParam(1 , $id, PDO::PARAM_STR);
-    $statement->execute();
-
-    $rows = $statement->fetchAll();
-    foreach($rows as $row){
-        if($row["user_permission_level"] == 0){
-            continue;
-        }
-        if($row["user_permission_level"] == 1){
-            $auth = 2;
-        }
+    // loads the auth levels of every group
+    $request = array("fetch" => " * "
+                    ,"table" => "users_inside_groups"
+                    ,"specific" => "user_id = ". $id 
+                    ,"counted" => 1
+                );
+    $group_auth = get_user_group_auth($request , $pdo);
+    if(count($group_auth["auth"]) >= 1){
+        $auth = 2;
     }
-
-    //checks if is an admin
+    // checks if is an admin 
     $sql = "SELECT * FROM sudo_group WHERE id_user = ?";
     $statement = $pdo->prepare($sql);
     if(!$statement)
@@ -104,8 +105,6 @@ function login_check($pdo , $errors , $email , $password ){
             $auth = 1;
         }
     }
-
-    session_start();
     $_SESSION["logged_in"] = true;
     $_SESSION["id"] = $id;
     $_SESSION["email"] = $email;
@@ -122,6 +121,7 @@ function login_check($pdo , $errors , $email , $password ){
             $_SESSION["user_type"] = "User";
             break;
     }
+    $_SESSION["group_auth"] = $group_auth;
     header("Location: /pages/dashboard.php");
 }
 ?>

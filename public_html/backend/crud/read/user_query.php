@@ -3,46 +3,10 @@
 // define('profile_pdo_config' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
 
 include_once query_generator_dir;
+include_once common_funcs;
 
 function get_user_search(){
 
-}
-
-function get_userinfo_groups($request , $pdo){
-    $sql_error = "";
-    $sql = common_select_query($request);
-    $statement = $pdo->prepare($sql);
-    if(!$statement)
-        return $sql_error;
-    $statement->execute();
-    if(!$statement)
-        return $sql_error;
-    $groups =  $statement->fetchAll();
-    $user_groups = array("auth" => array()
-                        ,"own_auth" => array()
-                        ,"de_auth" => array()
-                        ,"all_groups" => array()
-                        ,"total_items" => 0);
-    foreach($groups as $group){
-        switch($group["user_permission_level"]){
-            case 0: // user is a group manager
-                array_push($user_groups["auth"] , $group["group_id"])  ;
-                array_push($user_groups["all_groups"] , $group["group_id"]);
-                break;
-            case 1: // user is permited to alter own equipment
-                array_push($user_groups["own_auth"] , $group["group_id"]);
-                array_push($user_groups["all_groups"] , $group["group_id"]);
-                break;
-            case 2: // user is only permited to view own equipment
-                array_push($user_groups["de_auth"] , $group["group_id"]);
-                array_push($user_groups["all_groups"] , $group["group_id"]);
-                break;
-            default:
-                break;
-        }
-        $user_groups["total_items"]++;
-    }
-    return $user_groups;
 }
 
 function user_info(){
@@ -96,21 +60,42 @@ function user_info(){
     return($ret);
 }
 
+// gets all the equipments from certain ids
 function get_users($request , $pdo){
     $sql_error = array("error" => "error");
     if(isset($request["error"]))
         return $sql_error;
+    if(!isset($request["limit"]))
+        $request["limit"] = 20;
     $ret = array();
+    // the reason this table exists is because it simplifies the querying 
+    // of the equipments of a group or its users
+    page_check($request);
     $sql = common_select_query($request);
+    // request is unavailable
     if($sql == "")
         return $sql_error;
+    error_log($sql);
     $statement = $pdo->prepare($sql);
     $statement->execute();
     if(!$statement)
         return $sql_error;
-    $ids = $statement->fetchAll();
-    $ret["success"] = "success";
-    $ret["items"] = $ids;
-    return $ret;
+    if(!isset($request["total_items"])){
+        $rows_in_query = $statement->fetch();
+        $request["total_items"] = $rows_in_query[0];
+        $request["counted"] = 1;
+        $request["page"] = 1;
+        $request["pages"] = ceil($request["total_items"] / $request["limit"]);
+        $sql = common_select_query($request);
+        $statement = $pdo->prepare($sql);
+        $statement->execute();
+    }
+    $users = $statement->fetchAll();
+    $ret["items"] = $users;
+    $ret["pages"] = $request["total_pages"];
+    $ret["current_page"] = $request["page"];
+    $ret["paging"] = 1; 
+    $ret["total_items"] = $request["total_items"];
+    return($ret);   
 }
 ?>

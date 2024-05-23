@@ -2,20 +2,22 @@
 session_start();
 // defines section 
 // to avoid other files from working without the controler
+
+if(!defined('common_funcs'))
+    define('common_funcs' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_functions.php');
+
 if(!defined('pdo_config_dir'))
     define('pdo_config_dir' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
-
+ 
 if(!defined('query_generator_dir'))
     define('query_generator_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/query_generator.php');
 
-// authentication code
-include_once "/var/www/html/gestequip.izrt/public_html/backend/auth/user_auth.php";
-
 // crud functions 
-include_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_query.php";
-include_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/merge_arrays.php"; 
-include_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/equipment_query.php";
-include_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/user_query.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_query.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/merge_arrays.php"; 
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/equipment_query.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/group_query.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/user_query.php";
 
 // base get requests 
 $tab_request = $_GET["tab"];
@@ -99,13 +101,13 @@ function request_crud_validation(){
     }
 }
 
-function request_crud_authentication($pdo , $user_id){
-    $group_permissions = user_group_auth($user_id , $pdo);
-    // if admin do as you wish
-    if($_SESSION["user_type"] === "Admin")
-        return array("admin" => "true");
-    $group_permissions;
-}
+// function request_crud_authentication($pdo , $user_id){
+//     $group_permissions = user_group_auth($user_id , $pdo);
+//     // if admin do as you wish
+//     if($_SESSION["user_type"] === "Admin")
+//         return array("admin" => "true");
+//     $group_permissions;
+// }
 
 function equipment_group_user_sql_metacode($queried_users){
     $unique_users = array();
@@ -169,26 +171,38 @@ function equipment_sql_query_metacode($user_data){
     return $sql;
 }
 
-// bloody hell this was a headache and a half to write
-
-function group_sql_query_metacode($group_ids , $user_id){
+// this function was also a major headache to make but less than the previous one
+function user_group_sql_query_metacode($group_ids , $user_id){
     $sql = '';
     $i = 0;
     foreach($group_ids as $auth => $group_id){
         if($auth === "all_groups")
             break;
-        if($i > 0 && $i < $group_ids["total_items"])$sql .= " OR ";
+        if($i > 0 && $i < $group_ids["total_items"])$sql .= " or ";
         if($auth === "auth"){
             foreach($group_id as $id){
-                $sql .= "(group_id = " . $id . " AND user_permission_level >= 0)";
+                $sql .= "(group_id = " . $id . " and user_permission_level >= 0)";
             }
         }
         if($auth === "own_auth" || $auth === "de_auth"){
             foreach($group_id as $id){
-                $sql .= "(group_id = " . $id . " AND user_id = " . $user_id . ")";
+                $sql .= "(group_id = " . $id . " and user_id = " . $user_id . ")";
             }
         }
         $i++;
+    }
+    return $sql;
+}
+
+function sql_array_query_metacode($inputs){
+    $sql = '';
+    $i = 1;
+    $total = count($inputs);
+    foreach($inputs as $input){
+        $sql .= $input;
+        if($i !== $total){
+            $sql .= ', ';
+        } 
     }
     return $sql;
 }
@@ -216,32 +230,25 @@ function full_group_equipment_user_data($users_groups_equipments , $equipments ,
         array_push($items , $data);
     }
     $items["pages"] = $equipments["pages"];
-    $items["current_page"] = $equipments["page"];
+    $items["current_page"] = $equipments["current_page"];
     $items["paging"] = $equipments["paging"]; 
     $items["total_items"] = $equipments["total_items"];
     return $items;
 }
 
-function set_tab_request($tab , &$data_request , $user_id , $pdo){
+function tab_read_request($tab , &$data_request , $user_id , $pdo){
     $group_ids = '';
     $user_ids = '';
     $equipment_ids ='';
+    $data = array();
     switch($tab){
         case "yur_eq":
-            $request = array("fetch" => " * "
-                            ,"table" => "users_inside_groups_equipments"
-                            ,"specific" => "user_id = " . $user_id
-                        );
-            $data_request = $request;
-            return;
+            $data_request["fetch"] = " * ";
+            $data_request["table"] = "users_inside_groups_equipments";
+            $data_request["specific"] = "user_id = " . $user_id;
+            return get_equipments($data_request , $pdo);
         case "grp_eq":
-            $request = array("fetch" => " * "
-                            ,"table" => "users_inside_groups"
-                            ,"specific" => "user_id = " . $user_id
-                            ,"counted" => 1
-                        );
-            // side query to get the querying users groups
-            $user_group_info = get_userinfo_groups($request , $pdo);
+            $user_group_info = $_SESSION["group_auth"];
             // turn the ids from the fetched groups into a string that 
             // can be read by mysql
             for($i = 0 ; $i < $user_group_info["total_items"] ; $i++){
@@ -254,7 +261,7 @@ function set_tab_request($tab , &$data_request , $user_id , $pdo){
             // their own
             $request = array("fetch" => " distinct user_id , group_id "
                             ,"table" => "users_inside_groups"
-                            ,"specific" => group_sql_query_metacode($user_group_info , $user_id)
+                            ,"specific" => user_group_sql_query_metacode($user_group_info , $user_id)
                             ,"counted" => 1);
             // gets all the unique user_ids and groups
             $equipment_groups_users_info = get_queries($request , $pdo);
@@ -285,24 +292,69 @@ function set_tab_request($tab , &$data_request , $user_id , $pdo){
             $data_request["fetch"] = " * ";
             $data_request["table"] = " users_inside_groups_equipments ";
             $data_request["specific"] = equipment_sql_query_metacode($equipment_groups_users_info["items"]);
-            $data_request["multiple"] = 1;
             $equipments_info = get_equipments($data_request , $pdo);
+            // Hydrate the request with aditional information to be sent to the frontend
             $data = full_group_equipment_user_data($links , $equipments_info , $users_info , $groups_info);
             return $data;
+        case 'add_eq':
+            $auth_groups = $_SESSION["group_auth"]["auth"];
+            if(!isset($data_request["refresh"])){
+                $request = array("fetch" => " * "
+                                ,"table" => " equipment_types "
+                                ,"counted" => 1
+                            );
+                $equipment_types = get_queries($request , $pdo);
+                $request = array("fetch" => " * " 
+                                ,"table" => " user_groups "
+                                ,"specific" => " id IN ( " . sql_array_query_metacode($auth_groups) . " ) "
+                            );
+                $manageable_groups = get_groups($request , $pdo);
+                array_push($data , $equipment_types , $manageable_groups);
+                return $data;
+            }else{
+                switch($data_request["refresh"]){
+                    case "group":
+                        $request = array("fetch" => " * "
+                                        ,"table" => " users_inside_groups "
+                                        ,"specific" => " group_id = " . $data_request["origin"]
+                                    );
+                        $user_info = get_users($request , $pdo);
+                        return $user_info;
+                    case "equip":
+                        $request = array("fetch" => " column_name , data_type "
+                                        ,"table" => " information_schema.columns "
+                                        ,"specific" => " table_name = '" . $data_request["origin"] ."s' "
+                                        ,"counted" => 1
+                                    );
+                        $equipment_info = get_query($request , $pdo);
+                        return $equipment_info;
+                    default:
+                        $data_request["error"] = "error";
+                        return 0;
+                        break;
+                }
+            }
+            break;
     }
     $data_request["error"] = "error";
     return 0;
 }
 
+function tab_create_information($tab , $user_id , $pdo){
+    switch($tab){
+        case "add_eq":
+            
+            break;
+    }
+}
+
 // gets the correct requests for each tab
-function tab_fetch_data($tab , $user_id , $pdo){
+function tab_read_information($tab , $user_id , $pdo){
     $data_request = array();
     if(isset($_GET["page"])){
         $page = preg_replace('/[^0-9]/s' , '' , $_GET["page"]); 
         $data_request["page"] = $page;
-    }else{
-        $data_request["page"] = 1;
-    }
+    } 
     if(isset($_GET["t_i"])){
         $total_items = preg_replace('/[^0-9]/s' , '' , $_GET["t_i"]); 
         $data_request["total_items"] = $total_items;
@@ -311,13 +363,16 @@ function tab_fetch_data($tab , $user_id , $pdo){
         $paging = preg_replace('/[^0-9]/s' , '' , $_GET["pgng"]); 
         $data_request["paging"] = $paging;
     }
-    $data = set_tab_request($tab , $data_request , $user_id , $pdo);
-    if(!isset($data_request["multiple"])){
-        $data = get_equipments($data_request , $pdo);
+    if(isset($_GET["rfsh"])){// refesh x data
+        $refresh = preg_replace('/[^a-zA-Z]/s' , '' , $_GET["rfsh"]); 
+        $data_request["refresh"] = $refresh;
     }
-    return $data;
+    if(isset($_GET["rgin"])){// origin of refresh
+        $origin = preg_replace('/[^a-zA-Z0-9]/s' , '' , $_GET["rgin"]); 
+        $data_request["origin"] = $origin;
+    }
+    return tab_read_request($tab , $data_request , $user_id , $pdo);
 }
-
 
 // function to handle crud requests from tabs
 function data_request($tab , $pdo , $user_id){
@@ -329,11 +384,10 @@ function data_request($tab , $pdo , $user_id){
     $crud = request_crud_validation();
     if($crud === 0)
         return $ret;
+    if($crud === 1) //create new info
+        $data = tab_create_information($tab , $user_id , $pdo);
     if($crud === 2) //read info
-        $data = tab_fetch_data($tab , $user_id , $pdo);
-    else{
-        $auth = request_crud_authentication($pdo , $user_id);
-    }
+        $data = tab_read_information($tab , $user_id , $pdo);
     $ret = $data;
     return $ret;
 }
@@ -362,7 +416,6 @@ function request_handle($tab_valid , $tab , $type_valid){
         require_once pdo_config_dir;
         $user_id = $_SESSION["id"];
         $ret = data_request($tab , $pdo , $user_id);
-        // equipment_parser($ret);
         unset($pdo);
         if(isset($ret["error"]))
             return array("unavailable" , $ret);
@@ -383,5 +436,5 @@ if($req_type === 2){
     echo json_encode(array('data' => $ret[0]
                           ,'tab' => $tab_request
                           ,'information' => $ret[1]));
-unset($pdo);
 }
+unset($pdo);

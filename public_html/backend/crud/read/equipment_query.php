@@ -1,8 +1,7 @@
 <?php
 
 include_once query_generator_dir;
-
-// todo later
+include_once common_funcs;
 
 function handle_equipment_search($search , &$sql){
     return 0;
@@ -11,17 +10,6 @@ function handle_equipment_search($search , &$sql){
     // switch($search["category"]){
     //     case "user":
     // }
-}
-
-function page_check(&$request){
-    $pages = 0;
-    if(!isset($request["total_pages"]))
-        $request["total_pages"] = 1;
-    if(!isset($request["page"]))
-        $request["page"] = 1;
-    if($pages <= 0)
-        $pages = 1;
-    return;
 }
 
 // gets all the equipments from certain ids
@@ -37,7 +25,6 @@ function get_equipments($request , $pdo){
     // of the equipments of a group or its users
     page_check($request);
     $sql = common_select_query($request);
-    error_log($sql);
     // request is unavailable
     if($sql == "")
         return $sql_error;

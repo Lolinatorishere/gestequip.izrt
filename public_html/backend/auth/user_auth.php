@@ -1,27 +1,41 @@
 <?php
 
-//obtains the authentication level for every group the user is part of
-function user_group_auth($id , $pdo){
+include_once query_generator_dir;
 
-    $ret = array("success" => "false");
-    $sql = "SELECT * 
-            FROM users_inside_groups
-            WHERE user_id = ?";
-
+function get_user_group_auth($request , $pdo){
+    $sql_error = "";
+    $sql = common_select_query($request);
     $statement = $pdo->prepare($sql);
-
-    if(!$statement){
-        return $ret;
-    }
-
-    $statement->bindParam(1 , $id , PDO::PARAM_INT);
+    if(!$statement)
+        return $sql_error;
     $statement->execute();
-
-    if(!$statement){
-        return $ret;
+    if(!$statement)
+        return $sql_error;
+    $groups =  $statement->fetchAll();
+    $user_groups = array("auth" => array()
+                        ,"own_auth" => array()
+                        ,"de_auth" => array()
+                        ,"all_groups" => array()
+                        ,"total_items" => 0);
+    foreach($groups as $group){
+        switch($group["user_permission_level"]){
+            case 0: // user is a group manager
+                array_push($user_groups["auth"] , $group["group_id"])  ;
+                array_push($user_groups["all_groups"] , $group["group_id"]);
+                break;
+            case 1: // user is permited to alter own equipment
+                array_push($user_groups["own_auth"] , $group["group_id"]);
+                array_push($user_groups["all_groups"] , $group["group_id"]);
+                break;
+            case 2: // user is only permited to view own equipment
+                array_push($user_groups["de_auth"] , $group["group_id"]);
+                array_push($user_groups["all_groups"] , $group["group_id"]);
+                break;
+            default:
+                break;
+        }
+        $user_groups["total_items"]++;
     }
-
-    $ret = $statement->fetchAll();
-    return $ret;
+    return $user_groups;
 }
 ?>
