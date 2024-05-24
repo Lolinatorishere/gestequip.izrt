@@ -29,7 +29,6 @@ function tab_request_validation($tab){
     }
     switch ($trim_req){
         case "yur_eq":
-            return 1;
             break;
         case "grp_eq":
             return 1;
@@ -318,9 +317,30 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
                                         ,"table" => " users_inside_groups "
                                         ,"specific" => " group_id = " . $data_request["origin"]
                                     );
-                        $user_info = get_users($request , $pdo);
-                        return $user_info;
-                    case "equip":
+                        $group_users = get_users($request , $pdo);
+                        $_SESSION["group_users"] = $group_users["items"];
+                        return $group_users;
+                    case "user":
+                        if(!isset($_SESSION["group_users"]))
+                            break;
+                        foreach ($_SESSION["group_users"] as $group_user) {
+                            error_log($group_user["user_id"]);
+                            error_log($data_request["origin"]);
+                            if($group_user["user_id"] == $data_request["origin"]){
+                                error_log("saoiudiuodsfiooasidfoiupasfpiuasdupiupiaospuio");
+                                $request  = array("fetch" => " users_name , email , phone_number , regional_indicator , account_status "
+                                                 ,"table" => " users "
+                                                 ,"specific" => " id = " . $data_request["origin"]
+                                                 ,"counted" => 1
+                                            );
+                                break;
+                            }
+                        }
+                        if(isset($request))
+                            return get_query($request , $pdo);
+                        else 
+                            break;
+                    case "equipment":
                         $request = array("fetch" => " column_name , data_type "
                                         ,"table" => " information_schema.columns "
                                         ,"specific" => " table_name = '" . $data_request["origin"] ."s' "
@@ -329,13 +349,11 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
                         $equipment_info = get_query($request , $pdo);
                         return $equipment_info;
                     default:
-                        $data_request["error"] = "error";
-                        return 0;
-                        break;
+                        break; 
                 }
             }
             break;
-    }
+        }
     $data_request["error"] = "error";
     return 0;
 }

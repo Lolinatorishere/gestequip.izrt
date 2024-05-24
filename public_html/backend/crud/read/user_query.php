@@ -75,7 +75,6 @@ function get_users($request , $pdo){
     // request is unavailable
     if($sql == "")
         return $sql_error;
-    error_log($sql);
     $statement = $pdo->prepare($sql);
     $statement->execute();
     if(!$statement)
