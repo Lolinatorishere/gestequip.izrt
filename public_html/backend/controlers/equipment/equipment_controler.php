@@ -29,6 +29,7 @@ function tab_request_validation($tab){
     }
     switch ($trim_req){
         case "yur_eq":
+            return 1;
             break;
         case "grp_eq":
             return 1;
@@ -328,7 +329,7 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
                             error_log($data_request["origin"]);
                             if($group_user["user_id"] == $data_request["origin"]){
                                 error_log("saoiudiuodsfiooasidfoiupasfpiuasdupiupiaospuio");
-                                $request  = array("fetch" => " users_name , email , phone_number , regional_indicator , account_status "
+                                $request  = array("fetch" => " id , users_name , email , phone_number , regional_indicator , account_status "
                                                  ,"table" => " users "
                                                  ,"specific" => " id = " . $data_request["origin"]
                                                  ,"counted" => 1
@@ -358,13 +359,40 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
     return 0;
 }
 
-function tab_create_information($tab , $user_id , $pdo){
+function tab_create_request($data_request , $tab , $user_id , $pdo){
     switch($tab){
         case "add_eq":
-            
-            break;
+            return create_equipment($data_request , $pdo);
     }
 }
+
+function tab_create_information($tab , $user_id , $pdo){
+    $data_request = array();
+    if(!isset($_POST["equipment"]))
+        return 0;
+    if(!isset($_POST["normal"]))
+        return 0;
+    if(!isset($_POST["special"]))
+        return 0;
+    if(!isset($_POST["user"]))
+        return 0;
+    if(!isset($_POST["group"]))
+        return 0;
+    $equipment_type = preg_replace('/[^a-zA-Z]/s' , '' , $_POST["equipment"]); 
+    $user_info = $_POST["user"];
+    $group_info = $_POST["group"];
+    $data_request["equipment_type"] = $equipment_type; 
+    $normal_info = $_POST["normal"];
+    $special_info = $_POST["special"];
+    foreach($normal_info as $key => $info){
+        $data_request["normal"][$key] = " \'" . $info . "\' ";
+    }
+    foreach($special_info as $key => $info){
+        $data_request["special"][$key] = " \'" . $info . "\' ";
+    }
+    return tab_create_request($data_request , $tab , $user_id , $pdo);
+}
+
 
 // gets the correct requests for each tab
 function tab_read_information($tab , $user_id , $pdo){

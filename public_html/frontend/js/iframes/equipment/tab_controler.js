@@ -309,6 +309,8 @@ async function tabbarFunctionality(button , tab){
     }
     button.addEventListener('click' , async function(){
         setTabHighlight(button);
+        tab_css = document.getElementById("tab-css");
+        tab_css.href = '/frontend/css/iframes/equipment/tabs/' + tab +'.css';
         // fetches the correct tab ui on click
         request.custom = {
             tab: tab

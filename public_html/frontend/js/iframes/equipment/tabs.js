@@ -40,7 +40,12 @@ async function createEquipmentContent(){
     });
 
     link.rel = 'stylesheet';
-    link.href = '/frontend/css/iframes/equipment/iframe_content.css';
+    link.href = '/frontend/css/iframes/equipment/iframe_common.css';
+    iframe.contentDocument.head.appendChild(link);
+    link = document.createElement('link')
+    link.rel = 'stylesheet';
+    link.id = 'tab-css';
+    link.href = '';
     iframe.contentDocument.head.appendChild(link);
     script.src = '/frontend/js/iframes/equipment/tab_controler.js';
     iframe.contentDocument.head.appendChild(script);

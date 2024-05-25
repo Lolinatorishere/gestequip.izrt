@@ -1,0 +1,181 @@
+
+.add-equipment{
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+}
+
+.add-new-items *{
+    display: flex;
+    flex-direction: column;
+}
+
+.add-new-items{
+    height: 100%;
+    width: 60%;
+    border-style: none solid none none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+.add-inputs {
+    height: 100%;
+}
+
+.add-inputs *{
+    width: 100%;
+}
+
+.common-equipment{
+    height: 30%;
+}
+
+.user-group-select{
+    height: 10%;
+}
+
+.type-control{
+    height: 40%;
+}
+
+.add-buttons{
+    height: 5%;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.server-message{
+    height: 15%;
+    width: 100%;
+    font-size: 1rem;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.message-content{
+    height: 100%;
+    width: 90%;
+    justify-content: start;
+}
+
+.server-response-center{
+    height: 30%;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.server-response{
+    justify-content: center;
+    text-align: center;
+}
+
+.specific-message{
+    height: 70%;
+    flex-direction: row;
+    justify-content: start;
+}
+
+.add-details{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 40%;
+}
+
+.add-details-groups *{
+    width: 100%;
+}
+
+.add-details-groups{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    height: 50%;
+    border-style: none none solid none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+.add-groups-controls{
+    display: flex;
+    flex-direction: row;
+    height: 10%;
+    user-select: none;
+    border-style: none none solid none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+#group-control{
+    cursor: pointer;
+}
+
+.add-groups-items{
+    display: flex;
+    flex-direction: column;
+    height 90%;
+}
+
+.add-groups-item{
+    height: 10%;
+    cursor: pointer;
+}
+
+.add-groups-item :hover{
+    border-color: rgb(215, 215, 215);
+}
+
+.add-groups-item #highlight{
+    background-color:rgb(239, 239, 239);
+}
+
+.add-groups-item #selected{
+    background-color: rgb(201, 201, 201) !important;
+}
+
+.add-details-users{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    height: 50%;
+}
+
+.add-user-controls{
+    display: flex;
+    flex-direction: row;
+    height: 10%;
+    user-select: none;
+    border-style: none none solid none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+
+}
+
+#user-control{
+    cursor: pointer;
+}
+
+.add-user-items{
+    display: flex;
+    flex-direction: column;
+    height 90%;
+}
+
+.add-user-item{
+    height: 10%;
+    cursor: pointer;
+}
+
+.add-user-item :hover{
+    border-color: rgb(215, 215, 215);
+}
+
+.add-user-item #highlight{
+    background-color:rgb(239, 239, 239);
+}
+
+.add-user-item #selected{
+    background-color: rgb(201, 201, 201) !important;
+}
