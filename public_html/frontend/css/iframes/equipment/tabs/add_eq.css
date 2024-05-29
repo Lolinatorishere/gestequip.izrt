@@ -35,6 +35,14 @@
     height: 10%;
 }
 
+.user-group-select #selected-user{
+    flex-direction: row;
+}
+
+.user-group-select #selected-group{
+    flex-direction: row;
+}
+
 .type-control{
     height: 40%;
 }

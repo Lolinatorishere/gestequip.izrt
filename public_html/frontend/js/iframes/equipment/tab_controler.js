@@ -8,7 +8,6 @@ async function isFirstTab(string){
         return 0
     }
 }
-
 async function setTabHighlight(tab_node){
     let previous_tab = document.getElementById('current-tab');
     await unsetPreviousHighlight(previous_tab , tab_node);
@@ -122,14 +121,14 @@ function controlsHtml(data){
     return html;
 }
 
-function controlsFunctionality(data){
-    let current_page = data.information.current_page
-       ,total_items = data.information.total_items
-       ,page_max = data.information.pages
+function controlsFunctionality(data ){
+    let current_page = parseInt(data.information.current_page)
+       ,total_items = parseInt(data.information.total_items)
+       ,page_max = parseInt(data.information.pages)
        ,page_controls = []
        ,arrow_backward
        ,arrow_forward;
-        let request = {
+    let request = {
             page: 'equipment'
            ,custom: undefined
         }
@@ -200,11 +199,11 @@ function controlsFunctionality(data){
     });
 }
 
-function setControls(data , append_to){
+function setControls(data , append_to , ){
     let totalDiv = document.createElement('div')
        ,controlDiv = document.createElement('div')
        ,controls = document.createElement('div');
-    let info = data.information
+    let info = data.information;
     totalDiv.className = 'total';
     totalDiv.innerHTML = `
         Total: ${info.total_items}
@@ -217,42 +216,51 @@ function setControls(data , append_to){
     controlsFunctionality(data);
 }
 
-function itemsHtml(data){
+function itemsHtml(data , appends){
     let itemsDiv = document.createElement('div')
        ,info = data.information;
     if(data.data !== "success"){
         itemsDiv.className = 'info-message';
         itemsDiv.innerHTML = `
-            no equipment is available
+            no information is available
         `;
         return itemsDiv;
     }else{
+        if(data.title !== undefined){
+            let title = document.createElement('div');
+
+            data.title.forEach(element => {
+                let HTMLinner = '';
+                HTMLinner += `
+                            <div id="title-${element}">
+                                ${element}
+                            <div>
+                             `
+                title.innerHTML += HTMLinner;
+            });
+            itemsDiv.appendChild(title);
+        }
         //equipment type, brand, model, purchase_date, equipment state
         for(let i = 0 ; i < info.total_items ; i++){
+            console.log(info);
             let item = info.items[i];
             let items = document.createElement('div');
-            items.className = 'item-eq';
+            let HTMLinner = '';
+            items.className = 'item-' + appends[0];
             if(i%2 !== 0){
-                items.className = 'item-eq highlight';
+                items.className = 'item-' + appends[0] + ' highlight';
             }
-            items.id = 'item-' + i;
-            items.innerHTML = `
-                <div class="equipment-type">
-                    ${item.equipment_type}
-                </div>
-                <div class="brand">
-                    ${item.brand}
-                </div>
-                <div class="model">
-                    ${item.model}
-                </div>
-                <div class="purchase_date">
-                    ${item.purchase_date}
-                </div>
-                <div class="equipment_status">
-                    ${item.equipment_status}
-                </div>
-            `
+            items.id = 'item-' + appends[0] + "-" + i;
+            appends[1].forEach(element => {
+                if(item !== undefined){
+                    HTMLinner += `
+                                <div class="${element}">
+                                    ${item[element]}
+                                </div>
+                                `
+                }
+            })
+            items.innerHTML = HTMLinner
             itemsDiv.appendChild(items);
         }
     }
@@ -272,30 +280,109 @@ function itemDetailsHtml(info){
     return html;
 }
 
-function itemsFunctionality(data , append_details){
+function itemsFunctionality(data , append_details , appends){
     let info = data.information; 
     for(let i = 0 ; i < info.total_items ; i++){
-        document.getElementById('item-' + i)
+        elementid = 'item-' + appends[0] + '-' + i;
+        document.getElementById(elementid)
         .addEventListener('click' ,  function(){
             append_details.innerHTML = itemDetailsHtml(data.information.items[i]);
         });
     }
 }
 
-function setItems(data , append_to , append_details){
-        append_to.innerHTML = itemsHtml(data).innerHTML;;
-        if(append_details !== null || append_details !== undefined){
-            itemsFunctionality(data , append_details);
-        }
+function setEqTypes(data) {
+    let info = data;
+    console.log(info);
+    for(let i = 0 ; i < info.total_items ; i++){
+        document.getElementById('item-' + i)
+        .addEventListener('click' , function(){
+            request.custom = {
+                tab: data.tab
+               ,type: 'data' 
+               ,crud: 'read'
+            }
+        });
+    }
+}
+
+function setFetchItems(Functionality , data , appends , append_to , append_details){
+    append_to.innerHTML = itemsHtml(data , appends).innerHTML;;
+    if(append_details !== null || append_details !== undefined){
+        Functionality(data , append_details , appends);
+    }
+}
+
+function setUserHasNoItems(append_controls , append_items , append_details , message){
+    append_controls.innerHTML = `
+                                <div class="${message.controlsclass}">
+                                    User has no ${message.controls}
+                                </div>
+                                `
+    append_items.innerHTML =    `
+                                <div class="${message.itemsclass}">
+                                    ${message.items}
+                                </div>
+                                `
+    append_details.innerHTML =  `
+                                <div class="${message.detailsclass}">
+                                    ${message.details}
+                                </div>
+                                `
 }
 
 async function setTabContent(data){
     switch(data.tab){
         case 'yur_eq':
-            setControls(data , document.getElementById("items-controls"));
-            setItems(data , document.getElementById("items-content") , document.getElementById("info-selected"));
+            append_controls = document.getElementById("items-controls");
+            append_items = document.getElementById("items-content");
+            append_details = document.getElementById("info-selected");
+            appends = [["yur"],["equipment_type","brand","model","purchase_date","equipment_status"]];
+            if(data.information.error !== undefined){
+                message = {controlsclass: "control_error_msg"
+                          ,controls: "user has no equipment"
+                          ,itemsclass: "items_error_msg" 
+                          ,items: "no equipment has been assigned to you"
+                          ,detailsclass: "details_error_msg"
+                          ,details: "at this current moment there are no items assigned to you"
+                          }
+                setUserHasNoItems(append_controls , append_items , append_details , message);
+                break;
+            }
+            setControls(data , append_controls);
+            setFetchItems(itemsFunctionality , data , appends , append_items , append_details);
             break;
         case'grp_eq':
+            append_controls = document.getElementById("items-controls");
+            append_items = document.getElementById("items-content");
+            append_details = document.getElementById("info-selected");
+            appends = [["grp"],["users_name","group_name","equipment_type","brand","model","purchase_date","equipment_status"]];
+            if(data.information.error !== undefined){
+                message = {controlsclass: "control_error_msg"
+                          ,controls: "user has no groups"
+                          ,itemsclass: "items_error_msg" 
+                          ,items: "no groups or equipment has been assigned to you"
+                          ,detailsclass: "details_error_msg"
+                          ,details: "at this current moment there are no groups assigned to you"
+                          }
+                setUserHasNoItems(append_controls , append_items , append_details , message);
+                break;
+            }
+            setControls(data , append_controls);
+            setFetchItems(itemsFunctionality , data , appends , append_items , append_details);
+            break;
+        case'add_eq':
+            append_controls = {
+                
+            }
+            group_data = {tab: data.tab
+                         ,information: data.information.groups
+                         ,data: data.data
+                         ,title: ["name" , "status" , "type"]
+                         };
+            appends = [["group"] , ["group_name","group_status","group_type"]];
+            setControls(group_data , document.getElementById("groups-controls"));
+            setFetchItems(itemsFunctionality , group_data , appends , document.getElementById("groups-items") , document.getElementById("selected-group"));
             break;
         default:
             break;

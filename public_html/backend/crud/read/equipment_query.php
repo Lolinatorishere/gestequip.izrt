@@ -85,7 +85,7 @@ function get_equipments($request , $pdo){
             return $sql_error;
         $item = array();
         array_push($item, $equipment , $equipment_spec);
-        array_push($equipment_all , merge_array($item));
+        array_push($equipment_all , query_merge_array($item));
     };
     $ret["items"] = $equipment_all;
     $ret["pages"] = $request["total_pages"];
