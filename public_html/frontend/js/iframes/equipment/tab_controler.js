@@ -47,6 +47,25 @@ async function unsetPreviousHighlight(previous_tab , tab_node){
     previous_tab.id = 'first-tab';
 }
 
+function setUserHasNoItems(append_controls , append_items , append_details , message){
+    append_controls.innerHTML = `
+                                <div class="${message.controlsclass}">
+                                    User has no ${message.controls}
+                                </div>
+                                `
+    append_items.innerHTML =    `
+                                <div class="${message.itemsclass}">
+                                    ${message.items}
+                                </div>
+                                `
+    append_details.innerHTML =  `
+                                <div class="${message.detailsclass}">
+                                    ${message.details}
+                                </div>
+                                `
+}
+
+
 function controlsHtml(data){
     let html = ''; 
     if(data.current_page > 1){
@@ -291,21 +310,6 @@ function itemsFunctionality(data , append_details , appends){
     }
 }
 
-function setEqTypes(data) {
-    let info = data;
-    console.log(info);
-    for(let i = 0 ; i < info.total_items ; i++){
-        document.getElementById('item-' + i)
-        .addEventListener('click' , function(){
-            request.custom = {
-                tab: data.tab
-               ,type: 'data' 
-               ,crud: 'read'
-            }
-        });
-    }
-}
-
 function setFetchItems(Functionality , data , appends , append_to , append_details){
     append_to.innerHTML = itemsHtml(data , appends).innerHTML;;
     if(append_details !== null || append_details !== undefined){
@@ -313,22 +317,84 @@ function setFetchItems(Functionality , data , appends , append_to , append_detai
     }
 }
 
-function setUserHasNoItems(append_controls , append_items , append_details , message){
-    append_controls.innerHTML = `
-                                <div class="${message.controlsclass}">
-                                    User has no ${message.controls}
-                                </div>
-                                `
-    append_items.innerHTML =    `
-                                <div class="${message.itemsclass}">
-                                    ${message.items}
-                                </div>
-                                `
-    append_details.innerHTML =  `
-                                <div class="${message.detailsclass}">
-                                    ${message.details}
-                                </div>
-                                `
+function setFetchTypes(data , append_to){
+    let info = data.items
+       ,totalHTML = "";
+    info.forEach(element => {
+        type = element.Type.match(/(\w+)/);
+        max_input = element.Type.match(/(\d+)/);
+        max_input_html = "";
+        switch (type) {
+            case "tinyint":
+                input_specific = `
+                                 <div class="input-area">
+                                     <div class="label">
+                                         ${element.Field}
+                                     </div>
+                                     <input type="checkbox">
+                                 </div>
+                                 `
+                break;
+            default:
+                if(max_input !== null)
+                    max_input_html = "maxlength=\"" + max_input[0] + "\"";
+                input_specific = `
+                                 <div class="input-area">
+                                     <input id="input" placeholder="${element.Field}" type="text" ${max_input_html} >
+                                 </div>
+                                 `
+                break;
+        }
+        HTMLinner = `
+                    <div class="specific-input" 
+                         id="specific-input"
+                         input_field="${element.Field}"
+                         is_nullable="${element.Null}"
+                         input_type="${type[0]}"
+                    >
+                        ${input_specific}
+                    </div>
+                    `
+        totalHTML += HTMLinner;
+    });
+    append_to.innerHTML = totalHTML;
+}
+
+async function setEqTypes(data){
+    let info = data.items
+       ,append_dropdown = document.getElementById("type-dropdown")
+       ,request = {}
+       ,append_to = document.getElementById("type-load");
+    info.forEach(element => {
+        HTMLinner = `
+                    <div id="eq-${element.equipment_type}">
+                    ${element.equipment_type}
+                    </div>
+                    `
+        append_dropdown.innerHTML += HTMLinner; 
+    });
+    info.forEach(element => {
+        request[element.equipment_type] = {
+            page: 'equipment'
+            ,custom:{
+                tab: data.tab
+                ,type: 'data' 
+                ,crud: 'read'
+                ,rfsh: 'eq_tables'
+                ,rgin: element.equipment_type
+            }
+        };
+    });
+    info.forEach(element => {
+        document.getElementById("eq-" + element.equipment_type)
+            .addEventListener('click' , async function(){
+                response = await fetch(await urlCreateBackendRequest(request[element.equipment_type]));
+                if(response !== undefined){
+                    type_information = await response.json();
+                    setFetchTypes(type_information.information.types_specific , append_to);
+                }
+            });
+    });
 }
 
 async function setTabContent(data){
@@ -339,13 +405,14 @@ async function setTabContent(data){
             append_details = document.getElementById("info-selected");
             appends = [["yur"],["equipment_type","brand","model","purchase_date","equipment_status"]];
             if(data.information.error !== undefined){
-                message = {controlsclass: "control_error_msg"
-                          ,controls: "user has no equipment"
-                          ,itemsclass: "items_error_msg" 
-                          ,items: "no equipment has been assigned to you"
-                          ,detailsclass: "details_error_msg"
-                          ,details: "at this current moment there are no items assigned to you"
-                          }
+                message = {
+                    controlsclass: "control_error_msg"
+                   ,controls: "user has no equipment"
+                   ,itemsclass: "items_error_msg" 
+                   ,items: "no equipment has been assigned to you"
+                   ,detailsclass: "details_error_msg"
+                   ,details: "at this current moment there are no items assigned to you"
+                }
                 setUserHasNoItems(append_controls , append_items , append_details , message);
                 break;
             }
@@ -358,13 +425,14 @@ async function setTabContent(data){
             append_details = document.getElementById("info-selected");
             appends = [["grp"],["users_name","group_name","equipment_type","brand","model","purchase_date","equipment_status"]];
             if(data.information.error !== undefined){
-                message = {controlsclass: "control_error_msg"
-                          ,controls: "user has no groups"
-                          ,itemsclass: "items_error_msg" 
-                          ,items: "no groups or equipment has been assigned to you"
-                          ,detailsclass: "details_error_msg"
-                          ,details: "at this current moment there are no groups assigned to you"
-                          }
+                message = {
+                    controlsclass: "control_error_msg"
+                   ,controls: "user has no groups"
+                   ,itemsclass: "items_error_msg" 
+                   ,items: "no groups or equipment has been assigned to you"
+                   ,detailsclass: "details_error_msg"
+                   ,details: "at this current moment there are no groups assigned to you"
+                }
                 setUserHasNoItems(append_controls , append_items , append_details , message);
                 break;
             }
@@ -372,17 +440,25 @@ async function setTabContent(data){
             setFetchItems(itemsFunctionality , data , appends , append_items , append_details);
             break;
         case'add_eq':
-            append_controls = {
-                
-            }
-            group_data = {tab: data.tab
-                         ,information: data.information.groups
-                         ,data: data.data
-                         ,title: ["name" , "status" , "type"]
-                         };
-            appends = [["group"] , ["group_name","group_status","group_type"]];
-            setControls(group_data , document.getElementById("groups-controls"));
-            setFetchItems(itemsFunctionality , group_data , appends , document.getElementById("groups-items") , document.getElementById("selected-group"));
+            apnd_controls = document.getElementById("groups-controls");
+            apnd_items = document.getElementById("groups-items");
+            apnd_details = document.getElementById("selected-group");
+            apnds = [["group"] , ["group_name","group_status","group_type"]];
+            custom_data = {
+                group: { 
+                    tab: data.tab
+                   ,information: data.information.groups
+                   ,data: data.data
+                   ,title: ["name" , "status" , "type"]
+                }
+               ,types:{
+                    tab: data.tab
+                   ,items: data.information.types.items
+                }
+            };
+            setControls(custom_data.group , apnd_controls);
+            setFetchItems(itemsFunctionality , custom_data.group , apnds , apnd_items , apnd_details);
+            setEqTypes(custom_data.types);
             break;
         default:
             break;
