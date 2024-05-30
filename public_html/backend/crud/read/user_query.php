@@ -62,6 +62,7 @@ function user_info(){
 
 // gets all the equipments from certain ids
 function get_users($request , $pdo){
+    $users = array();
     $sql_error = array("error" => "error");
     if(isset($request["error"]))
         return $sql_error;
@@ -89,7 +90,19 @@ function get_users($request , $pdo){
         $statement = $pdo->prepare($sql);
         $statement->execute();
     }
-    $users = $statement->fetchAll();
+    $user_ids = $statement->fetchAll();
+    foreach ($user_ids as $user_id) {
+        $request = array("fetch" => " id , users_name , email , phone_number , regional_indicator "
+                        ,"table" => " users "
+                        ,"specific" => " id = " . $user_id["user_id"]
+                        ,"counted" => 1
+        );
+        $sql = common_select_query($request);
+        $statement = $pdo->prepare($sql);
+        $statement->execute();
+        $user = $statement->fetch();
+        array_push($users , $user);
+    }
     $ret["items"] = $users;
     $ret["pages"] = $request["total_pages"];
     $ret["current_page"] = $request["page"];

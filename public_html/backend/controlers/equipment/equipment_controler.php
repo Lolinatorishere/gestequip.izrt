@@ -421,7 +421,7 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
                         return $data_specific;
                     case "grp_usrs":
                         foreach ($auth_groups as $auth) {
-                            if($auth === $data_request["origin"]){
+                            if($auth == $data_request["origin"]){
                                 $guard = 0;
                             }
                         }
@@ -431,6 +431,9 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
                         $request = array("fetch" => " * "
                                         ,"table" => " users_inside_groups "
                                         ,"specific" => " group_id = " . $data_request["origin"]
+                                        ,"total_items" => $data_request["total_items"]
+                                        ,"page" => $data_request["page"]
+                                        ,"paging" => $data_request["paging"]
                                         ,"limit" => 8
                                     );
                         $group_users = get_users($request , $pdo);

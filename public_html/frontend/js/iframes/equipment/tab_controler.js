@@ -8,6 +8,7 @@ async function isFirstTab(string){
         return 0
     }
 }
+
 async function setTabHighlight(tab_node){
     let previous_tab = document.getElementById('current-tab');
     await unsetPreviousHighlight(previous_tab , tab_node);
@@ -64,7 +65,6 @@ function setUserHasNoItems(append_controls , append_items , append_details , mes
                                 </div>
                                 `
 }
-
 
 function controlsHtml(data){
     let html = ''; 
@@ -140,7 +140,9 @@ function controlsHtml(data){
     return html;
 }
 
-function controlsFunctionality(data ){
+function controlsFunctionality(data , refresh , loadingFunction){
+    console.log(data);
+    console.log(data.information.current_page);
     let current_page = parseInt(data.information.current_page)
        ,total_items = parseInt(data.information.total_items)
        ,page_max = parseInt(data.information.pages)
@@ -151,7 +153,7 @@ function controlsFunctionality(data ){
             page: 'equipment'
            ,custom: undefined
         }
-        
+    console.log(current_page);
     if(current_page !== 1){
         document.getElementById('control-arrow-backward')
         .addEventListener('click' , async function(){
@@ -162,10 +164,14 @@ function controlsFunctionality(data ){
                ,crud: 'read'
                ,page: current_page-1
                ,t_i: total_items
-            }   
+            }
+            if(refresh !== undefined){
+                request.custom.rfsh = refresh[0];
+                request.custom.rgin = refresh[1];
+            }
             response = await fetch(await urlCreateBackendRequest(request));
             tab_information = await response.json();
-            await setTabContent(tab_information);
+            await loadingFunction(tab_information);
         });
         for(let i = 1 ; i <= 6 ; i++){
             if(current_page - i >= 1){
@@ -188,9 +194,13 @@ function controlsFunctionality(data ){
                ,page: current_page+1
                ,t_i: total_items
             }   
+            if(refresh !== undefined){
+                request.custom.rfsh = refresh[0];
+                request.custom.rgin = refresh[1];
+            }
             response = await fetch(await urlCreateBackendRequest(request));
             tab_information = await response.json();
-            await setTabContent(tab_information);
+            await loadingFunction(tab_information);
         });
         for(let i = 1 ; i <= 6 ; i++){
             if(current_page + i <= page_max){
@@ -211,28 +221,32 @@ function controlsFunctionality(data ){
                ,page: page.innerHTML.trim()
                ,t_i: total_items
             }   
+            if(refresh !== undefined){
+                request.custom.rfsh = refresh[0];
+                request.custom.rgin = refresh[1];
+            }
             response = await fetch(await urlCreateBackendRequest(request));
             tab_information = await response.json();
-            await setTabContent(tab_information);
+            await loadingFunction(tab_information);
         });
     });
 }
 
-function setControls(data , append_to , ){
+function setControls(data , append_to , refresh , loadingFunction){
     let totalDiv = document.createElement('div')
        ,controlDiv = document.createElement('div')
        ,controls = document.createElement('div');
     let info = data.information;
     totalDiv.className = 'total';
     totalDiv.innerHTML = `
-        Total: ${info.total_items}
-    `
+                            Total: ${info.total_items}
+                         `
     controlDiv.className = 'controls';
     controlDiv.innerHTML = controlsHtml(info);
     controls.appendChild(totalDiv);
     controls.appendChild(controlDiv);
     append_to.innerHTML = controls.innerHTML;
-    controlsFunctionality(data);
+    controlsFunctionality(data , refresh , loadingFunction);
 }
 
 function itemsHtml(data , appends){
@@ -247,7 +261,6 @@ function itemsHtml(data , appends){
     }else{
         if(data.title !== undefined){
             let title = document.createElement('div');
-
             data.title.forEach(element => {
                 let HTMLinner = '';
                 HTMLinner += `
@@ -261,7 +274,6 @@ function itemsHtml(data , appends){
         }
         //equipment type, brand, model, purchase_date, equipment state
         for(let i = 0 ; i < info.total_items ; i++){
-            console.log(info);
             let item = info.items[i];
             let items = document.createElement('div');
             let HTMLinner = '';
@@ -306,6 +318,36 @@ function itemsFunctionality(data , append_details , appends){
         document.getElementById(elementid)
         .addEventListener('click' ,  function(){
             append_details.innerHTML = itemDetailsHtml(data.information.items[i]);
+        });
+    }
+}
+
+async function addGroupsFunctionality(data , append_details , appends){
+    let info = data.information
+       ,request = {}
+    for(let i = 0 ; i < info.total_items ; i++){
+       let fetch_request = undefined
+          ,group_users = undefined;
+        elementid = 'item-' + appends[0] + '-' + i;
+        document.getElementById(elementid)
+        .addEventListener('click' , async function(){
+            request[i] = {
+                page: "equipment"
+               ,custom: {
+                     tab: data.tab
+                    ,type: 'data' 
+                    ,crud: 'read'
+                    ,rfsh: 'grp_usrs'
+                    ,rgin: info.items[i].id
+                    }
+                }
+            append_details.innerHTML = itemDetailsHtml(info.items[i]);
+            fetch_request = await fetch(await urlCreateBackendRequest(request[i]));
+            if(fetch_request !== undefined)
+                group_users = await fetch_request.json();
+            if(group_users !== undefined){
+                console.log(group_users);
+            }
         });
     }
 }
@@ -364,15 +406,17 @@ async function setEqTypes(data){
     let info = data.items
        ,append_dropdown = document.getElementById("type-dropdown")
        ,request = {}
-       ,append_to = document.getElementById("type-load");
+       ,append_to = document.getElementById("type-load")
+       ,dropdown_html = "";
     info.forEach(element => {
         HTMLinner = `
                     <div id="eq-${element.equipment_type}">
                     ${element.equipment_type}
                     </div>
                     `
-        append_dropdown.innerHTML += HTMLinner; 
+         dropdown_html += HTMLinner; 
     });
+    append_dropdown.innerHTML = dropdown_html;
     info.forEach(element => {
         request[element.equipment_type] = {
             page: 'equipment'
@@ -397,7 +441,24 @@ async function setEqTypes(data){
     });
 }
 
+async function addEqGroupControlFunctionality(data){
+    apnd_controls = document.getElementById("groups-controls");
+    apnd_items = document.getElementById("groups-items");
+    apnd_details = document.getElementById("selected-group");
+    apnds = [["group"] , ["group_name","group_status","group_type"]];
+    refresh = ["groups" , "none"];
+    custom_data ={
+        tab: data.tab
+       ,information: data.information.groups
+       ,data: data.data
+       ,title: ["name" , "status" , "type"]
+    }
+    setControls(custom_data , apnd_controls , refresh , addEqGroupControlFunctionality);
+    setFetchItems(addGroupsFunctionality , custom_data , apnds , apnd_items , apnd_details);
+}
+
 async function setTabContent(data){
+    empty = [];
     switch(data.tab){
         case 'yur_eq':
             append_controls = document.getElementById("items-controls");
@@ -416,7 +477,7 @@ async function setTabContent(data){
                 setUserHasNoItems(append_controls , append_items , append_details , message);
                 break;
             }
-            setControls(data , append_controls);
+            setControls(data , append_controls , empty , setTabContent);
             setFetchItems(itemsFunctionality , data , appends , append_items , append_details);
             break;
         case'grp_eq':
@@ -436,7 +497,7 @@ async function setTabContent(data){
                 setUserHasNoItems(append_controls , append_items , append_details , message);
                 break;
             }
-            setControls(data , append_controls);
+            setControls(data , append_controls , empty , setTabContent);
             setFetchItems(itemsFunctionality , data , appends , append_items , append_details);
             break;
         case'add_eq':
@@ -444,6 +505,7 @@ async function setTabContent(data){
             apnd_items = document.getElementById("groups-items");
             apnd_details = document.getElementById("selected-group");
             apnds = [["group"] , ["group_name","group_status","group_type"]];
+            refresh = ["groups" , "none"];
             custom_data = {
                 group: { 
                     tab: data.tab
@@ -456,8 +518,8 @@ async function setTabContent(data){
                    ,items: data.information.types.items
                 }
             };
-            setControls(custom_data.group , apnd_controls);
-            setFetchItems(itemsFunctionality , custom_data.group , apnds , apnd_items , apnd_details);
+            setControls(custom_data.group , apnd_controls , refresh , addEqGroupControlFunctionality);
+            setFetchItems(addGroupsFunctionality , custom_data.group , apnds , apnd_items , apnd_details);
             setEqTypes(custom_data.types);
             break;
         default:
