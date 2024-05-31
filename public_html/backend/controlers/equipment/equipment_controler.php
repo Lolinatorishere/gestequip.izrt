@@ -288,7 +288,6 @@ function full_group_equipment_user_data($users_groups_equipments , $equipments ,
 
 function parse_equipment_type_columns($columns){
     $parsed_columns = array();
-    error_log($remove);
     $i = 1;
     $filter = array("filter" => array("0","1","2","3","4","5"));
     foreach($columns as $column){
@@ -299,7 +298,6 @@ function parse_equipment_type_columns($columns){
         $column = merge_arrays($filter , $column);
         array_push($parsed_columns , $column);
     }
-    error_log(print_r($parsed_columns,true));
     return $parsed_columns;
 }
 
@@ -431,9 +429,6 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
                         $request = array("fetch" => " * "
                                         ,"table" => " users_inside_groups "
                                         ,"specific" => " group_id = " . $data_request["origin"]
-                                        ,"total_items" => $data_request["total_items"]
-                                        ,"page" => $data_request["page"]
-                                        ,"paging" => $data_request["paging"]
                                         ,"limit" => 8
                                     );
                         $group_users = get_users($request , $pdo);
@@ -443,7 +438,6 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
                         if(!isset($_SESSION["equipment_types"]))
                             break;
                         foreach($_SESSION["equipment_types"] as $type) {
-                            error_log($type["equipment_type"]);
                             if($data_request["origin"] === $type["equipment_type"]){
                                 $guard = 0;
                                 break;

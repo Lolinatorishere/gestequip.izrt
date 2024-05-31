@@ -68,6 +68,10 @@ function setUserHasNoItems(append_controls , append_items , append_details , mes
 
 function controlsHtml(data){
     let html = ''; 
+    control_location = '';
+    if(data.control_location !== ""){
+        control_location = "-" + data.control_location;
+    }
     if(data.current_page > 1){
         //render reversing pages
         let page_render;
@@ -77,16 +81,16 @@ function controlsHtml(data){
             }
         }
         html + `
-            <div class="control-arrow" id="control-arrow-backward">
-                <
-            </div>  
-            `
+               <div class="control-arrow" id="control-arrow-backward${control_location}">
+                   <
+               </div>  
+               `
         if(data.current_page >= 7){
         html + `
-            <div id="first-page">
-                1
-           </div> 
-           `
+               <div id="first-page${control_location}">
+                    1
+               </div> 
+               `
             if(data.current_page > 7){
                 html + `
                 <div id="dots">
@@ -97,22 +101,22 @@ function controlsHtml(data){
         }
         for(let i = page_render ; i < data.current_page ; i++){
             html + `
-            <div id="control-page-${i}">
-                ${i}
-            </div>
-            `    
+                   <div id="control-page-${i}${control_location}">
+                       ${i}
+                   </div>
+                   `
         }
     }
     html += `
-    <div id="control-page-${data.current_page}">
-        ${data.current_page}
-    </div>
-    `;
+            <div id="control-page-${data.current_page}${control_location}">
+                ${data.current_page}
+            </div>
+            `;
     if(data.current_page !== data.pages){
         //dont render forwarding pages controls
         for(let i = data.current_page+1 ; i < data.pages ; i++){
             html + `
-            <div id="control-page-${i}">
+            <div id="control-page-${i}${control_location}">
                 ${i}
             </div>
             `    
@@ -126,13 +130,13 @@ function controlsHtml(data){
                 `
             }
             html + `
-            <div id="last-page">
+            <div id="last-page${control_location}">
                 ${data.pages}
             </div>
             `
         }
         html + `
-            <div class="control-arrow" id="control-arrow-forward">
+            <div class="control-arrow" id="control-arrow-forward${control_location}">
                 >
             </div>  
             `
@@ -141,23 +145,26 @@ function controlsHtml(data){
 }
 
 function controlsFunctionality(data , refresh , loadingFunction){
-    console.log(data);
-    console.log(data.information.current_page);
     let current_page = parseInt(data.information.current_page)
        ,total_items = parseInt(data.information.total_items)
        ,page_max = parseInt(data.information.pages)
        ,page_controls = []
        ,arrow_backward
-       ,arrow_forward;
+       ,arrow_forward
+       ,control_location = '';
+    if(data.control_location !== undefined){
+        control_location = "-" + data.control_location;
+    }
     let request = {
             page: 'equipment'
            ,custom: undefined
         }
-    console.log(current_page);
     if(current_page !== 1){
-        document.getElementById('control-arrow-backward')
+        element_arrow = 'control-arrow-backward' + control_location;
+        document.getElementById(element_arrow)
         .addEventListener('click' , async function(){
             // fetch first time tab info
+            let tab_information = undefined;
             request.custom = {
                 tab: data.tab
                ,type: 'data' 
@@ -170,23 +177,34 @@ function controlsFunctionality(data , refresh , loadingFunction){
                 request.custom.rgin = refresh[1];
             }
             response = await fetch(await urlCreateBackendRequest(request));
-            tab_information = await response.json();
-            await loadingFunction(tab_information);
+            if(response !== undefined){
+                tab_information = await response.json();
+            }
+            if(tab_information !== undefined){
+                tab_information.control_location = control_location;
+                await loadingFunction(tab_information);
+            }
+                // TODO: got to create the loading of an error response
         });
         for(let i = 1 ; i <= 6 ; i++){
+            page_control = 'control-page-' + i + control_location;
             if(current_page - i >= 1){
-                page_controls.push(document.getElementById('control-page-' + i));
+                page_controls.push(document.getElementById(page_control));
             }
         }
         if(current_page > 6){
-            page_controls.push(document.getElementById('first-page'));
+            page_control = 'first-page' + control_location;
+            page_controls.push(document.getElementById(page_control));
         }
     }
-    page_controls.push(document.getElementById('control-page-' + current_page));
+    control_page = 'control-page-' + current_page + control_location
+    page_controls.push(document.getElementById(control_page));
     if(current_page !== page_max){
-        document.getElementById('control-arrow-forward')
+        element_arrow = 'control-arrow-forward' + control_location;
+        document.getElementById(element_arrow)
         .addEventListener('click' , async function(){
             // fetch first time tab info
+            let tab_information = undefined;
             request.custom = {
                 tab: data.tab
                ,type: 'data' 
@@ -199,21 +217,30 @@ function controlsFunctionality(data , refresh , loadingFunction){
                 request.custom.rgin = refresh[1];
             }
             response = await fetch(await urlCreateBackendRequest(request));
-            tab_information = await response.json();
-            await loadingFunction(tab_information);
+            if(response !== undefined){
+                tab_information = await response.json();
+            }
+            if(tab_information !== undefined){
+                tab_information.control_location = control_location;
+                await loadingFunction(tab_information);
+            }
+                // TODO: got to create the loading of an error response
         });
         for(let i = 1 ; i <= 6 ; i++){
+            control_page = 'control-page-' + i + control_location;
             if(current_page + i <= page_max){
-                page_controls.push(document.getElementById('control-page-' + i));
+                page_controls.push(document.getElementById(control_page));
             }
         }
         if(current_page+6 < page_max){
-            page_controls.push(document.getElementById('last-page'));
+            last_page = 'last-page' + control_location;
+            page_controls.push(document.getElementById(last_page));
         }
     }
     page_controls.forEach(page => {
         page.addEventListener('click' , async function(){
             // fetch first time tab info
+            let tab_information = undefined;
             request.custom = {
                 tab: data.tab
                ,type: 'data' 
@@ -226,8 +253,14 @@ function controlsFunctionality(data , refresh , loadingFunction){
                 request.custom.rgin = refresh[1];
             }
             response = await fetch(await urlCreateBackendRequest(request));
-            tab_information = await response.json();
-            await loadingFunction(tab_information);
+            if(response !== undefined){
+                tab_information = await response.json();
+            }
+            if(tab_information !== undefined){
+                tab_information.control_location = control_location;
+                await loadingFunction(tab_information);
+            }
+                // TODO: got to create the loading of an error response
         });
     });
 }
@@ -235,8 +268,13 @@ function controlsFunctionality(data , refresh , loadingFunction){
 function setControls(data , append_to , refresh , loadingFunction){
     let totalDiv = document.createElement('div')
        ,controlDiv = document.createElement('div')
-       ,controls = document.createElement('div');
-    let info = data.information;
+       ,controls = document.createElement('div')
+       ,info = data.information
+       ,control_location = '';
+    if(data.control_location !== undefined){
+        control_location = data.control_location;
+    }
+    info.control_location = control_location;
     totalDiv.className = 'total';
     totalDiv.innerHTML = `
                             Total: ${info.total_items}
@@ -303,7 +341,7 @@ function itemDetailsHtml(info){
         Object.keys(info).forEach(key => {
             let value = info[key];
             html +=`
-            <div id=${key}>
+            <div id="${key}">
                 ${value}
             </div>
             ` 
@@ -341,13 +379,33 @@ async function addGroupsFunctionality(data , append_details , appends){
                     ,rgin: info.items[i].id
                     }
                 }
-            append_details.innerHTML = itemDetailsHtml(info.items[i]);
+            custom_details = {
+                    selected_group_id: info.items[i].id
+                   ,selected_group_name: info.items[i].group_name
+                   ,selected_group_type: info.items[i].group_type
+                   ,selected_group_status: info.items[i].group_status
+                }
+            append_details.innerHTML = itemDetailsHtml(custom_details);
             fetch_request = await fetch(await urlCreateBackendRequest(request[i]));
             if(fetch_request !== undefined)
                 group_users = await fetch_request.json();
             if(group_users !== undefined){
-                console.log(group_users);
+                addEqUsersControlFunctionality(group_users , info.items[i].id)
             }
+        });
+    }
+}
+
+async function addUsersFunctionality(data , append_details , appends){
+    let info = data.information
+       ,request = {}
+    for(let i = 0 ; i < info.total_items ; i++){
+       let fetch_request = undefined
+          ,group_users = undefined;
+        elementid = 'item-' + appends[0] + '-' + i;
+        document.getElementById(elementid)
+        .addEventListener('click' , async function(){
+            append_details.innerhtml = itemDetailsHtml(info.items[i]);
         });
     }
 }
@@ -452,9 +510,29 @@ async function addEqGroupControlFunctionality(data){
        ,information: data.information.groups
        ,data: data.data
        ,title: ["name" , "status" , "type"]
+       ,control_location: "groups"
     }
     setControls(custom_data , apnd_controls , refresh , addEqGroupControlFunctionality);
     setFetchItems(addGroupsFunctionality , custom_data , apnds , apnd_items , apnd_details);
+    // TODO: i have to make the functionality for the users table so the query
+    // inserts the correct info into the correct place
+}
+
+async function addEqUsersControlFunctionality(data , group_id){
+    apnd_controls = document.getElementById("users-controls");
+    apnd_items = document.getElementById("users-items");
+    apnd_details = document.getElementById("selected-user");
+    apnds = [["user"] , ["users_name","email","phone_number","regional_indicator"]];
+    refresh = ["grp_usrs" , document.getElementById("selected_group_id").innerText];
+    custom_data ={
+        tab: data.tab
+       ,information: data.information.users
+       ,data: data.data
+       ,title: ["name","email","phone_number","regional_indicator"]
+       ,control_location: "users"
+    }
+    setControls(custom_data , apnd_controls , refresh , addEqUsersControlFunctionality);
+    setFetchItems(addUsersFunctionality , custom_data , apnds , apnd_items , apnd_details);
 }
 
 async function setTabContent(data){
@@ -512,6 +590,7 @@ async function setTabContent(data){
                    ,information: data.information.groups
                    ,data: data.data
                    ,title: ["name" , "status" , "type"]
+                   ,control_location: "groups"
                 }
                ,types:{
                     tab: data.tab

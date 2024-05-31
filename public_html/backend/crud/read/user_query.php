@@ -60,6 +60,15 @@ function user_info(){
     return($ret);
 }
 
+function custom_user_filter($number){
+    $filter = array();
+    for($i = 0 ; $i < $number ; $i++){
+        $filter_internal = "\"" . strval($i) . "\"";
+        $filter[$filter_internal] = $i;
+    }
+    error_log(print_r($filter , true));
+}
+
 // gets all the equipments from certain ids
 function get_users($request , $pdo){
     $users = array();
@@ -90,6 +99,10 @@ function get_users($request , $pdo){
         $statement = $pdo->prepare($sql);
         $statement->execute();
     }
+    $t_i = $request["total_items"];
+    $counted = $request["counted"];
+    $page = $request["page"];
+    $pages = $request["pages"];
     $user_ids = $statement->fetchAll();
     foreach ($user_ids as $user_id) {
         $request = array("fetch" => " id , users_name , email , phone_number , regional_indicator "
@@ -101,13 +114,15 @@ function get_users($request , $pdo){
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $user = $statement->fetch();
-        array_push($users , $user);
+        error_log(print_r($user , true));
+        $filter = custom_user_filter(count($user));
+        array_push($users , merge_arrays($filter , $user));
     }
     $ret["items"] = $users;
-    $ret["pages"] = $request["total_pages"];
-    $ret["current_page"] = $request["page"];
+    $ret["pages"] = $pages;
+    $ret["current_page"] = $page;
     $ret["paging"] = 1; 
-    $ret["total_items"] = $request["total_items"];
+    $ret["total_items"] = $t_i;
     return($ret);   
 }
 ?>
