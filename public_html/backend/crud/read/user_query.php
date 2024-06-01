@@ -61,12 +61,11 @@ function user_info(){
 }
 
 function custom_user_filter($number){
-    $filter = array();
-    for($i = 0 ; $i < $number ; $i++){
-        $filter_internal = "\"" . strval($i) . "\"";
-        $filter[$filter_internal] = $i;
+    $filter = array("filter" => array());
+    for($i = 0 ; $i < $number/2 ; $i++){
+        $filter["filter"][$i] = $i;
     }
-    error_log(print_r($filter , true));
+    return $filter;
 }
 
 // gets all the equipments from certain ids

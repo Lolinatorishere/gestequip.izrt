@@ -286,14 +286,31 @@ function full_group_equipment_user_data($users_groups_equipments , $equipments ,
     return $items;
 }
 
+function custom_query_filter($number){
+    $filter = array("filter" => array());
+    for($i = 0 ; $i < $number/2 ; $i++){
+        $filter["filter"][$i] = $i;
+    }
+    return $filter;
+}
+
+
 function parse_equipment_type_columns($columns){
     $parsed_columns = array();
     $i = 1;
-    $filter = array("filter" => array("0","1","2","3","4","5"));
+    $filter = custom_query_filter(count($columns));
     foreach($columns as $column){
         if($column["Field"] === "id")
             continue;
         if($column["Field"] === "equipment_id")
+            continue;
+        if($column["Field"] === "registration_date")
+            continue;
+        if($column["Field"] === "registration_lock")
+            continue;
+        if($column["Field"] === "equipment_type")
+            continue;
+        if($column["Field"] === "serial_md5")
             continue;
         $column = merge_arrays($filter , $column);
         array_push($parsed_columns , $column);
@@ -376,7 +393,7 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
             return $data;
         case 'add_eq':
             // what queries can data specific have:
-            //$data_specific = array("types" => array(),"groups" => array(),"users" => array(),"user" => array(),"types_specific" => array());
+            //$data_specific = array("default" => array(),types" => array(),"groups" => array(),"users" => array(),"user" => array(),"types_specific" => array());
             if(!isset($_SESSION["group_auth"]))
                 break;
             $auth_groups = $_SESSION["group_auth"]["auth"];
@@ -384,6 +401,7 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
                 $filter = array("filter" => array("0","1","2","3"));
                 $data_specific = array("types" => array()
                                       ,"groups" => array()
+                                      ,"default" => array()
                                  );
                 $request = array("fetch" => " * "
                                 ,"table" => " equipment_types "
@@ -396,11 +414,15 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
                                 ,"limit" => 8
                             );
                 $manageable_groups = get_groups($request , $pdo);
+                $request = array("table" => "equipment");
+                $default_columns = describe_table($request , $pdo);
+                $default_columns["items"] = parse_equipment_type_columns($default_columns["items"]);
                 $equipment_types["items"] = clean_query($filter  , $equipment_types["items"]);
                 $_SESSION["equipment_types"] = $equipment_types["items"];
                 $manageable_groups["items"] = clean_query($filter  , $manageable_groups["items"]);
                 $data_specific["types"] = $equipment_types;
                 $data_specific["groups"] = $manageable_groups;
+                $data_specific["default" ] = $default_columns;
                 return $data_specific;
             }else{
                 switch($data_request["refresh"]){

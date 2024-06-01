@@ -2,38 +2,55 @@
     <div class="add-new-items">
         <div class="add-inputs">
             <div class="common-equipment">
-                <div id="add-inputs">
-                    page controls
+                <div class="center-inputs">
+                    <div class="inputs-buffer">
+                        
+                    </div>
+                    <div id="add-inputs" class="default-inputs">
+                        page controls
+                    </div>
+                    <div class="inputs-buffer">
+
+                    </div>
                 </div>
             </div>
             <div class="user-group-select">
-                <div id="selected-group">
-                    group not selected
+                <div id="selected-group" class="neutral-input">
+                    Group Not Selected
                 </div>
-                <div id="selected-user">
-                    group user not selected
+                <div id="selected-user" class="neutral-input">
+                    Group User Not Selected
                 </div>
             </div>
             <div id="type-control" class="type-control">
                 <div id="equipment-type">
-                    <div class="eq-type-button">
-                        Equipment Type
-                    </div>
-                    <div class="eq-type-dropdown" id="type-dropdown">
-
+                    <div class="eq-type-dropdown">
+                        <div class="equipment-type-hover" id="loaded-type-dropdown">
+                            Equipment Type
+                        </div>
+                        <div class="type-dropdown-content">
+                            <div class="type-dropdown-positioner">
+                            </div>
+                            <div class="positioned-content" id="type-dropdown">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <form>
-                    <div id="type-load">
-
+                <div class="equipment-specific-load">
+                    <div class="selected-eq-type" id="selected-eq-type" >
                     </div>
-                </form>
+                    <div class="specific-equipment-type-load">
+                        <div id="type-load">
+
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="add-buttons">
-                <div class="create-info-button">
+                <div class="create-info-button" id="create-new-equipment">
                     Add Equipment
                 </div>
-                <div class="clear-info">
+                <div class="clear-info" id="clear-website-info">
                     Clear Inputs
                 </div>
             </div>

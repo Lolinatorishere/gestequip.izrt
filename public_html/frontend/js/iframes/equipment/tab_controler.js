@@ -369,6 +369,13 @@ async function addGroupsFunctionality(data , append_details , appends){
         elementid = 'item-' + appends[0] + '-' + i;
         document.getElementById(elementid)
         .addEventListener('click' , async function(){
+            defaultHTML = `
+                          <div class="unselected-user">
+                              Group User Not Selected
+                          </div>
+                          `;
+            document.getElementById("selected-user").innerHTML = defaultHTML
+                
             request[i] = {
                 page: "equipment"
                ,custom: {
@@ -385,6 +392,7 @@ async function addGroupsFunctionality(data , append_details , appends){
                    ,selected_group_type: info.items[i].group_type
                    ,selected_group_status: info.items[i].group_status
                 }
+            append_details.attributes.class.nodeValue = "neutral-input"
             append_details.innerHTML = itemDetailsHtml(custom_details);
             fetch_request = await fetch(await urlCreateBackendRequest(request[i]));
             if(fetch_request !== undefined)
@@ -398,14 +406,21 @@ async function addGroupsFunctionality(data , append_details , appends){
 
 async function addUsersFunctionality(data , append_details , appends){
     let info = data.information
-       ,request = {}
     for(let i = 0 ; i < info.total_items ; i++){
        let fetch_request = undefined
           ,group_users = undefined;
         elementid = 'item-' + appends[0] + '-' + i;
         document.getElementById(elementid)
         .addEventListener('click' , async function(){
-            append_details.innerhtml = itemDetailsHtml(info.items[i]);
+            custom_details = {
+                    selected_user_id: info.items[i].id
+                   ,selected_user_name: info.items[i].users_name
+                   ,selected_user_email: info.items[i].email
+                   ,selected_user_phone_number: info.items[i].phone_number
+                   ,selected_user_regional_indicator: info.items[i].regional_indicator
+                }
+            append_details.attributes.class.nodeValue = "neutral-input"
+            append_details.innerHTML = itemDetailsHtml(custom_details);
         });
     }
 }
@@ -424,14 +439,20 @@ function setFetchTypes(data , append_to){
         type = element.Type.match(/(\w+)/);
         max_input = element.Type.match(/(\d+)/);
         max_input_html = "";
-        switch (type) {
+        label = element.Field.replace(/_/g, ' ');
+        switch(type[0]){
             case "tinyint":
                 input_specific = `
-                                 <div class="input-area">
-                                     <div class="label">
-                                         ${element.Field}
+                                <div class="${data.input_class}" 
+                                    id="${data.input_id}"
+                                    input_field="${element.Field}"
+                                    is_nullable="${element.Null}"
+                                    input_type="${type[0]}"
+                                >
+                                    <div class="label">
+                                        ${label}
                                      </div>
-                                     <input type="checkbox">
+                                     <input id="input" class="neutral-input" type="checkbox">
                                  </div>
                                  `
                 break;
@@ -439,15 +460,16 @@ function setFetchTypes(data , append_to){
                 if(max_input !== null)
                     max_input_html = "maxlength=\"" + max_input[0] + "\"";
                 input_specific = `
-                                 <div class="input-area">
-                                     <input id="input" placeholder="${element.Field}" type="text" ${max_input_html} >
-                                 </div>
+                                    <div class="label">
+                                        ${label}
+                                    </div>
+                                     <input class="neutral-input" id="input" placeholder="${label}" type="text" ${max_input_html} >
                                  `
                 break;
         }
         HTMLinner = `
-                    <div class="specific-input" 
-                         id="specific-input"
+                    <div class="${data.input_class}" 
+                         id="${data.input_id}"
                          input_field="${element.Field}"
                          is_nullable="${element.Null}"
                          input_type="${type[0]}"
@@ -468,7 +490,7 @@ async function setEqTypes(data){
        ,dropdown_html = "";
     info.forEach(element => {
         HTMLinner = `
-                    <div id="eq-${element.equipment_type}">
+                    <div id="eq-${element.equipment_type}" class="equipment-type">
                     ${element.equipment_type}
                     </div>
                     `
@@ -490,13 +512,114 @@ async function setEqTypes(data){
     info.forEach(element => {
         document.getElementById("eq-" + element.equipment_type)
             .addEventListener('click' , async function(){
+                document.getElementById("selected-eq-type").innerHTML = `
+                                                                        <div class="selected-class-label">
+                                                                            selected equipment: 
+                                                                        </div>
+                                                                        <div class="selected-equipment-type">
+                                                                            ${element.equipment_type}
+                                                                        </div>
+                                                                        `
                 response = await fetch(await urlCreateBackendRequest(request[element.equipment_type]));
                 if(response !== undefined){
                     type_information = await response.json();
-                    setFetchTypes(type_information.information.types_specific , append_to);
+                    inputs = type_information.information.types_specific;
+                    inputs.input_class = "specific_input";
+                    inputs.input_id = "equipment_specific";
+                    setFetchTypes(inputs , append_to);
                 }
             });
     });
+}
+
+async function setEqDefault(data){
+    let apend_to = document.getElementById("add-inputs");
+    data.input_class = "default_input";
+    data.input_id = "equipment_default";
+    setFetchTypes(data , apend_to);
+}
+
+function selectedInput(input_info){
+    selected = document.getElementById("selected-group");
+    if(selected.innerText === "Group Not Selected"){
+        selected.attributes.class.nodeValue = "error-input-select";
+    }else{
+        selected.attributes.class.nodeValue = "neutral-input";
+        input_info.data.selected_group = {
+            id: document.getElementById("selected_group_id").innerText
+        }
+    }
+    selected = document.getElementById("selected-user");
+    if(selected.innerText === "Group User Not Selected"){
+        selected.attributes.class.nodeValue = "error-input-select";
+    }else{
+        selected.attributes.class.nodeValue = "neutral-input";
+        input_info.data.selected_user = {
+            id: document.getElementById("selected_user_id").innerText
+        }
+    }
+}
+
+function defaultTextInput(input_info){
+    inputs = document.querySelectorAll("#equipment_default");
+    if(inputs.length === 0){
+        document.getElementById("add-inputs").innerHTML = "Default Inputs Have not Loaded";
+        return;
+    }
+    inputs.forEach(input => {
+        if(input.attributes.is_nullable.nodeValue === "NO"){
+            if(input.attributes.class.nodeValue === "error-input-text"){
+                input.attributes.class.nodeValue = "default-input";
+            }
+            if(input.children.input.value === ''){
+                input.attributes.class.nodeValue = "error-input-text";
+            }else{
+                input_info.data.default_info = {};
+                input_info.data.default_info[input.attributes.input_field.nodeValue] = input.children.input.value;
+            }
+        }
+    });
+}
+
+function specificTextInput(input_info){
+    inputs = document.querySelectorAll("#equipment_specific")
+    eq_type_drpdwn = document.getElementById("type-dropdown");
+    eq_drpdwn_text_default = eq_type_drpdwn.attributes.default_text
+    if(inputs.length === 0){
+        
+        return;
+    }
+    inputs.forEach(input => {
+        if(input.attributes.is_nullable.nodeValue === "NO"){
+            if(input.attributes.class.nodeValue === "error-input-text"){
+                input.attributes.class.nodeValue = "default_input";
+            }
+            if(input.children.input.value === ''){
+                input.attributes.class.nodeValue = "error-input-text";
+            }else{
+                input_info.data.specific_info = {};
+                input_info.data.specific_info[input.attributes.input_field.nodeValue] = input.children.input.value;
+            }
+        }
+    });
+    console.log(inputs);
+}
+
+function setAddButtons(buttons){
+    buttons.add_eq
+        .addEventListener('click' , async function(){
+            let input_info = {
+                data: {}
+            };
+            selectedInput(input_info);
+            defaultTextInput(input_info);
+            specificTextInput(input_info);
+            if(input_info.error !== undefined){
+                console.log(input_info.error);
+            }
+            console.log(input_info);
+        }
+    );
 }
 
 async function addEqGroupControlFunctionality(data){
@@ -505,7 +628,7 @@ async function addEqGroupControlFunctionality(data){
     apnd_details = document.getElementById("selected-group");
     apnds = [["group"] , ["group_name","group_status","group_type"]];
     refresh = ["groups" , "none"];
-    custom_data ={
+    custom_data = {
         tab: data.tab
        ,information: data.information.groups
        ,data: data.data
@@ -514,8 +637,6 @@ async function addEqGroupControlFunctionality(data){
     }
     setControls(custom_data , apnd_controls , refresh , addEqGroupControlFunctionality);
     setFetchItems(addGroupsFunctionality , custom_data , apnds , apnd_items , apnd_details);
-    // TODO: i have to make the functionality for the users table so the query
-    // inserts the correct info into the correct place
 }
 
 async function addEqUsersControlFunctionality(data , group_id){
@@ -582,6 +703,10 @@ async function setTabContent(data){
             apnd_controls = document.getElementById("groups-controls");
             apnd_items = document.getElementById("groups-items");
             apnd_details = document.getElementById("selected-group");
+            buttons = {
+                add_eq: document.getElementById("create-new-equipment")
+               ,clear_info: document.getElementById("clear-website-info")
+            }
             apnds = [["group"] , ["group_name","group_status","group_type"]];
             refresh = ["groups" , "none"];
             custom_data = {
@@ -596,10 +721,16 @@ async function setTabContent(data){
                     tab: data.tab
                    ,items: data.information.types.items
                 }
+               ,default_eq:{
+                    tab:data.tab 
+                   ,items: data.information.default.items
+                }
             };
             setControls(custom_data.group , apnd_controls , refresh , addEqGroupControlFunctionality);
             setFetchItems(addGroupsFunctionality , custom_data.group , apnds , apnd_items , apnd_details);
+            setEqDefault(custom_data.default_eq);
             setEqTypes(custom_data.types);
+            setAddButtons(buttons);
             break;
         default:
             break;
