@@ -91,12 +91,12 @@
 }
 
 .equipment-specific-load .label{
-    width: 35%;
+    width: fit-content;
     text-align: center;
 }
 
 .specific-equipment-type-load{
-    width: 50%;
+    width: 70%;
 }
 
 .specific_input{
@@ -253,8 +253,21 @@
     justify-content: center;
 }
 
+.default-input{
+    flex-direction: row;
+}
+
+.specific_input{
+    flex-direction: row;
+}
+
 .default-inputs{
     justify-content: center;
+}
+
+.default-inputs .label{
+    width: fit-content;
+    text-align: center;
 }
 
 .inputs-buffer{

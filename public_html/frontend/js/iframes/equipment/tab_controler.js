@@ -443,27 +443,20 @@ function setFetchTypes(data , append_to){
         switch(type[0]){
             case "tinyint":
                 input_specific = `
-                                <div class="${data.input_class}" 
-                                    id="${data.input_id}"
-                                    input_field="${element.Field}"
-                                    is_nullable="${element.Null}"
-                                    input_type="${type[0]}"
-                                >
-                                    <div class="label">
-                                        ${label}
-                                     </div>
-                                     <input id="input" class="neutral-input" type="checkbox">
+                                 <div class="label" id="${data.input_area_id}label">
+                                    ${label}
                                  </div>
+                                 <input id="input" class="neutral-input" type="checkbox">
                                  `
                 break;
             default:
                 if(max_input !== null)
                     max_input_html = "maxlength=\"" + max_input[0] + "\"";
                 input_specific = `
-                                    <div class="label">
+                                    <div class="label" id="${data.input_area_id}label">
                                         ${label}
                                     </div>
-                                     <input class="neutral-input" id="input" placeholder="${label}" type="text" ${max_input_html} >
+                                    <input class="neutral-input" id="${data.input_area_id}input" placeholder="${label}" type="text" ${max_input_html} >
                                  `
                 break;
         }
@@ -473,6 +466,7 @@ function setFetchTypes(data , append_to){
                          input_field="${element.Field}"
                          is_nullable="${element.Null}"
                          input_type="${type[0]}"
+                         error="NO"
                     >
                         ${input_specific}
                     </div>
@@ -480,6 +474,42 @@ function setFetchTypes(data , append_to){
         totalHTML += HTMLinner;
     });
     append_to.innerHTML = totalHTML;
+}
+function minClientWidthSet(list_of_inputs , list_of_labels){
+
+    let smallestInput = undefined
+       ,largestLabel = undefined
+       ,padding = 10;
+    list_of_inputs.forEach(input => {
+        let clientWidth = parseInt(input.clientWidth);
+        if(isNaN(clientWidth) || clientWidth === null)
+            return;
+        if(smallestInput === undefined){
+            smallestInput = clientWidth;
+            return;
+        }
+        if(smallestInput > clientWidth){
+            smallestInput = parseInt(input.clientWidth);
+        }
+    });
+    list_of_labels.forEach(label =>{
+        let clientWidth = parseInt(label.clientWidth);
+        if(isNaN(clientWidth) || clientWidth === null)
+            return; 
+        if(largestLabel === undefined){
+            largestLabel = clientWidth;
+            return; 
+        }
+        if(largestLabel < clientWidth){
+            largestLabel = parseInt(label.clientWidth);
+        }
+    });
+    list_of_inputs.forEach(input => {
+        input.style.width = smallestInput - padding;
+    });
+    list_of_labels.forEach(label => {
+        label.style.width = largestLabel + padding;
+    });
 }
 
 async function setEqTypes(data){
@@ -526,7 +556,9 @@ async function setEqTypes(data){
                     inputs = type_information.information.types_specific;
                     inputs.input_class = "specific_input";
                     inputs.input_id = "equipment_specific";
+                    inputs.input_area_id = "spec_";
                     setFetchTypes(inputs , append_to);
+                    minClientWidthSet(document.querySelectorAll('#spec_input') , document.querySelectorAll('#spec_label'));
                 }
             });
     });
@@ -536,7 +568,9 @@ async function setEqDefault(data){
     let apend_to = document.getElementById("add-inputs");
     data.input_class = "default_input";
     data.input_id = "equipment_default";
+    data.input_area_id = "def_";
     setFetchTypes(data , apend_to);
+    minClientWidthSet(document.querySelectorAll('#def_input') , document.querySelectorAll('#def_label'));
 }
 
 function selectedInput(input_info){
@@ -546,7 +580,7 @@ function selectedInput(input_info){
     }else{
         selected.attributes.class.nodeValue = "neutral-input";
         input_info.data.selected_group = {
-            id: document.getElementById("selected_group_id").innerText
+            group_id: document.getElementById("selected_group_id").innerText
         }
     }
     selected = document.getElementById("selected-user");
@@ -555,30 +589,41 @@ function selectedInput(input_info){
     }else{
         selected.attributes.class.nodeValue = "neutral-input";
         input_info.data.selected_user = {
-            id: document.getElementById("selected_user_id").innerText
+            user_id: document.getElementById("selected_user_id").innerText
         }
     }
 }
 
 function defaultTextInput(input_info){
     inputs = document.querySelectorAll("#equipment_default");
+    default_info = {};
     if(inputs.length === 0){
         document.getElementById("add-inputs").innerHTML = "Default Inputs Have not Loaded";
         return;
     }
     inputs.forEach(input => {
         if(input.attributes.is_nullable.nodeValue === "NO"){
-            if(input.attributes.class.nodeValue === "error-input-text"){
-                input.attributes.class.nodeValue = "default-input";
-            }
-            if(input.children.input.value === ''){
+            let widthSize = parseInt(input.children.def_label.style.width);
+            if(input.children.def_input.value === ''){
                 input.attributes.class.nodeValue = "error-input-text";
-            }else{
-                input_info.data.default_info = {};
-                input_info.data.default_info[input.attributes.input_field.nodeValue] = input.children.input.value;
+                if(input.attributes.error.nodeValue === "NO"){
+                    input.children.def_label.style.width = widthSize-4;
+                }
+                input.attributes.error.nodeValue = "YES"
+                return;
             }
+            if(input.attributes.error.nodeValue !== "YES")
+                return;
+            if(input.children.def_input.value === '')
+                return;
+            input.attributes.class.nodeValue = "default_input";
+            input.attributes.error.nodeValue = "NO"
+            input.children.def_label.style.width = widthSize+4;
         }
+        console.log(input.attributes.input_field.nodeValue);
+        default_info[input.attributes.input_field.nodeValue] = input.children.def_input.value;
     });
+    input_info.data.default = default_info;
 }
 
 function specificTextInput(input_info){
@@ -586,23 +631,30 @@ function specificTextInput(input_info){
     eq_type_drpdwn = document.getElementById("type-dropdown");
     eq_drpdwn_text_default = eq_type_drpdwn.attributes.default_text
     if(inputs.length === 0){
-        
         return;
     }
     inputs.forEach(input => {
+        let widthSize = parseInt(input.children.spec_label.style.width);
         if(input.attributes.is_nullable.nodeValue === "NO"){
-            if(input.attributes.class.nodeValue === "error-input-text"){
-                input.attributes.class.nodeValue = "default_input";
+            if(input.attributes.error.nodeValue === "YES"){
+                if(input.children.spec_input.value !== ''){
+                    input.attributes.class.nodeValue = "default_input";
+                    input.children.spec_label.style.width = widthSize+4;
+                    input.attributes.error.nodeValue = "NO"
+                }
             }
-            if(input.children.input.value === ''){
+            if(input.children.spec_input.value === ''){
                 input.attributes.class.nodeValue = "error-input-text";
+                if(input.attributes.error.nodeValue === "NO"){
+                    input.children.spec_label.style.width = widthSize-4;
+                }
+                input.attributes.error.nodeValue = "YES"
             }else{
                 input_info.data.specific_info = {};
-                input_info.data.specific_info[input.attributes.input_field.nodeValue] = input.children.input.value;
+                input_info.data.specific_info[input.attributes.input_field.nodeValue] = input.children.spec_input.value;
             }
         }
     });
-    console.log(inputs);
 }
 
 function setAddButtons(buttons){
