@@ -16,6 +16,7 @@ if(!defined('query_generator_dir'))
 require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/describe_column.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/create/equipment_create.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/equipment_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/group_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/user_query.php";
@@ -497,9 +498,8 @@ function tab_create_information($tab , $user_id , $pdo){
     if(!isset($_POST["specific"]))
         return 0;
     $equipment_type = preg_replace('/[^a-zA-Z]/s' , '' , $_POST["equipment_type"]); 
-    error_log($equipment_type);
-    $user_id = $_POST["selected_user"]["user_id"];
-    $group_id = $_POST["selected_group"]["group_id"];
+    $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_user"]["user_id"]);
+    $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
     $data_request["equipment_type"] = $equipment_type; 
     $default_info = $_POST["default"];
     $specific_info = $_POST["specific"];
@@ -509,8 +509,7 @@ function tab_create_information($tab , $user_id , $pdo){
     foreach($specific_info as $key => $info){
         $data_request["specific"][$key] = "'" . $info . "'";
     }
-    error_log(print_r($data_request , true));
-    //return tab_create_request($data_request , $tab , $user_id , $pdo);
+    return tab_create_request($data_request , $tab , $user_id , $pdo);
 }
 
 // gets the correct requests for each tab
