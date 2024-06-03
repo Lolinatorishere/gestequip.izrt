@@ -446,7 +446,7 @@ function setFetchTypes(data , append_to){
                                  <div class="label" id="${data.input_area_id}label">
                                     ${label}
                                  </div>
-                                 <input id="input" class="neutral-input" type="checkbox">
+                                 <input id="${data.input_area_id}input" class="neutral-input" type="checkbox">
                                  `
                 break;
             default:
@@ -476,7 +476,6 @@ function setFetchTypes(data , append_to){
     append_to.innerHTML = totalHTML;
 }
 function minClientWidthSet(list_of_inputs , list_of_labels){
-
     let smallestInput = undefined
        ,largestLabel = undefined
        ,padding = 10;
@@ -542,14 +541,16 @@ async function setEqTypes(data){
     info.forEach(element => {
         document.getElementById("eq-" + element.equipment_type)
             .addEventListener('click' , async function(){
-                document.getElementById("selected-eq-type").innerHTML = `
-                                                                        <div class="selected-class-label">
-                                                                            selected equipment: 
-                                                                        </div>
-                                                                        <div class="selected-equipment-type">
-                                                                            ${element.equipment_type}
-                                                                        </div>
-                                                                        `
+                selected = document.getElementById("selected-eq-type");
+                selected.innerHTML = `
+                                     <div class="selected-class-label">
+                                         selected equipment: 
+                                     </div>
+                                     <div class="selected-equipment-type">
+                                         ${element.equipment_type}
+                                     </div>
+                                     `
+                selected.attributes.class.nodeValue = "selected-eq-type";
                 response = await fetch(await urlCreateBackendRequest(request[element.equipment_type]));
                 if(response !== undefined){
                     type_information = await response.json();
@@ -576,6 +577,10 @@ async function setEqDefault(data){
 function selectedInput(input_info){
     selected = document.getElementById("selected-group");
     if(selected.innerText === "Group Not Selected"){
+        if(input_info.error === undefined){
+            input_info.error = {};
+        }
+        input_info.error["group_select"] = "false";
         selected.attributes.class.nodeValue = "error-input-select";
     }else{
         selected.attributes.class.nodeValue = "neutral-input";
@@ -586,6 +591,10 @@ function selectedInput(input_info){
     selected = document.getElementById("selected-user");
     if(selected.innerText === "Group User Not Selected"){
         selected.attributes.class.nodeValue = "error-input-select";
+        if(input_info.error === undefined){
+            input_info.error = {};
+        }
+        input_info.error["user_select"] = "false";
     }else{
         selected.attributes.class.nodeValue = "neutral-input";
         input_info.data.selected_user = {
@@ -594,82 +603,105 @@ function selectedInput(input_info){
     }
 }
 
+function inputNullUi(input , label , input_area , input_info){
+    if(input.attributes.is_nullable.nodeValue === "NO"){
+        let widthSize = parseInt(label.style.width);
+        if(input_area.value === ''){
+            input.attributes.class.nodeValue = "error-input-text";
+            if(input.attributes.error.nodeValue === "NO"){
+                label.style.width = widthSize-4;
+            }
+            input.attributes.error.nodeValue = "YES"
+            if(input_info.error === undefined){
+                input_info.error = {};
+            }
+            input_info.error[input.attributes.input_field.nodeValue] = "missing input";
+            return;
+        }
+        if(input.attributes.error.nodeValue === "NO")
+            return;
+        input.attributes.class.nodeValue = "default_input";
+        input.attributes.error.nodeValue = "NO"
+        label.style.width = widthSize+4;
+    }
+}
+
 function defaultTextInput(input_info){
     inputs = document.querySelectorAll("#equipment_default");
-    default_info = {};
+    let default_info = {};
     if(inputs.length === 0){
         document.getElementById("add-inputs").innerHTML = "Default Inputs Have not Loaded";
+        if(input_info.error === undefined){
+            input_info.error = {};
+        }
+        input_info.error["default_load"] = "false";
         return;
     }
     inputs.forEach(input => {
-        if(input.attributes.is_nullable.nodeValue === "NO"){
-            let widthSize = parseInt(input.children.def_label.style.width);
-            if(input.children.def_input.value === ''){
-                input.attributes.class.nodeValue = "error-input-text";
-                if(input.attributes.error.nodeValue === "NO"){
-                    input.children.def_label.style.width = widthSize-4;
-                }
-                input.attributes.error.nodeValue = "YES"
-                return;
-            }
-            if(input.attributes.error.nodeValue !== "YES")
-                return;
-            if(input.children.def_input.value === '')
-                return;
-            input.attributes.class.nodeValue = "default_input";
-            input.attributes.error.nodeValue = "NO"
-            input.children.def_label.style.width = widthSize+4;
+        let input_area = input.children.def_input
+           ,label = input.children.def_label;
+        //checks if the user input can or not be null
+        inputNullUi(input , label , input_area , input_info);
+        if(input.children.def_input.attributes.type.nodeValue === "checkbox"){
+            default_info[input.attributes.input_field.nodeValue] = input.children.def_input.checked;
+            return;
         }
-        console.log(input.attributes.input_field.nodeValue);
         default_info[input.attributes.input_field.nodeValue] = input.children.def_input.value;
     });
     input_info.data.default = default_info;
 }
 
 function specificTextInput(input_info){
-    inputs = document.querySelectorAll("#equipment_specific")
+    inputs = document.querySelectorAll("#equipment_specific");
     eq_type_drpdwn = document.getElementById("type-dropdown");
-    eq_drpdwn_text_default = eq_type_drpdwn.attributes.default_text
+    eq_drpdwn_text_default = eq_type_drpdwn.attributes.default_text;
+    let specific_info = {}
     if(inputs.length === 0){
+        document.getElementById("selected-eq-type").innerHTML = "please select Equipment";
+        document.getElementById("selected-eq-type").attributes.class.nodeValue = "error-input-text" ;
+        if(input_info.error === undefined){
+            input_info.error = {};
+        }
+        input_info.error["specific_load"] = "false";
         return;
     }
     inputs.forEach(input => {
-        let widthSize = parseInt(input.children.spec_label.style.width);
-        if(input.attributes.is_nullable.nodeValue === "NO"){
-            if(input.attributes.error.nodeValue === "YES"){
-                if(input.children.spec_input.value !== ''){
-                    input.attributes.class.nodeValue = "default_input";
-                    input.children.spec_label.style.width = widthSize+4;
-                    input.attributes.error.nodeValue = "NO"
-                }
-            }
-            if(input.children.spec_input.value === ''){
-                input.attributes.class.nodeValue = "error-input-text";
-                if(input.attributes.error.nodeValue === "NO"){
-                    input.children.spec_label.style.width = widthSize-4;
-                }
-                input.attributes.error.nodeValue = "YES"
-            }else{
-                input_info.data.specific_info = {};
-                input_info.data.specific_info[input.attributes.input_field.nodeValue] = input.children.spec_input.value;
-            }
+        let input_area = input.children.spec_input
+           ,label = input.children.spec_label;
+        inputNullUi(input , label , input_area , input_info);
+        if(input.children.spec_input.attributes.type.nodeValue === "checkbox"){
+            specific_info[input.attributes.input_field.nodeValue] = input.children.spec_input.checked;
+            return;
         }
+        specific_info[input.attributes.input_field.nodeValue] = input.children.spec_input.value;
     });
+    input_info.data.specific = specific_info;
 }
 
 function setAddButtons(buttons){
     buttons.add_eq
         .addEventListener('click' , async function(){
             let input_info = {
-                data: {}
-            };
+                    data: {}
+                }
+               ,server_response = document.getElementById("server-response");
             selectedInput(input_info);
             defaultTextInput(input_info);
             specificTextInput(input_info);
+
             if(input_info.error !== undefined){
                 console.log(input_info.error);
+                server_response.innerHTML = `
+                                            <div class="server-response-content error-input-text-background">
+                                                Missing Inputs
+                                            </div>
+                                            `
+                server_response.attributes.class.nodeValue = "error-input-text";
+            }else{
+                server_response.innerHTML = ``;
+                server_response.attributes.class.nodeValue = "server-response";
+                console.log(input_info);
             }
-            console.log(input_info);
         }
     );
 }

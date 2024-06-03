@@ -139,6 +139,14 @@
     text-align: center;
 }
 
+.server-response-content{
+    justify-content: center;
+    width: fit-content;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    border-radius: 0rem 4px 4px 0rem;
+}
+
 .specific-message{
     height: 70%;
     flex-direction: row;
@@ -302,3 +310,8 @@
     border-style: none none none solid;
     border-color: red;
 }
+
+.error-input-text-background{
+    background-color: rgb(255, 199, 199);
+}
+
