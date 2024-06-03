@@ -34,21 +34,49 @@ function common_select_query($request){
 }
 
 function common_insert_query($request){
-    $i = 1;
     $sql = " INSERT INTO ";
     $sql .= " " . $request["table"] . " ";
-    $sql .= " (" . $request["columns"] . ") ";
-    $sql .= " VALUES ";
-    if($request["multiple"] === 1){
-        convert_to_array($request["values"]);
-        $total = count($request["values"]);
-        foreach($request["values"] as $values){
-            $sql .= "( " . $values . ") ";
+    if(isset($request["multiple"])){
+        $i = 1;
+        convert_to_array($request["columns"]);
+        $total = count($request["columns"]);
+        foreach ($request["columns"] as $column) {
+            if($i === 1){
+                $sql .= " ( ";
+            }
+            $sql .= $column;
             if($i !== $total){
-                $sql .= ",";
+                $sql .= ", ";
+            }
+            if($i === $total){
+                $sql .= " ) ";
             }
             $i++;
         }
+    }else{
+        $sql .= " ( " . $request["columns"][0] . " ) ";
     }
+    $sql .= " VALUES ";
+    if(isset($request["multiple"])){
+        $i = 1;
+        convert_to_array($request["values"]);
+        $total = count($request["values"]);
+        foreach($request["values"] as $values){
+            if($i === 1){
+                $sql .= " ( ";
+            }
+            $sql .= $values;
+            if($i !== $total){
+                $sql .= ",";
+            }
+            if($i === $total){
+                $sql .= " ) ";
+            }
+            $i++;
+        }
+    }else{
+        $sql .= "( " . $request["values"][0] ." )";
+    }
+    return $sql;
 }
 ?>

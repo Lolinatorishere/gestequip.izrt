@@ -21,7 +21,7 @@ require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/equipme
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/group_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/user_query.php";
 
-// Post requerst
+// Post request
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $POST_RAW = file_get_contents('php://input');
     $parsed_data = json_decode($POST_RAW , true);
