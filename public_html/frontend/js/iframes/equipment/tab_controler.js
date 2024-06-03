@@ -546,7 +546,7 @@ async function setEqTypes(data){
                                      <div class="selected-class-label">
                                          selected equipment: 
                                      </div>
-                                     <div class="selected-equipment-type">
+                                     <div class="selected-equipment-type" id="user-selected-equipment-type">
                                          ${element.equipment_type}
                                      </div>
                                      `
@@ -657,7 +657,7 @@ function specificTextInput(input_info){
     eq_drpdwn_text_default = eq_type_drpdwn.attributes.default_text;
     let specific_info = {}
     if(inputs.length === 0){
-        document.getElementById("selected-eq-type").innerHTML = "please select Equipment";
+        document.getElementById("selected-eq-type").innerHTML = "please select an Equipment Type";
         document.getElementById("selected-eq-type").attributes.class.nodeValue = "error-input-text" ;
         if(input_info.error === undefined){
             input_info.error = {};
@@ -679,28 +679,48 @@ function specificTextInput(input_info){
 }
 
 function setAddButtons(buttons){
+    server_response = undefined;
+    request = {
+        page: "equipment"
+       ,custom: undefined 
+    };
     buttons.add_eq
         .addEventListener('click' , async function(){
             let input_info = {
                     data: {}
                 }
-               ,server_response = document.getElementById("server-response");
+               ,response_html = document.getElementById("server-response");
             selectedInput(input_info);
             defaultTextInput(input_info);
             specificTextInput(input_info);
-
             if(input_info.error !== undefined){
-                console.log(input_info.error);
-                server_response.innerHTML = `
+                response_html.innerHTML = `
                                             <div class="server-response-content error-input-text-background">
                                                 Missing Inputs
                                             </div>
                                             `
-                server_response.attributes.class.nodeValue = "error-input-text";
+                response_html.attributes.class.nodeValue = "error-input-text";
             }else{
-                server_response.innerHTML = ``;
-                server_response.attributes.class.nodeValue = "server-response";
-                console.log(input_info);
+                input_info.data.equipment_type = document.getElementById('user-selected-equipment-type').innerText;
+                request.custom = {
+                     tab: 'add_eq'
+                    ,type: 'data' 
+                    ,crud: 'create'
+                }
+                response_html.innerHTML = ``;
+                response_html.attributes.class.nodeValue = "server-response";
+                server_response = fetch(await urlCreateBackendRequest(request) , {
+                    method: "POST"
+                   ,headers: {
+                       "Content-Type": "application/json"
+                    }
+                   ,body: JSON.stringify(input_info)
+                })
+                .then(server_response => server_response.json())
+                .then(data => console.log(data))
+                .catch((error) => {
+                    console.error('error:', error);
+                })
             }
         }
     );

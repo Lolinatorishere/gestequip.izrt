@@ -13,12 +13,23 @@ if(!defined('query_generator_dir'))
     define('query_generator_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/query_generator.php');
 
 // crud functions 
+require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/describe_column.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/equipment_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/group_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/user_query.php";
+
+// Post requerst
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    $POST_RAW = file_get_contents('php://input');
+    $parsed_data = json_decode($POST_RAW , true);
+    foreach($parsed_data as $data){
+        foreach ($data as $key => $value) {
+            $_POST[$key] = $value;
+        }
+    }
+}
 
 // base get requests 
 $tab_request = $_GET["tab"];
@@ -31,28 +42,20 @@ function tab_request_validation($tab){
     switch ($trim_req){
         case "yur_eq":
             return 1;
-            break;
         case "grp_eq":
             return 1;
-            break;
         case "sch_eq":
             return 1;
-            break;
         case "add_eq":
             return 2;
-            break;
         case "all_eq":
             return 2;
-            break;
         case "rem_eq":
             return 2;
-            break;
         case "log_eq":
             return 3;
-            break;
         default:
             return 0;
-            break;
     }
 }
 
@@ -65,14 +68,11 @@ function type_validation($type){
         //user interface requested
         case "usri":
             return 1;
-            break;
         //tab data requested
         case "data":
             return 2;
-            break;
         default:
             return 0;
-            break;
     }
 }
 
@@ -86,19 +86,14 @@ function request_crud_validation(){
     switch($_GET["crud"]){
         case "create":
             return 1;
-            break;
         case "read":
             return 2;
-            break;
         case "update":
             return 3;
-            break;
         case "delete":
             return 4;
-            break;
         default:
             return 0;
-            break;
     }
 }
 
@@ -491,32 +486,32 @@ function tab_create_request($data_request , $tab , $user_id , $pdo){
 }
 
 function tab_create_information($tab , $user_id , $pdo){
-    $data_request = array();
-    if(!isset($_POST["equipment"]))
+    if(!isset($_POST["selected_group"]))
         return 0;
-    if(!isset($_POST["normal"]))
+    if(!isset($_POST["selected_user"]))
         return 0;
-    if(!isset($_POST["special"]))
+    if(!isset($_POST["equipment_type"]))
         return 0;
-    if(!isset($_POST["user"]))
+    if(!isset($_POST["default"]))
         return 0;
-    if(!isset($_POST["group"]))
+    if(!isset($_POST["specific"]))
         return 0;
-    $equipment_type = preg_replace('/[^a-zA-Z]/s' , '' , $_POST["equipment"]); 
-    $user_info = $_POST["user"];
-    $group_info = $_POST["group"];
+    $equipment_type = preg_replace('/[^a-zA-Z]/s' , '' , $_POST["equipment_type"]); 
+    error_log($equipment_type);
+    $user_id = $_POST["selected_user"]["user_id"];
+    $group_id = $_POST["selected_group"]["group_id"];
     $data_request["equipment_type"] = $equipment_type; 
-    $normal_info = $_POST["normal"];
-    $special_info = $_POST["special"];
-    foreach($normal_info as $key => $info){
-        $data_request["normal"][$key] = " \'" . $info . "\' ";
+    $default_info = $_POST["default"];
+    $specific_info = $_POST["specific"];
+    foreach($default_info as $key => $info){
+        $data_request["default"][$key] = " '" . $info . "'";
     }
-    foreach($special_info as $key => $info){
-        $data_request["special"][$key] = " \'" . $info . "\' ";
+    foreach($specific_info as $key => $info){
+        $data_request["specific"][$key] = "'" . $info . "'";
     }
-    return tab_create_request($data_request , $tab , $user_id , $pdo);
+    error_log(print_r($data_request , true));
+    //return tab_create_request($data_request , $tab , $user_id , $pdo);
 }
-
 
 // gets the correct requests for each tab
 function tab_read_information($tab , $user_id , $pdo){
@@ -560,8 +555,8 @@ function data_request($tab , $pdo , $user_id){
         $data = tab_read_information($tab , $user_id , $pdo);
     $ret = $data;
     return $ret;
-
 }
+
 function tab_auth_handle($auth_level){
     if($auth_level === 1)
         return 1;
@@ -572,7 +567,7 @@ function tab_auth_handle($auth_level){
             return 1;
     }
     return 0;
-} 
+}
 
 function request_handle($tab_valid , $tab , $type_valid){
     // validity guard clause
@@ -607,3 +602,4 @@ if($req_type === 2){
                           ,'information' => $ret[1]));
 }
 unset($pdo);
+unset($_POST);
