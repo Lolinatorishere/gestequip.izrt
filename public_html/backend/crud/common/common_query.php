@@ -14,7 +14,7 @@ function get_queries($request , $pdo){
     $statement->execute();
     if(!$statement)
         return $sql_error;
-    $ids = $statement->fetchAll();
+    $ids = $statement->fetchAll(PDO::FETCH_ASSOC);
     $ret["success"] = "success";
     $ret["items"] = $ids;
     return $ret;
@@ -32,7 +32,7 @@ function get_query($request , $pdo){
     $statement->execute();
     if(!$statement)
         return $sql_error;
-    $ids = $statement->fetch();
+    $ids = $statement->fetch(PDO::FETCH_ASSOC);
     $ret["success"] = "success";
     $ret["items"] = $ids;
     return $ret;

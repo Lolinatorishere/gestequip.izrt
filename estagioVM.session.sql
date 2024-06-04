@@ -4,12 +4,12 @@ CREATE table if not EXISTS equipment(
     registration_lock tinyint(1) DEFAULT NULL,
     equipment_type int NOT NULL,
     -- 0 delivered, 1 is in storage, 2 is ordered, 3 to be ordered
-    delivery_status int DEFAULT NULL,
+    delivery_status bool DEFAULT NULL,
     purchase_date date DEFAULT NULL,
     brand varchar(255) DEFAULT NULL,
     serial_number text NOT NULL,
     -- 0 is active the higher the int the closer to retirement
-    equipment_status int NOT NULL,
+    equipment_status bool NOT NULL,
     serial_md5 char(32) AS (md5(serial_number)) unique not null,
     business_unit text,
     PRIMARY KEY (id),
@@ -27,7 +27,7 @@ create table if NOT EXISTS computers(
     equipment_id int not null unique,
     hwid varchar(255) unique,
     computer_model text,
-    computer_type int,
+    computer_type varchar(255),
     os text,
     has_battery boolean,
     ram text,

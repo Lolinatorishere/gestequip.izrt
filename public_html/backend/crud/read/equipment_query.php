@@ -42,7 +42,7 @@ function get_equipments($request , $pdo){
         $statement = $pdo->prepare($sql);
         $statement->execute();
     }
-    $equipment_ids = $statement->fetchAll();
+    $equipment_ids = $statement->fetchAll(PDO::FETCH_ASSOC);
     foreach($equipment_ids as $eq_ids){
         $sql = "SELECT *
                 from equipment
@@ -54,7 +54,7 @@ function get_equipments($request , $pdo){
         $statement->execute();
         if(!$statement)
             return $sql_error;
-        $equipment = $statement->fetch();
+        $equipment = $statement->fetch(PDO::FETCH_ASSOC);
         if(!$statement)
             return $sql_error;
         $sql = "SELECT *
@@ -80,7 +80,7 @@ function get_equipments($request , $pdo){
         $statement->execute();
         if(!$statement)
             return $sql_error;
-        $equipment_spec = $statement->fetch();
+        $equipment_spec = $statement->fetch(PDO::FETCH_ASSOC);
         if(!$statement)
             return $sql_error;
         $item = array();

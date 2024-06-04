@@ -436,30 +436,34 @@ function setFetchTypes(data , append_to){
     let info = data.items
        ,totalHTML = "";
     info.forEach(element => {
-        type = element.Type.match(/(\w+)/);
-        max_input = element.Type.match(/(\d+)/);
-        max_input_html = "";
-        label = element.Field.replace(/_/g, ' ');
+        let type = element.Type.match(/(\w+)/)
+           ,max_input = element.Type.match(/(\d+)/)
+           ,max_input_html = "maxlength=\"-1\""
+           ,label = element.Field.replace(/_/g, ' ')
+           ,input_type = "text";
+        if(max_input !== null)
+            max_input_html = "maxlength=\"" + max_input[0] + "\"";
         switch(type[0]){
             case "tinyint":
-                input_specific = `
-                                 <div class="label" id="${data.input_area_id}label">
-                                    ${label}
-                                 </div>
-                                 <input id="${data.input_area_id}input" class="neutral-input" type="checkbox">
-                                 `
+                input_type = "checkbox";
+                break;
+            case "int":
+                input_type = "number";
+                break;
+            case "date":
+                input_type = "date";
                 break;
             default:
-                if(max_input !== null)
-                    max_input_html = "maxlength=\"" + max_input[0] + "\"";
-                input_specific = `
-                                    <div class="label" id="${data.input_area_id}label">
-                                        ${label}
-                                    </div>
-                                    <input class="neutral-input" id="${data.input_area_id}input" placeholder="${label}" type="text" ${max_input_html} >
-                                 `
+                input_type = "text";
                 break;
         }
+        input_specific = `
+                         <div class="label" id="${data.input_area_id}label">
+                             ${label}
+                         </div>
+                         <input class="neutral-input" id="${data.input_area_id}input" placeholder="${label}" type="${input_type}" ${max_input_html} >
+
+                         `
         HTMLinner = `
                     <div class="${data.input_class}" 
                          id="${data.input_id}"

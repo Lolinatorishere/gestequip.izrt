@@ -2,12 +2,8 @@
 function query_merge_array($arrays){
     $combined = array();
     foreach($arrays as $part){
-        $i = 1;
         foreach($part as $key => $info){
-            if($i%2 !== 0){
-                $combined[$key] = $info;
-            }
-            $i++;
+            $combined[$key] = $info;
         }
     }
     return $combined;

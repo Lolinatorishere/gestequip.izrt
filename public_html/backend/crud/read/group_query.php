@@ -32,7 +32,7 @@ function get_groups($request , $pdo){
         $statement = $pdo->prepare($sql);
         $statement->execute();
     }
-    $groups = $statement->fetchAll();
+    $groups = $statement->fetchAll(PDO::FETCH_ASSOC);
     $ret["items"] = $groups;
     $ret["pages"] = $request["total_pages"];
     $ret["current_page"] = $request["page"];

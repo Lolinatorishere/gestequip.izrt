@@ -238,17 +238,13 @@ function full_group_equipment_user_data($users_groups_equipments , $equipments ,
         array_push($data , $us);
         foreach($users["items"] as $user){
             if($user["id"] === $usr_grp_eq["user_id"]){
-                $i = 1;
                 $us_info = array();
                 foreach ($user as $key => $value) {
                     if($key === "id"){
                         $us_info["user_id"] = $value;
                         continue;
                     }
-                    if($i%2 === 0){
-                        $us_info[$key] = $value;
-                    }
-                    $i++;
+                    $us_info[$key] = $value;
                 }
                 array_push($data , $us_info);
             }
@@ -256,17 +252,13 @@ function full_group_equipment_user_data($users_groups_equipments , $equipments ,
         array_push($data , $gp);
         foreach($groups["items"] as $group){
             if($group["id"] === $usr_grp_eq["group_id"]){
-            $i = 1;
                 $gp_info = array();
                 foreach ($group as $key => $value) {
                     if($key === "id"){
                         $gp_info["group_id"] = $value;
                         continue;
                     }
-                    if($i%2 === 0){
-                        $gp_info[$key] = $value;
-                    }
-                    $i++;
+                    $gp_info[$key] = $value;
                 }
                 array_push($data , $gp_info);
             }
@@ -296,6 +288,12 @@ function parse_equipment_type_columns($columns){
     $i = 1;
     $filter = custom_query_filter(count($columns));
     foreach($columns as $column){
+        if($column["Key"] === "PRI")
+            continue;
+        if($column["Key"] === "MUL")
+            continue;
+        if(isset($column["Default"]))
+            continue;
         if($column["Field"] === "id")
             continue;
         if($column["Field"] === "equipment_id")
@@ -504,10 +502,10 @@ function tab_create_information($tab , $user_id , $pdo){
     $default_info = $_POST["default"];
     $specific_info = $_POST["specific"];
     foreach($default_info as $key => $info){
-        $data_request["default"][$key] = " '" . $info . "'";
+        $data_request["default"][$key] =  $info;
     }
     foreach($specific_info as $key => $info){
-        $data_request["specific"][$key] = "'" . $info . "'";
+        $data_request["specific"][$key] =  $info;
     }
     return tab_create_request($data_request , $tab , $user_id , $pdo);
 }

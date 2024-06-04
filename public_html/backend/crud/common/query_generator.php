@@ -20,15 +20,19 @@ function common_select_query($request){
     }
     $sql .= " FROM " 
          . $request["table"];
-    if(isset($request["specific"])){
+    if(!isset($request["specific"]))
+        return $sql;
+    if(!is_array($request["specific"])){
         $sql .= " WHERE "
-             . $request["specific"];
+            . $request["specific"];
         if(isset($request["paging"])){
             $limit = $request["limit"];
             $page = $request["current_page"];
             $sql .= " LIMIT " . $limit
-                 .  " OFFSET " . ($page * $limit) - $limit;
+                .  " OFFSET " . ($page * $limit) - $limit;
         }
+    }else{
+        error_log($request["specific"]);
     }
     return $sql;
 }
@@ -65,7 +69,7 @@ function common_insert_query($request){
             if($i === 1){
                 $sql .= " ( ";
             }
-            $sql .= $values;
+            $sql .= $values ;
             if($i !== $total){
                 $sql .= ",";
             }

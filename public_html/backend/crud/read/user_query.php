@@ -112,7 +112,7 @@ function get_users($request , $pdo){
         $sql = common_select_query($request);
         $statement = $pdo->prepare($sql);
         $statement->execute();
-        $user = $statement->fetch();
+        $user = $statement->fetch(PDO::FETCH_ASSOC);
         $filter = custom_user_filter(count($user));
         array_push($users , merge_arrays($filter , $user));
     }
