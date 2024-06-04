@@ -113,7 +113,6 @@ function get_users($request , $pdo){
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $user = $statement->fetch();
-        error_log(print_r($user , true));
         $filter = custom_user_filter(count($user));
         array_push($users , merge_arrays($filter , $user));
     }

@@ -43,19 +43,16 @@ function equipment_create_request_validation($request , $pdo){
     $table_request = array("table" => " " . $request["equipment_type"] . "s ");
     $table = describe_table($table_request , $pdo);
     $counted_table = count($request["specific"]);
-    //error_log(print_r($table,true));
     foreach($request["specific"] as $key => $value){
-        for ($i=0; $i < count($table["items"]) ; $i++) { 
-            if($table["items"][$i]["Field"] === $key){
-                if($table["items"][$i]["Null"] === "NO"){
-                    if(is_null($value))
-                        return 0;
-                    if($value != 0 || $value != 1)
-                        return 0;
-                }
-                $table_check++;
-                break;
+        for ($i = 0; $i < count($table["items"]) ; $i++) { 
+            if($table["items"][$i]["Field"] !== $key)
+                continue;
+            if($table["items"][$i]["Null"] === "NO"){
+                if(is_null($value))
+                    return 0;
             }
+            $table_check++;
+            break;
             if($table["items"][$i]["Type"] === "tinyint(1)") {
                 if($request["specific"][$key] !== 0 || $request["specific"][$key] !== 1)
                     return 0;
@@ -65,6 +62,16 @@ function equipment_create_request_validation($request , $pdo){
     if($table_check !== $counted_table)
         return 0;
     return 1;
+}
+
+function get_equipment_type_id($equipment_type , $pdo){
+    $request = array("fetch" => " * "
+                    ,"table" => " equipment_types "
+                    ,"counted" => 1
+                    ,"specific" => " equipment_type='" . $equipment_type . "' "
+                    );
+    $query = get_query($request , $pdo);
+    return $query["items"]["id"];
 }
 
 function create_equipment_create_query($request , $input_type){
@@ -86,18 +93,6 @@ function create_equipment_create_query($request , $input_type){
     return common_insert_query($create_request);
 }
 
-
-function create_request_sql_queries($request){
-    $sql = array("default_eq" => ""
-                ,"user_group_eq" => ""
-                ,"specifc_eq" => ""
-                );
-    $sql["default_eq"] = create_equipment_create_query($request , "default");
-    //$sql["user_group_eq"] = user_group_eq($request);
-    $sql["specifc_eq"] = create_equipment_create_query($request , "specific");
-    return $sql;
-}
-
 function create_equipment($request , $pdo){
     $insert_error = "User not created";
     if(equipment_create_request_validation($request , $pdo) === 0)
@@ -105,7 +100,8 @@ function create_equipment($request , $pdo){
     if(equipment_create_request_authentication($request , $pdo) === 0)
         return $insert_error;
     error_log("authorised lmao");
-    error_log(print_r(create_request_sql_queries($request), true));
+    error_log(get_equipment_type_id($request["equipment_type"] , $pdo));
+    //error_log(print_r(create_request_sql_queries($request), true));
 }
 
 ?>
