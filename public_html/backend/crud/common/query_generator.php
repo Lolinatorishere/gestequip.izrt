@@ -7,6 +7,7 @@ function convert_to_array(&$input){
 }
 
 function common_select_query($request){
+try{
     //this function will create the sql query that does:
     // returns total amount of items from a table
     // or the items with the specific requirements 
@@ -35,9 +36,14 @@ function common_select_query($request){
         error_log($request["specific"]);
     }
     return $sql;
+}catch(TypeError $e){
+    error_log(print_r($e , true));
+    return "error";
+}
 }
 
 function common_insert_query($request){
+try{
     $sql = " INSERT INTO ";
     $sql .= " " . $request["table"] . " ";
     if(isset($request["multiple"])){
@@ -68,8 +74,7 @@ function common_insert_query($request){
         foreach($request["values"] as $values){
             if($i === 1){
                 $sql .= " ( ";
-            }
-            $sql .= $values ;
+            } $sql .= $values ;
             if($i !== $total){
                 $sql .= ",";
             }
@@ -82,5 +87,58 @@ function common_insert_query($request){
         $sql .= "( " . $request["values"][0] ." )";
     }
     return $sql;
+}catch(TypeError $e){
+    error_log(print_r($e , true));
+    return "error";
 }
+}
+
+function common_delete_query($request){
+try{
+    if(!isset($request["specific"]))
+        return "error";
+    $sql = " DELETE FROM ";
+    $sql .= $request["table"];
+    $sql .= " WHERE ";
+    $sql .= $request["specific"];
+}catch(TypeError $e){
+    error_log(print_r($e , true));
+    return "error";
+}
+}
+
+function common_update_query($request){
+try{
+    if(!isset($request["specific"]))
+        return "error";
+    $sql = " UPDATE ";
+    $sql .= $request["table"];
+    $sql .= " SET ";
+    if(!is_array($request["columns"]))
+        return "error";
+    if(!is_array($request["values"]))
+        return "error";
+    $counted_columns = count($request["columns"]);
+    $counted_values = count($request["values"]);
+    $update_sql = "";
+    if($counted_columns !== $counted_values)
+        return "error";
+    for($i = 0 ; $i < $counted_columns ; $i++) { 
+        $update_sql .= $request["columns"][$i];
+        $update_sql .= " = ";
+        $update_sql .= $request["values"][$i];
+        if($i + 1 < $counted_columns){
+            $update_sql .= ", ";
+        }
+    }
+    $sql .= $update_sql;
+    $sql .= " WHERE ";
+    $sql .= $request["specific"];
+    return $sql;
+}catch(TypeError $e){
+    error_log(print_r($e , true));
+    return "error";
+}
+}
+
 ?>

@@ -12,11 +12,13 @@ if(!defined('pdo_config_dir'))
 if(!defined('query_generator_dir'))
     define('query_generator_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/query_generator.php');
 
-// crud functions 
 require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_query.php";
+// crud functions 
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/describe_column.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/delete/equipment_delete.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/create/equipment_create.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/update/equipment_update.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/common_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/equipment_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/group_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/user_query.php";
