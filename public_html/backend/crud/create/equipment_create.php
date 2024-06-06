@@ -164,69 +164,106 @@ function create_equipment_users_groups_query($request , $equipment_id){
 //}
 
 function create_equipment($request , $pdo){
+try{
+    $ret = array("server_message" => ""
+                ,"message" => "default"
+                );
     $insert_error = "User not created";
-    $loggable = array();
+    $loggable = array("type" => ""
+                     ,"exception" => array()
+                     ,"message" => array()
+                     ,"user_id" => $_SESSION["id"]
+                     );
+    $loggable["message"]["userInput"] = $request;
     if(equipment_create_request_validation($request , $pdo) === 0)
-        return "Blocked Invalid Inputs";
+        throw new Exception("Blocked Invalid Inputs");
     if(equipment_create_request_authentication($request , $pdo) === 0)
-        return "Blocked Unuthorised Creation";
-    error_log("authorised and valid lmao");
+        throw new Exception("Blocked Unuthorised Creation");
     $request["default"]["equipment_type"] = get_equipment_type_id($request["equipment_type"] , $pdo);
     $sql = create_equipment_create_query($request , " equipment " , "default");
-try{
-    $statement = $pdo->prepare($sql);
-    $statement->execute();
-    $equipment_id = $pdo->lastInsertId();
-    $loggable["default_sql"] = $sql;
-    $loggable["default_inserted_id"] = $equipment_id;
-    //error_log(print_r($loggable , true));
-}catch(PDOException $e){
-    //error_log(print_r($e,true));
-    return "Equipment not Created";
+    try{
+        $statement = $pdo->prepare($sql);
+        $statement->execute();
+        $equipment_id = $pdo->lastInsertId();
+        $loggable["message"]["default_sql"] = $sql;
+        $loggable["message"]["default_inserted_id"] = $equipment_id;
+    }catch(PDOException $e){
+        array_push($loggable["exception"] , $e);
+        throw new Exception("Server Error");
+    }
+    try{
+        $request["specific"]["equipment_id"] = $equipment_id;
+        $sql = create_equipment_create_query($request , " " . $request["equipment_type"] . "s " , "specific");
+        $statement = $pdo->prepare($sql);
+        $statement->execute();
+        $specifics_id = $pdo->lastInsertId();
+        $loggable["message"]["specific_sql"] = $sql;
+        $loggable["message"]["specific_inserted_id"] = array("type_id" => $specifics_id
+                                                 ,"eq_type" => $request["equipment_type"]
+                                                 );
+    }catch(PDOException $e){
+        array_push($loggable["exception"] , $e->getMessage());
+        $deletion_request = array("table" => " equipment "
+                                 ,"specific" => "id=" . $equipment_id
+                                 );
+        delete_equipment($deletion_request , $pdo);
+        throw new Exception("Server Error");
+    }
+    try{
+        $update_request = array("table" => " equipment "
+            ,"columns" => array("registration_lock")
+            ,"values" => array("1")
+            ,"specific" => "id = " . $equipment_id
+        );
+        $was_updated = update_equipment($update_request , $pdo);
+        if(isset($was_updated["PDOException"]))
+            throw new PDOException($was_updated["PDOException"]);
+    }catch(PDOException $e){
+        array_push($loggable["exception"] , $e->getMessage());
+        $deletion_request = array("table" => $request["equipment_type"] ."s "
+                                 ,"specific" => "equipment_id=" . $equipment_id
+                                 );
+        delete_equipment($deletion_request , $pdo);
+        $deletion_request = array("table" => " equipment "
+                                 ,"specific" => "id=" . $equipment_id
+                                 );
+        delete_equipment($deletion_request , $pdo);
+        throw new Exception("Server Error");
+    }
+    try{
+        $sql = create_equipment_users_groups_query($request , $equipment_id);
+        $statement = $pdo->prepare($sql);
+        $statement->execute();
+        $loggable["message"]["users_inside_groups_equipments_ids"] = array($request["user_id"] , $request["group_id"] , $equipment_id);
+        $loggable["message"]["users_inside_groups_equipments_sql"] = $sql;
+    }catch(PDOException $e){
+        array_push($loggable["exception"] , $e->getMessage());
+        throw new Exception("equipment_Group query not made");
+    }
+    throw new Exception("Equipment Created");
+    
+}catch(Exception $e){
+    switch($e->getMessage()){
+        case 'Equipment Created':
+            $loggable["type"] = "Equipment_Create";
+            $loggable["equipment_id"] = $equipment_id;
+            create_log($loggable , "equipment" , $pdo);
+            $ret["server_message"] = "Equipment Created";
+            // todo equipment querying seems to not be working
+            $ret["message"] = get_equipment(" * " , $equipment_id , $pdo);  
+            return $ret;
+        default:
+            $loggable["type"] = "user_input_error";
+            if(isset($equipment_id)){
+                $loggable["equipment_id"] = $equipment_id;
+            }
+            $loggable["user_inputs"] = $request;
+            create_log($loggable , "equipment" , $pdo);
+            $ret["server_message"] = "Opperation could not Be Completed";
+            $ret["message"] = $e->getMessage();
+            return $ret;
+    }
 }
-try{
-    $request["specific"]["equipment_id"] = $equipment_id;
-    $sql = create_equipment_create_query($request , " " . $request["equipment_type"] . "s " , "specific");
-    //error_log(print_r($sql ,true));
-    $statement = $pdo->prepare($sql);
-    $statement->execute();
-    $specifics_id = $pdo->lastInsertId();
-    $loggable["specific_sql"] = $sql;
-    $loggable["specific_inserted_id"] = array("type_id" => $specifics_id
-                                             ,"eq_type" => $request["equipment_type"]
-                                             );
-    //error_log(print_r($loggable , true));
-}catch(PDOException $e){
-    //error_log(print_r($e,true));
-    return $request["equipment_type"] . "not Created";
-}
-try{
-    $update_request = array("table" => " equipment "
-                           ,"columns" => array("registration_lock")
-                           ,"values" => array("1")
-                           ,"specific" => "id = " . $equipment_id
-                           );
-    $was_updated = update_equipment($update_request , $pdo);
-    if(isset($was_updated["PDOException"]))
-        throw new PDOException($was_updated["PDOException"]);
-    //error_log(print_r($loggable , true));
-}catch(PDOException $e){
-    //error_log(print_r($e,true));
-    return "registration_lock not set";
-}
-try{
-    $sql = create_equipment_users_groups_query($request , $equipment_id);
-    error_log($sql);
-    $statement = $pdo->prepare($sql);
-    $statement->execute();
-    $loggable["users_inside_groups_equipments_ids"] = array($request["user_id"] , $request["group_id"] , $equipment_id);
-    $loggable["users_inside_groups_equipments_sql"] = $sql;
-}catch(PDOException $e){
-    error_log(print_r($e,true));
-    return "equipment_Group query not made";
-}
-    error_log(print_r($loggable , true));
-    return "equipment created";
 }
 
 ?>

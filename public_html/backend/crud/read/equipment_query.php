@@ -94,4 +94,68 @@ function get_equipments($request , $pdo){
     $ret["total_items"] = $request["total_items"];
     return($ret);   
 }
+
+function get_equipment($fetch , $equipment_id , $pdo){
+    if(!isset($equipment_id))
+        return $sql_error;
+    $sql_error = array("error" => "error");
+    $table = "";
+    $sql = "";
+    $item = array();
+    $ret = array();
+    $equipment_selected = array();
+    // the reason this table exists is because it simplifies the querying 
+    // of the equipments of a group or its users
+    $request = array("fetch" => ":fetch"
+                    ,"table" => "equipment"
+                    ,"counted" => 1
+                    ,"specific" => "id=:equipment_id" 
+                    );
+    $sql = common_select_query($request);
+    // request is unavailable
+    if($sql === "error")
+        return $sql_error;
+    $statement = $pdo->prepare($sql);
+    $statement->bindParam(':equipment_id' , $equipment_id);
+    $statement->bindParam(':fetch' , $fetch);
+    $statement->execute();
+    if(!$statement)
+        return $sql_error;
+    $equipment_default = $statement->fetch(PDO::FETCH_ASSOC);
+    if(count($equipment_default) === 0)
+        return $sql_error;
+    $request = array("fetch" => " * "
+                    ,"table" => ":table"
+                    ,"counted" => 1
+                    ,"specific" => "equipment_id=:equipment_id"
+                    );
+    $sql = common_select_query($request);
+    if($sql === "error")
+        return $sql_error;
+    // todo create a metafunction that allows the switch case 
+    // to search all possible equipments inside the DB
+    switch($equipment_default["equipment_type"]){
+        case 1:
+            $table = "computers";
+        break;
+        case 2:
+            $table .= "phones";
+        break;  
+        default:
+            return $sql_error;
+        break;
+    }
+    $statement = $pdo->prepare($sql);
+    $statment->bindParam(':table' , $table);
+    $statement->execute();
+    if(!$statement)
+        return $sql_error;
+    $equipment_specific = $statement->fetch(PDO::FETCH_ASSOC);
+    array_push($item, $equipment_default , $equipment_spec);
+    array_push($equipment_selected , query_merge_array($item));
+    $ret["success"] = "success";
+    $ret["items"] = $equipment_specific;
+    return($ret);
+}
+
 ?>

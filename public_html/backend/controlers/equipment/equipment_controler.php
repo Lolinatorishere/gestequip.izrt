@@ -17,6 +17,7 @@ require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arra
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/describe_column.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/delete/equipment_delete.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/create/equipment_create.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/create/create_logs.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/update/equipment_update.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/common_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/equipment_query.php";
