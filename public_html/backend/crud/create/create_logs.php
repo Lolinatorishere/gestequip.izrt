@@ -24,7 +24,7 @@ function log_parse($log_type){
 }
 
 function create_log($log , $log_type , $pdo){
-//try{
+try{
     $message = "";
     $sql_error = array("error" => "error");
     $ret = array();
@@ -61,9 +61,9 @@ function create_log($log , $log_type , $pdo){
     $ret["success"] = "success";
     $ret["items"] = $log_id;
     return $ret;
-//}catch(PDOException $e){
-//    error_log(print_r($e , true));
-//    return $sql_error;
-//}
+}catch(PDOException $e){
+    error_log(print_r($e , true));
+    return $sql_error;
+}
 }
 ?>

@@ -9,6 +9,7 @@ async function createEquipmentContent(){
                     ,'search'
                     ,'all_equipment'
                     ,'add_equipment'
+                    ,'add_equipment_type'
                     ,'remove_equipment'
                     ,'logs'],
 
@@ -17,6 +18,7 @@ async function createEquipmentContent(){
                     ,'sch_eq'
                     ,'all_eq'
                     ,'add_eq'
+                    ,'adeqty'
                     ,'rem_eq'
                     ,'log_eq']
         }

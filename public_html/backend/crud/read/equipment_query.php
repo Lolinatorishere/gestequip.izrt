@@ -34,8 +34,7 @@ function get_equipments($request , $pdo){
         return $sql_error;
     if(!isset($request["total_items"])){
         $rows_in_query = $statement->fetch();
-        $request["total_items"] = $rows_in_query[0];
-        $request["counted"] = 1;
+        $request["total_items"] = $rows_in_query[0]; $request["counted"] = 1;
         $request["page"] = 1;
         $request["pages"] = ceil($request["total_items"] / $request["limit"]);
         $sql = common_select_query($request);
@@ -109,7 +108,7 @@ function get_equipment($fetch , $equipment_id , $pdo){
     $request = array("fetch" => ":fetch"
                     ,"table" => "equipment"
                     ,"counted" => 1
-                    ,"specific" => "id=:equipment_id" 
+                    ,"specific" => "id = :equipment_id " 
                     );
     $sql = common_select_query($request);
     // request is unavailable

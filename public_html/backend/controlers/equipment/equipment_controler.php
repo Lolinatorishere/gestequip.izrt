@@ -56,6 +56,8 @@ function tab_request_validation($tab){
             return 2;
         case "rem_eq":
             return 2;
+        case "adeqty":
+            return 3;
         case "log_eq":
             return 3;
         default:

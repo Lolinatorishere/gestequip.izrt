@@ -1,4 +1,26 @@
 <?php
+function create_profile_div(){
+    $user_type = "";
+    if(isset($_SESSION["user_type"])){
+        $user_type = "
+                        <p id=\"profile-user-type\">
+                            " . $_SESSION["user_type"] . "
+                        </p>
+                     ";
+    }
+
+    $profile = "
+        <div class=\"profile-div\">
+            ". $user_type . "
+            <p class=\"profile-username\">" . $_SESSION["users_name"] . "</p>
+            <a href=\"\..\backend\session\uncheck.php\" id=\"profile-logout-button\">
+                Sign out
+            </a>
+        </div>
+        ";
+    return $profile;
+}
+
 
    $sidebar_link = array(
         "../../../pages/dashboard.php",
@@ -43,7 +65,7 @@
 // The sidebar is a div that contains 7 sidebar-items
 // Each sidebar-item is a link to a different page
     $current_page = basename($_SERVER['REQUEST_URI']);
-    echo("<div class=\"sidebar\">");
+    echo("<div class=\"sidebar\"><div class=\"sidebar-nav\">");
     for($i = 0 ; $i < 7; $i++){
         echo("
             <div class=\"sidebar-item\" ");
@@ -65,5 +87,13 @@
             </div>
         ");
     }
-    echo("</div>");  
+    echo("</div>");
+    echo("<div class=\"sidebar-buffer\"></div>");
+    echo("<div class=\"sidebar-profile\">
+          <div class=\"profile-controls\">"
+    );
+        echo(create_profile_div());
+    echo("</div>
+          </div>
+          </div>");  
 ?>

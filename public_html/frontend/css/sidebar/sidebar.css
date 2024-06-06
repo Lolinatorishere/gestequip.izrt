@@ -45,3 +45,15 @@
     background-color: rgb(170, 170, 170);
     color: rgb(255, 255, 255);
 }
+
+.sidebar-nav{
+    height: fit-content;
+}
+
+.sidebar-buffer{
+    height: 50%;
+}
+
+.sidebar-profile{
+    height: fit-content;
+}

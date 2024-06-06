@@ -12,7 +12,7 @@ if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] === true)
     header("Location: /pages/dashboard.php");
 
 require_once pdo_config_dir;
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_query.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/common_query.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/auth/user_auth.php";
 $error_message = "";
 $email = "";

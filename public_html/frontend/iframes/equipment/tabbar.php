@@ -27,7 +27,7 @@ function make_tabbar(){
                 </div>
             </div>
         </div>";
-    if($_SESSION["user_type"] === "Admin")
+    if($_SESSION["user_type"] === "Manager" || $_SESSION["user_type"] === "Admin"){ 
         $equipment_tabbar .= "
         <div class = \"tabbar-item\">
             <div class = \"tabbar-content\">
@@ -35,8 +35,18 @@ function make_tabbar(){
                     add equipment
                 </div>
             </div>
-        </div>
-
+        </div>";
+        if($_SESSION["user_type"] === "Admin"){
+            $equipment_tabbar .= "
+            <div class = \"tabbar-item\">
+                <div class = \"tabbar-content\">
+                    <div id = \"add_equipment_type\">
+                        equipment types 
+                    </div>
+                </div>
+            </div>";
+        }
+        $equipment_tabbar .= "
         <div class = \"tabbar-item\">
             <div class = \"tabbar-content\">
                 <div id = \"all_equipment\">
@@ -51,15 +61,18 @@ function make_tabbar(){
                     remove equipment
                 </div>
             </div>
-        </div>
-
-        <div class = \"tabbar-item\">
-            <div class = \"tabbar-content\">
-                <div id = \"logs\">
-                    logs
-                </div>
-            </div>
         </div>";
+        if($_SESSION["user_type"] === "Admin"){
+            $equipment_tabbar .="
+            <div class = \"tabbar-item\">
+                <div class = \"tabbar-content\">
+                    <div id = \"logs\">
+                        logs
+                    </div>
+                </div>
+            </div>";
+        }
+    }
     $equipment_tabbar .="
     </div>";
     return $equipment_tabbar;

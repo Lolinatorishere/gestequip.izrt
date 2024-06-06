@@ -152,6 +152,7 @@ function controlsFunctionality(data , refresh , loadingFunction){
        ,arrow_backward
        ,arrow_forward
        ,control_location = '';
+
     if(data.control_location !== undefined){
         control_location = "-" + data.control_location;
     }
@@ -271,8 +272,10 @@ function setControls(data , append_to , refresh , loadingFunction){
        ,controls = document.createElement('div')
        ,info = data.information
        ,control_location = '';
-    if(data.control_location !== undefined){
+    if(data.control_location !== undefined && data.control_page !== ""){
         control_location = data.control_location;
+    }else{
+        data.control_location = undefined;
     }
     info.control_location = control_location;
     totalDiv.className = 'total';
@@ -784,6 +787,7 @@ async function setTabContent(data){
                 setUserHasNoItems(append_controls , append_items , append_details , message);
                 break;
             }
+            data.control_location = undefined;
             setControls(data , append_controls , empty , setTabContent);
             setFetchItems(itemsFunctionality , data , appends , append_items , append_details);
             break;
@@ -804,6 +808,7 @@ async function setTabContent(data){
                 setUserHasNoItems(append_controls , append_items , append_details , message);
                 break;
             }
+            data.control_location = undefined;
             setControls(data , append_controls , empty , setTabContent);
             setFetchItems(itemsFunctionality , data , appends , append_items , append_details);
             break;
@@ -845,41 +850,49 @@ async function setTabContent(data){
     }
 }
 
-async function tabbarFunctionality(button , tab){
-    let request = {
-        page: 'equipment'
-       ,custom: undefined
+async function setTab(request , button , tab){
+    setTabHighlight(button);
+    tab_css = document.getElementById("tab-css");
+    tab_css.href = '/frontend/css/iframes/equipment/tabs/' + tab +'.css';
+    // fetches the correct tab ui on click
+    request.custom = {
+        tab: tab
+        ,type: 'usri'
     }
+    let response = await fetch(await urlCreateBackendRequest(request));
+    let userInterface = await response.json();
+    await setTabUI(userInterface);
+    // fetch first time tab info
+    request.custom = {
+        tab: tab
+        ,type: 'data' 
+        ,crud: 'read'
+    }
+    response = await fetch(await urlCreateBackendRequest(request));
+    tab_information = await response.json();
+    await setTabContent(tab_information);
+}
+
+async function tabbarFunctionality(request , button , tab){
     button.addEventListener('click' , async function(){
-        setTabHighlight(button);
-        tab_css = document.getElementById("tab-css");
-        tab_css.href = '/frontend/css/iframes/equipment/tabs/' + tab +'.css';
-        // fetches the correct tab ui on click
-        request.custom = {
-            tab: tab
-           ,type: 'usri'
-        }
-        let response = await fetch(await urlCreateBackendRequest(request));
-        let userInterface = await response.json();
-        await setTabUI(userInterface);
-        // fetch first time tab info
-        request.custom = {
-            tab: tab
-           ,type: 'data' 
-           ,crud: 'read'
-        }
-        response = await fetch(await urlCreateBackendRequest(request));
-        tab_information = await response.json();
-        console.log(tab_information);
-        await setTabContent(tab_information);
+        setTab(request , button  , tab)
     });
+
 }
 
 async function tabFunctionality(tabs){
+    let request = {
+        page: 'equipment'
+        ,custom: undefined
+    }
+    ,default_button = document.getElementById(tabs.buttons[0])
+    ,default_tab = tabs.tab[0];
     for(let i = 0 ; i < tabs.buttons.length ; i++){
         let button = document.getElementById(tabs.buttons[i]);
         if(button === null || button === undefined)
             continue;
-        tabbarFunctionality(button , tabs.tab[i]);
+        tabbarFunctionality(request , button , tabs.tab[i] );
     }
+    setTab(request , default_button , default_tab );
+
 }
