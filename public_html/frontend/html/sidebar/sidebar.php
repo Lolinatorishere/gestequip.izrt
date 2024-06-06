@@ -3,19 +3,19 @@ function create_profile_div(){
     $user_type = "";
     if(isset($_SESSION["user_type"])){
         $user_type = "
-                        <p id=\"profile-user-type\">
+                        <div id=\"profile-user-type\" class=\"profile-user-type\">
                             " . $_SESSION["user_type"] . "
-                        </p>
+                        </div>
                      ";
     }
 
     $profile = "
         <div class=\"profile-div\">
             ". $user_type . "
-            <p class=\"profile-username\">" . $_SESSION["users_name"] . "</p>
-            <a href=\"\..\backend\session\uncheck.php\" id=\"profile-logout-button\">
+            <div class=\"profile-username\">" . $_SESSION["users_name"] . "</div>
+            <div id=\"profile-logout-button\" class=\"profile-logout\">
                 Sign out
-            </a>
+            </div>
         </div>
         ";
     return $profile;
@@ -94,6 +94,7 @@ function create_profile_div(){
     );
         echo(create_profile_div());
     echo("</div>
+          <script src=\"/frontend/js/sidebar/sidebar.js\"></script>
           </div>
           </div>");  
 ?>

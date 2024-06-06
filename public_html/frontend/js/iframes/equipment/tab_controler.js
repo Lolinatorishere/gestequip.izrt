@@ -20,6 +20,42 @@ async function setTabUI(tab_html_content){
     div.innerHTML = tab_html_content.html;
 }
 
+async function setFetchedItemsUI(item_set_id , limit , equipment_type){
+    let item_location_height = document.getElementById(item_set_id).clientHeight
+       ,individual_item_height = item_location_height/limit
+       ,set_items = document.getElementById(item_set_id).children
+       ,title_properties = set_items[0]
+       ,i = 0;
+    if(title_properties.id === "title-bar"){
+        title_properties.style.paddingTop = 3
+        title_properties.style.paddingBottom = 3
+        individual_item_height = (item_location_height-title_properties.clientHeight)/limit;
+        title_properties.children[0].style.display = "flex";
+        title_properties.children[0].style.flexDirection = "row";
+        let title_content = title_properties.children[0].children;
+        i = 1;
+    }
+    let total_children = set_items[i].children.length
+       ,widths = {};
+    for(i ; i < set_items.length ; i++){
+        let width = [];
+        set_items[i].style.height = individual_item_height;
+        for(let j = 0 ; j < total_children ; j++){
+            width = [];
+            item = set_items[i].children[j];
+            for(let k = 0 ; k < equipment_type.length ; k++){
+                if(parseInt(item.innerText) === equipment_type[k].id){
+                    item.innerText = equipment_type[k].equipment_type;
+                    break;
+                }
+            }
+            width.push(item.clientWidth);
+        }
+        widths[i] = width;
+    }
+    console.log(widths);
+}
+
 async function urlCreateBackendRequest(request){
     let page_controler = request.page + '/' + request.page +'_controler.php?'
        ,i = 0;
@@ -301,7 +337,8 @@ function itemsHtml(data , appends){
         return itemsDiv;
     }else{
         if(data.title !== undefined){
-            let title = document.createElement('div');
+            let title = document.createElement('div')
+               ,title_div = document.createElement('div');
             data.title.forEach(element => {
                 let HTMLinner = '';
                 HTMLinner += `
@@ -311,7 +348,11 @@ function itemsHtml(data , appends){
                              `
                 title.innerHTML += HTMLinner;
             });
-            itemsDiv.appendChild(title);
+            title.className = appends[0] + "-title";
+            title_div.className = "title-bar";
+            title_div.id = "title-bar";
+            title_div.appendChild(title);
+            itemsDiv.appendChild(title_div);
         }
         //equipment type, brand, model, purchase_date, equipment state
         for(let i = 0 ; i < info.total_items ; i++){
@@ -482,34 +523,52 @@ function setFetchTypes(data , append_to){
     });
     append_to.innerHTML = totalHTML;
 }
+
+function findMinMaxAttributeFromList(list_input , min_or_max , attribute){
+    if(list_input === undefined)
+        return "error";
+    if(min_or_max === undefined)
+        return "error";
+    let smallest = undefined
+       ,largest = undefined
+       ,attribute_int = 0;
+    list_input.forEach(input => {
+        if(attribute === undefined){
+            attribute_int = parseInt(input);
+        }else{
+            attribute_int = parseInt(input[attribute]);
+        }
+        if(isNaN(attribute_int) || attribute_int === null)
+        return;
+        if(smallest === undefined){
+            smallest = attribute_int;
+        }
+        if(largest === undefined){
+            largest = attribute_int
+        }
+        if(largest < attribute_int){
+            largest = attribute_int;
+        }
+        if(smallest > attribute_int){
+            smallest = attribute_int;
+        }
+    });
+    switch (min_or_max) {
+        case "min":
+            return smallest;
+        case "max":
+            return largest;
+        case "both":
+            return {small: smallest, large: largest};
+        default:
+            return "error";
+    }
+}
+
 function minClientWidthSet(list_of_inputs , list_of_labels){
-    let smallestInput = undefined
-       ,largestLabel = undefined
+    let smallestInput = findMinMaxAttributeFromList(list_of_inputs , "min" , "clientWidth")
+       ,largestLabel = findMinMaxAttributeFromList(list_of_labels , "max" , "clientWidth")
        ,padding = 10;
-    list_of_inputs.forEach(input => {
-        let clientWidth = parseInt(input.clientWidth);
-        if(isNaN(clientWidth) || clientWidth === null)
-            return;
-        if(smallestInput === undefined){
-            smallestInput = clientWidth;
-            return;
-        }
-        if(smallestInput > clientWidth){
-            smallestInput = parseInt(input.clientWidth);
-        }
-    });
-    list_of_labels.forEach(label =>{
-        let clientWidth = parseInt(label.clientWidth);
-        if(isNaN(clientWidth) || clientWidth === null)
-            return; 
-        if(largestLabel === undefined){
-            largestLabel = clientWidth;
-            return; 
-        }
-        if(largestLabel < clientWidth){
-            largestLabel = parseInt(label.clientWidth);
-        }
-    });
     list_of_inputs.forEach(input => {
         input.style.width = smallestInput - padding;
     });
@@ -767,6 +826,7 @@ async function addEqUsersControlFunctionality(data , group_id){
     setFetchItems(addUsersFunctionality , custom_data , apnds , apnd_items , apnd_details);
 }
 
+
 async function setTabContent(data){
     empty = [];
     switch(data.tab){
@@ -775,6 +835,7 @@ async function setTabContent(data){
             append_items = document.getElementById("items-content");
             append_details = document.getElementById("info-selected");
             appends = [["yur"],["equipment_type","brand","model","purchase_date","equipment_status"]];
+            console.log(data);
             if(data.information.error !== undefined){
                 message = {
                     controlsclass: "control_error_msg"
@@ -787,9 +848,17 @@ async function setTabContent(data){
                 setUserHasNoItems(append_controls , append_items , append_details , message);
                 break;
             }
-            data.control_location = undefined;
-            setControls(data , append_controls , empty , setTabContent);
-            setFetchItems(itemsFunctionality , data , appends , append_items , append_details);
+            let custom_data = {
+                    data: data.data
+                   ,tab: data.tab
+                   ,information: data.information.equipment
+                   ,control_location: undefined
+                   ,title: ["type" , "brand" , "model" , "purchase date" , "status"]
+                   ,equipment_types: data.information.equipment_types
+                };
+            setControls(custom_data , append_controls , empty , setTabContent);
+            setFetchItems(itemsFunctionality , custom_data , appends , append_items , append_details);
+            setFetchedItemsUI("items-content" , 20 , data.information.equipment_types.items);
             break;
         case'grp_eq':
             append_controls = document.getElementById("items-controls");

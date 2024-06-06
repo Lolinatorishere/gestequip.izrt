@@ -14,7 +14,7 @@
     padding-top: 1rem;
     padding-bottom: 1rem;
     font-size: 1.3rem;
-    font-weight: 500;
+    font-weight: 500; 
 }
 
 #first-sidebar-item{
@@ -56,4 +56,23 @@
 
 .sidebar-profile{
     height: fit-content;
+}
+
+.sidebar-profile *{
+    height: 1.5rem;
+    color: #343a40;
+    cursor: default;
+    text-decoration: none;
+}
+
+.profile-logout{
+    text-align: center;
+    font-size: 1.4rem;
+    height: 2rem;
+    width: 18rem;
+}
+
+#profile-logout-button:hover{
+    background-color: rgb(252, 36, 20);
+    color: white;
 }
