@@ -1,7 +1,5 @@
 async function isFirstTab(string){
-    let parser = new DOMParser()
-       ,doc = parser.parseFromString(string , 'text/html')
-       ,id = doc.querySelector('#your_equipment');
+    id = document.querySelector(string);
     if(id === null){
         return 1;
     }else{
@@ -9,10 +7,11 @@ async function isFirstTab(string){
     }
 }
 
-async function setTabHighlight(tab_node){
-    let previous_tab = document.getElementById('current-tab');
+async function setTabHighlight(tab_node , tab_id){
+    let previous_tab = document.getElementById(tab_id);
+    console.log(tab_id);
     await unsetPreviousHighlight(previous_tab , tab_node);
-    tab_node.parentNode.id = 'current-tab';
+    tab_node.parentNode.id = tab_id;
 }
 
 async function setTabUI(tab_html_content){
@@ -22,15 +21,12 @@ async function setTabUI(tab_html_content){
 
 async function unsetPreviousHighlight(previous_tab , tab_node){
     let first_tab = 1;
+    console.log(previous_tab);
     if(previous_tab === null) 
         return;
     previous_tab.id = '';
     if(tab_node.id === "your_equipment")
         return;
-    first_tab = await isFirstTab(previous_tab.innerHTML);
-    if(first_tab === 1) 
-        return;
-    previous_tab.id = 'first-tab';
 }
 
 async function urlCreateBackendRequest(request){
@@ -62,27 +58,46 @@ function itemsUIparseWidthRows(widths){
 }
 
 async function searchTabFunctionality(tab){
-    let request = {
+    let tab_content = document.getElementById("tabbar-options")
+       ,tab_element = document.getElementById(tab.id)
+       ,request = {
         page: 'equipment'
        ,custom: {
-            tab: tab
+            tab: 'sch_eq'
            ,type: 'usri' 
            ,crud: 'read'
+            }
         }
-    }
     switch(tab.id){
         case 'user-group-search':
             tab.addEventListener('click' , async function(){
-                request.custom.rfsh = 'amongus';
-                request.custom.rgin = 'cum';
+                setTabHighlight(tab_element , 'selected-search-tab');
+                request.custom.rfsh = 'search_tab/group_user';
+                request.custom.rgin = 'none';
                 response = await fetch(await urlCreateBackendRequest(request));
                 tab_html = await response.json();
-                console.log(tab_html);
+                tab_content.innerHTML = tab_html.html;
             });
             break;
         case 'equipment-default':
+            tab.addEventListener('click' , async function(){
+                setTabHighlight(tab_element , 'selected-search-tab');
+                request.custom.rfsh = 'search_tab/equipment';
+                request.custom.rgin = 'none';
+                response = await fetch(await urlCreateBackendRequest(request));
+                tab_html = await response.json();
+                tab_content.innerHTML = tab_html.html;
+            });
             break;
         case 'equipment-specific':
+            tab.addEventListener('click' , async function(){
+                setTabHighlight(tab_element , 'selected-search-tab');
+                request.custom.rfsh = 'search_tab/equipment_type';
+                request.custom.rgin = 'none';
+                response = await fetch(await urlCreateBackendRequest(request));
+                tab_html = await response.json();
+                tab_content.innerHTML = tab_html.html;
+            });
             break;
         default:
             break;
@@ -92,11 +107,13 @@ async function searchTabFunctionality(tab){
 function internalTabSetter(tab_id , Functionality){
     tab_row = document.querySelector(tab_id).children;
     for(let i = 0 ; i < tab_row.length ; i++){
-        if(tab_row[i].id === "")
+        if(tab_row[i].children.length === 0)
             continue;
-        if(tab_row[i].id === undefined)
+        if(tab_row[i].children === undefined)
             continue;
-        Functionality(tab_row[i]);
+        tab_row[i].children[0].style.paddingLeft = 1 + 'rem';
+        tab_row[i].children[0].style.paddingRight = 1 + 'rem';
+        Functionality(tab_row[i].children[0]);
     }
 }
 
@@ -1064,7 +1081,7 @@ async function setTabContent(data){
 }
 
 async function setTab(request , button , tab){
-    setTabHighlight(button);
+    setTabHighlight(button , 'current-tab');
     tab_css = document.getElementById("tab-css");
     tab_css.href = '/frontend/css/iframes/equipment/tabs/' + tab +'.css';
     // fetches the correct tab ui on click

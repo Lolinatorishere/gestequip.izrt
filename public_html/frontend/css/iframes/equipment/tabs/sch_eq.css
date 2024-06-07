@@ -65,8 +65,6 @@
     border-style: none solid none solid;
     border-width: 1px;
     border-color: white;
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 
@@ -103,3 +101,55 @@
 .hidden{
     display: none;
 }
+
+.tabbar-options{
+    flex-direction: row;
+}
+
+.selected-items{
+    flex-direction: column;
+    width: 35.8%;
+    border-style: none solid none none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+
+}
+
+.sch-details-groups{
+    flex-direction: column;
+    border-style: none solid none none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+.groups-controls{
+    height: 10%;
+    border-style: none none solid none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+.sch-details-users{
+    flex-direction: column;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+.users-controls{
+    height: 10%;
+    border-style: none none solid none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+
+.add-details-users{
+    flex-direction: column;
+}
+
+#selected-search-tab{
+    background-color: rgb(201, 201, 201);
+    border-color: rgb(201, 201, 201);
+}
+
+

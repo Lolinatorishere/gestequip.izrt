@@ -95,13 +95,14 @@ function ui_refresh_origin(){
 }
 
 function load_ui($ui){
+    $dir = '/var/www/html/gestequip.izrt/public_html/frontend/iframes/equipment/tabs/';
     if(ui_refresh_origin() == 1){
-        $ui_dir = preg_replace('/[^a-zA-Z//]/s' , '' , $_GET["rsfh"]);
-        $ui_dir2 = preg_replace('/[^a-zA-Z//]/s' , '' , $_GET["rgin"]);
-        error_log($ui_dir);
-        error_log($ui_dir2);
+        $ui_dir = preg_replace('/[^a-zA-Z\/_]/s' , '' , $_GET["rfsh"]);
+        $ui_dir3 = preg_replace('/[^a-zA-Z\/_]/s' , '' , $_GET["rgin"]);
+        $dir .= $ui_dir . '.html';
+        return file_get_contents($dir);
     }
-    $dir = '/var/www/html/gestequip.izrt/public_html/frontend/iframes/equipment/tabs/' . $ui . '.html';
+    $dir .= $ui . '.html';
     return file_get_contents($dir);
 } 
 
