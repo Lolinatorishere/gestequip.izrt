@@ -20,6 +20,35 @@ async function setTabUI(tab_html_content){
     div.innerHTML = tab_html_content.html;
 }
 
+async function unsetPreviousHighlight(previous_tab , tab_node){
+    let first_tab = 1;
+    if(previous_tab === null) 
+        return;
+    previous_tab.id = '';
+    if(tab_node.id === "your_equipment")
+        return;
+    first_tab = await isFirstTab(previous_tab.innerHTML);
+    if(first_tab === 1) 
+        return;
+    previous_tab.id = 'first-tab';
+}
+
+async function urlCreateBackendRequest(request){
+    let page_controler = request.page + '/' + request.page +'_controler.php?'
+       ,i = 0;
+    url = '/backend/controlers/' 
+        + page_controler; 
+    for(let [key , value] of Object.entries(request.custom)){
+        if(i !== 0){
+            url += '&';
+        }
+        url += key + '=' + value;
+        i++;
+    }
+    return url;
+} 
+
+
 function itemsUIparseWidthRows(widths){
     let width_by_row = [];
     for(let i = 0 ; i < widths[0].length ; i++){
@@ -30,6 +59,45 @@ function itemsUIparseWidthRows(widths){
     width_by_row[i] = findMinMaxAttributeFromList(width_row , "max");
     }
     return width_by_row;
+}
+
+async function searchTabFunctionality(tab){
+    let request = {
+        page: 'equipment'
+       ,custom: {
+            tab: tab
+           ,type: 'usri' 
+           ,crud: 'read'
+        }
+    }
+    switch(tab.id){
+        case 'user-group-search':
+            tab.addEventListener('click' , async function(){
+                request.custom.rfsh = 'amongus';
+                request.custom.rgin = 'cum';
+                response = await fetch(await urlCreateBackendRequest(request));
+                tab_html = await response.json();
+                console.log(tab_html);
+            });
+            break;
+        case 'equipment-default':
+            break;
+        case 'equipment-specific':
+            break;
+        default:
+            break;
+    }
+}
+
+function internalTabSetter(tab_id , Functionality){
+    tab_row = document.querySelector(tab_id).children;
+    for(let i = 0 ; i < tab_row.length ; i++){
+        if(tab_row[i].id === "")
+            continue;
+        if(tab_row[i].id === undefined)
+            continue;
+        Functionality(tab_row[i]);
+    }
 }
 
 function calculateUiWidthPercentages(widths , parent_width , padding){
@@ -129,18 +197,6 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type , padding)
     aligned_widths = parsed_widths.widths; 
     aligned_percentage = parsed_widths.percentage; 
     wrap_text = parsed_widths.wrapText;
-    console.log(parsed_widths);
-//    if(wrap_text === "wrap"){
-//      for(let i = 0 ; i < set_items.length-title ; i++){
-//          for(let j = 0 ; j < total_children ; j++){
-//              item = set_items[i+title].children[j];
-//              item.style.textWrap = wrap_text;
-//          }
-//      }
-//      widths = getWidthsForUI(set_items , title , title_properties , individual_item_height , total_children , equipment_type);
-//      individual_widths = itemsUIparseWidthRows(widths);
-//      parsed_widths = calculateUiWidthPercentages(individual_widths , item_location_width , padding);
-//  }
     for(let i = 0 ; i < set_items.length-title ; i++){
         for(let j = 0 ; j < total_children ; j++){
             item = set_items[i+title].children[j];
@@ -158,35 +214,6 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type , padding)
             titles[i].style.paddingLeft = padding;
         }
     }
-    console.log(widths);
-}
-
-async function urlCreateBackendRequest(request){
-    let page_controler = request.page + '/' + request.page +'_controler.php?'
-       ,i = 0;
-    url = '/backend/controlers/' 
-        + page_controler; 
-    for(let [key , value] of Object.entries(request.custom)){
-        if(i !== 0){
-            url += '&';
-        }
-        url += key + '=' + value;
-        i++;
-    }
-    return url;
-} 
-
-async function unsetPreviousHighlight(previous_tab , tab_node){
-    let first_tab = 1;
-    if(previous_tab === null) 
-        return;
-    previous_tab.id = '';
-    if(tab_node.id === "your_equipment")
-        return;
-    first_tab = await isFirstTab(previous_tab.innerHTML);
-    if(first_tab === 1) 
-        return;
-    previous_tab.id = 'first-tab';
 }
 
 function setUserHasNoItems(append_controls , append_items , append_details , message){
@@ -931,7 +958,6 @@ async function addEqUsersControlFunctionality(data , group_id){
     setFetchItems(addUsersFunctionality , custom_data , apnds , apnd_items , apnd_details);
 }
 
-
 async function setTabContent(data){
     let empty = []
        ,custom_data = {};
@@ -962,9 +988,9 @@ async function setTabContent(data){
                    ,title: ["type" , "brand" , "model" , "purchase date" , "status"]
                    ,equipment_types: data.information.equipment_types
                 };
-            setControls(custom_data , append_controls , empty , setTabContent);
-            setFetchItems(itemsFunctionality , custom_data , appends , append_items , append_details);
-            setFetchedItemsUI("items-content" , 20 , data.information.equipment_types.items , 5);
+            await setControls(custom_data , append_controls , empty , setTabContent);
+            await setFetchItems(itemsFunctionality , custom_data , appends , append_items , append_details);
+            await setFetchedItemsUI("items-content" , 20 , data.information.equipment_types.items , 5);
             break;
         case'grp_eq':
             append_controls = document.getElementById("items-controls");
@@ -992,9 +1018,12 @@ async function setTabContent(data){
                    ,equipment_types: data.information.equipment_types
             };
             data.control_location = undefined;
-            setControls(custom_data , append_controls , empty , setTabContent);
-            setFetchItems(itemsFunctionality , custom_data , appends , append_items , append_details);
-            setFetchedItemsUI("items-content" , 20 , data.information.equipment_types.items , 5);
+            await setControls(custom_data , append_controls , empty , setTabContent);
+            await setFetchItems(itemsFunctionality , custom_data , appends , append_items , append_details);
+            await setFetchedItemsUI("items-content" , 20 , data.information.equipment_types.items , 10);
+            break;
+        case'sch_eq':
+            internalTabSetter("#parameter-tabbar" , searchTabFunctionality);
             break;
         case'add_eq':
             apnd_controls = document.getElementById("groups-controls");
@@ -1049,8 +1078,8 @@ async function setTab(request , button , tab){
     // fetch first time tab info
     request.custom = {
         tab: tab
-        ,type: 'data' 
-        ,crud: 'read'
+       ,type: 'data' 
+       ,crud: 'read'
     }
     response = await fetch(await urlCreateBackendRequest(request));
     tab_information = await response.json();

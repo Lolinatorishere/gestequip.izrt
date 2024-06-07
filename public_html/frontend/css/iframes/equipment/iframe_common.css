@@ -25,6 +25,9 @@
 }
 
 .tabbar-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     height: 100%;
     padding-left: 0.5rem;
     padding-right: 0.5rem;

@@ -82,7 +82,25 @@ function type_validation($type){
     }
 }
 
+function ui_refresh_origin(){
+    if(!isset($_GET["rfsh"]))
+        return 0;
+    if(!isset($_GET["rgin"]))
+        return 0;
+    if($_GET["rfsh"] === "undefined")
+        return 0;
+    if($_GET["rgin"] === "undefined")
+        return 0;
+    return 1;
+}
+
 function load_ui($ui){
+    if(ui_refresh_origin() == 1){
+        $ui_dir = preg_replace('/[^a-zA-Z//]/s' , '' , $_GET["rsfh"]);
+        $ui_dir2 = preg_replace('/[^a-zA-Z//]/s' , '' , $_GET["rgin"]);
+        error_log($ui_dir);
+        error_log($ui_dir2);
+    }
     $dir = '/var/www/html/gestequip.izrt/public_html/frontend/iframes/equipment/tabs/' . $ui . '.html';
     return file_get_contents($dir);
 } 
