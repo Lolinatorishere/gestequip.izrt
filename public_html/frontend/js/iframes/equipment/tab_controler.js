@@ -32,38 +32,41 @@ function itemsUIparseWidthRows(widths){
     return width_by_row;
 }
 
-function calculateUiWidthPercentages(widths , partent_width){
-    let total_width = 0;
+function calculateUiWidthPercentages(widths , parent_width , padding){
+    let total_width = 0
+       ,ret = {
+            widths: undefined
+           ,percentage: undefined
+           ,wrapText: "nowrap"
+       };
     for(let i = 0 ; i < widths.length ; i++){
         total_width += widths[i];
     }
     parsed_widths = [];
+    parsed_percentage = [];
     for(let i = 0 ; i < widths.length ; i++){
-        parsed_widths[i] =  partent_width * parseFloat(widths[i]/total_width);
+        parsed_percentage[i] = parseFloat(widths[i]/total_width);
+        parsed_widths[i] = parent_width * parsed_percentage[i];
     }
-    return parsed_widths;
+    total_parsed_widths = 0;
+    for(let i = 0 ; i < widths.length ; i++){
+        total_parsed_widths += parsed_widths[i] + padding*2;
+    }
+    if(total_parsed_widths > parent_width){
+        ret.wrapText = "wrap";
+        for(let i = 0 ; i < widths.length ; i++){
+            if(parsed_widths[i] <= parseFloat(parent_width/widths.length))
+                continue;
+            parsed_widths[i] = parsed_widths[i]*0.8;
+        }
+    }
+    ret.widths = parsed_widths;
+    ret.percentage = parsed_percentage;
+    return ret;
 }
 
-async function setFetchedItemsUI(item_set_id , limit , equipment_type){
-    let item_location_height = document.getElementById(item_set_id).clientHeight
-       ,item_location_width = document.getElementById(item_set_id).clientWidth
-       ,individual_item_height = item_location_height/limit
-       ,set_items = document.getElementById(item_set_id).children
-       ,title_properties = set_items[0]
-       ,title = 0;
-    const canvas = document.createElement("canvas");
-    const ctxt = canvas.getContext("2d");
-    if(title_properties.id === "title-bar"){
-        title_properties.style.paddingTop = 3
-        title_properties.style.paddingBottom = 3
-        individual_item_height = (item_location_height-title_properties.clientHeight)/limit;
-        title_properties.children[0].style.display = "flex";
-        title_properties.children[0].style.flexDirection = "row";
-        let title_content = title_properties.children[0].children;
-        title = 1;
-    }
-    let total_children = set_items[title].children.length
-       ,widths = [];
+function getWidthsForUI(set_items , title , title_properties , individual_item_height , total_children , equipment_type){
+    let widths = [];
     for(let i = 0 ; i < set_items.length-title ; i++){
         let width = []
            ,itempos = i+title;
@@ -88,7 +91,7 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type){
                     }
                 }
             }
-            width.push(ctxt.measureText(item.innerText).width);
+            width.push(item.clientWidth);
         }
         widths[i] = width;
     }
@@ -96,29 +99,65 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type){
         let titles = title_properties.children[0].children
            ,width = [];
         for(let i = 0 ; i < titles.length ; i++){
-            width.push(ctxt.measureText(titles[i].innerText).width);
+            width.push(titles[i].clientWidth);
         }
         widths[widths.length] = width;
     }
+    return widths;
+}
+
+async function setFetchedItemsUI(item_set_id , limit , equipment_type , padding){
+    let item_location_height = document.getElementById(item_set_id).clientHeight
+       ,item_location_width = document.getElementById(item_set_id).clientWidth
+       ,individual_item_height = item_location_height/limit
+       ,set_items = document.getElementById(item_set_id).children
+       ,title_properties = set_items[0]
+       ,title = 0;
+    if(title_properties.id === "title-bar"){
+        title_properties.style.paddingTop = 3
+        title_properties.style.paddingBottom = 3
+        individual_item_height = (item_location_height-title_properties.clientHeight)/limit;
+        title_properties.children[0].style.display = "flex";
+        title_properties.children[0].style.flexDirection = "row";
+        let title_content = title_properties.children[0].children;
+        title = 1;
+    }
+    let total_children = set_items[title].children.length
+    let widths = getWidthsForUI(set_items , title , title_properties , individual_item_height , total_children , equipment_type);
     individual_widths = itemsUIparseWidthRows(widths);
-    aligned_widths = calculateUiWidthPercentages(individual_widths , item_location_width);
+    parsed_widths = calculateUiWidthPercentages(individual_widths , item_location_width , padding);
+    aligned_widths = parsed_widths.widths; 
+    aligned_percentage = parsed_widths.percentage; 
+    wrap_text = parsed_widths.wrapText;
+    console.log(parsed_widths);
+//    if(wrap_text === "wrap"){
+//      for(let i = 0 ; i < set_items.length-title ; i++){
+//          for(let j = 0 ; j < total_children ; j++){
+//              item = set_items[i+title].children[j];
+//              item.style.textWrap = wrap_text;
+//          }
+//      }
+//      widths = getWidthsForUI(set_items , title , title_properties , individual_item_height , total_children , equipment_type);
+//      individual_widths = itemsUIparseWidthRows(widths);
+//      parsed_widths = calculateUiWidthPercentages(individual_widths , item_location_width , padding);
+//  }
     for(let i = 0 ; i < set_items.length-title ; i++){
         for(let j = 0 ; j < total_children ; j++){
-          item = set_items[i+title].children[j];
-          item.style.width = aligned_widths[j];
-          item.style.paddingRight = 5;
-          item.style.paddingLeft = 5;
+            item = set_items[i+title].children[j];
+            item.style.width = aligned_percentage[j]*100 + "%";
+            item.style.paddingRight = padding;
+            item.style.paddingLeft = padding;
+            item.style.textWrap = wrap_text;
         }
     }
     if(title === 1){
         let titles = title_properties.children[0].children
         for(let i = 0 ; i < titles.length ; i++){
-            titles[i].style.width = aligned_widths[i];
-            titles[i].style.paddingRight = 5;
-            titles[i].style.paddingLeft = 5;
+            titles[i].style.width = aligned_percentage[i]*100 + "%";
+            titles[i].style.paddingRight = padding;
+            titles[i].style.paddingLeft = padding;
         }
     }
-    
     console.log(widths);
 }
 
@@ -894,7 +933,8 @@ async function addEqUsersControlFunctionality(data , group_id){
 
 
 async function setTabContent(data){
-    empty = [];
+    let empty = []
+       ,custom_data = {};
     switch(data.tab){
         case 'yur_eq':
             append_controls = document.getElementById("items-controls");
@@ -914,7 +954,7 @@ async function setTabContent(data){
                 setUserHasNoItems(append_controls , append_items , append_details , message);
                 break;
             }
-            let custom_data = {
+            custom_data = {
                     data: data.data
                    ,tab: data.tab
                    ,information: data.information.equipment
@@ -924,7 +964,7 @@ async function setTabContent(data){
                 };
             setControls(custom_data , append_controls , empty , setTabContent);
             setFetchItems(itemsFunctionality , custom_data , appends , append_items , append_details);
-            setFetchedItemsUI("items-content" , 20 , data.information.equipment_types.items);
+            setFetchedItemsUI("items-content" , 20 , data.information.equipment_types.items , 5);
             break;
         case'grp_eq':
             append_controls = document.getElementById("items-controls");
@@ -943,9 +983,18 @@ async function setTabContent(data){
                 setUserHasNoItems(append_controls , append_items , append_details , message);
                 break;
             }
+            custom_data = {
+                    data: data.data
+                   ,tab: data.tab
+                   ,information: data.information.group_equipments
+                   ,control_location: undefined
+                   ,title: ["user" , "group" , "type" , "brand" , "model" , "purchase date" , "status"]
+                   ,equipment_types: data.information.equipment_types
+            };
             data.control_location = undefined;
-            setControls(data , append_controls , empty , setTabContent);
-            setFetchItems(itemsFunctionality , data , appends , append_items , append_details);
+            setControls(custom_data , append_controls , empty , setTabContent);
+            setFetchItems(itemsFunctionality , custom_data , appends , append_items , append_details);
+            setFetchedItemsUI("items-content" , 20 , data.information.equipment_types.items , 5);
             break;
         case'add_eq':
             apnd_controls = document.getElementById("groups-controls");

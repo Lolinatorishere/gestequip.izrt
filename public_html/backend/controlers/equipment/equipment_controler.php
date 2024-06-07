@@ -349,7 +349,7 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
             return $data_request;
         case "grp_eq":
             $user_group_info = $_SESSION["group_auth"];
-            // turn the ids from the fetched groups into a string that 
+                        // turn the ids from the fetched groups into a string that 
             // can be read by mysql
             for($i = 0 ; $i < $user_group_info["total_items"] ; $i++){
                 $group_ids .= $user_group_info["all_groups"][$i];
@@ -395,9 +395,17 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
             $data_request["table"] = " users_inside_groups_equipments ";
             $data_request["specific"] = equipment_sql_query_metacode($equipment_groups_users_info["items"]);
             $equipments_info = get_equipments($data_request , $pdo);
+            $request = array("fetch" => " * "
+                            ,"table" => " equipment_types"
+                            ,"counted" => 1
+                            );
+            $equipment_types = get_queries($request , $pdo);
             // Hydrate the request with aditional information to be sent to the frontend
-            $data = full_group_equipment_user_data($links , $equipments_info , $users_info , $groups_info);
-            return $data;
+            $group_equipments = full_group_equipment_user_data($links , $equipments_info , $users_info , $groups_info);
+            $data_specific = array("group_equipments" => $group_equipments
+                                  ,"equipment_types" => $equipment_types
+                                  );
+            return $data_specific;
         case 'add_eq':
             // what queries can data specific have:
             //$data_specific = array("default" => array(),types" => array(),"groups" => array(),"users" => array(),"user" => array(),"types_specific" => array());

@@ -77,15 +77,31 @@
     justify-content: center;
 }
 
+.title-bar{
+    border-style: none none dotted none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
 .items-content{
     display: flex;
     flex-direction: column;
     height: 95%;
     width: 100%;
-    justify-content: center;
+    justify-content: start;
     border-style: solid none none none;
     border-color: rgb(170, 170, 170);
     border-width: 2px;
+}
+
+.item-grp{
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+}
+
+.highlight{
+    background-color: rgb(239, 239, 239);
 }
 
 .your-details {
