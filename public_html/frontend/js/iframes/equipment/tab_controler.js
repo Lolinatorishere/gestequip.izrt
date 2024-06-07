@@ -20,12 +20,39 @@ async function setTabUI(tab_html_content){
     div.innerHTML = tab_html_content.html;
 }
 
+function itemsUIparseWidthRows(widths){
+    let width_by_row = [];
+    for(let i = 0 ; i < widths[0].length ; i++){
+        let width_row = [];
+        for(let j = 0 ; j < widths.length ; j++){
+            width_row.push(widths[j][i]);
+        }
+    width_by_row[i] = findMinMaxAttributeFromList(width_row , "max");
+    }
+    return width_by_row;
+}
+
+function calculateUiWidthPercentages(widths , partent_width){
+    let total_width = 0;
+    for(let i = 0 ; i < widths.length ; i++){
+        total_width += widths[i];
+    }
+    parsed_widths = [];
+    for(let i = 0 ; i < widths.length ; i++){
+        parsed_widths[i] =  partent_width * parseFloat(widths[i]/total_width);
+    }
+    return parsed_widths;
+}
+
 async function setFetchedItemsUI(item_set_id , limit , equipment_type){
     let item_location_height = document.getElementById(item_set_id).clientHeight
+       ,item_location_width = document.getElementById(item_set_id).clientWidth
        ,individual_item_height = item_location_height/limit
        ,set_items = document.getElementById(item_set_id).children
        ,title_properties = set_items[0]
-       ,i = 0;
+       ,title = 0;
+    const canvas = document.createElement("canvas");
+    const ctxt = canvas.getContext("2d");
     if(title_properties.id === "title-bar"){
         title_properties.style.paddingTop = 3
         title_properties.style.paddingBottom = 3
@@ -33,26 +60,65 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type){
         title_properties.children[0].style.display = "flex";
         title_properties.children[0].style.flexDirection = "row";
         let title_content = title_properties.children[0].children;
-        i = 1;
+        title = 1;
     }
-    let total_children = set_items[i].children.length
-       ,widths = {};
-    for(i ; i < set_items.length ; i++){
-        let width = [];
-        set_items[i].style.height = individual_item_height;
+    let total_children = set_items[title].children.length
+       ,widths = [];
+    for(let i = 0 ; i < set_items.length-title ; i++){
+        let width = []
+           ,itempos = i+title;
+        set_items[itempos].style.height = individual_item_height;
         for(let j = 0 ; j < total_children ; j++){
-            width = [];
-            item = set_items[i].children[j];
-            for(let k = 0 ; k < equipment_type.length ; k++){
-                if(parseInt(item.innerText) === equipment_type[k].id){
-                    item.innerText = equipment_type[k].equipment_type;
-                    break;
+            item = set_items[itempos].children[j];
+            if((item.attributes.class.nodeValue) === "equipment_type"){
+                for(let k = 0 ; k < equipment_type.length ; k++){
+                    if(parseInt(item.innerText) === equipment_type[k].id){
+                        item.innerText = equipment_type[k].equipment_type;
+                        break;
+                    }
                 }
             }
-            width.push(item.clientWidth);
+            if((item.attributes.class.nodeValue) === "equipment_status"){
+                 for(let k = 0 ; k < 2 ; k++){
+                    if(parseInt(item.innerText) === 1){
+                        item.innerText = "Active";
+                        break;
+                    }else{
+                        item.innerText = "Inactive";
+                    }
+                }
+            }
+            width.push(ctxt.measureText(item.innerText).width);
         }
         widths[i] = width;
     }
+    if(title === 1){
+        let titles = title_properties.children[0].children
+           ,width = [];
+        for(let i = 0 ; i < titles.length ; i++){
+            width.push(ctxt.measureText(titles[i].innerText).width);
+        }
+        widths[widths.length] = width;
+    }
+    individual_widths = itemsUIparseWidthRows(widths);
+    aligned_widths = calculateUiWidthPercentages(individual_widths , item_location_width);
+    for(let i = 0 ; i < set_items.length-title ; i++){
+        for(let j = 0 ; j < total_children ; j++){
+          item = set_items[i+title].children[j];
+          item.style.width = aligned_widths[j];
+          item.style.paddingRight = 5;
+          item.style.paddingLeft = 5;
+        }
+    }
+    if(title === 1){
+        let titles = title_properties.children[0].children
+        for(let i = 0 ; i < titles.length ; i++){
+            titles[i].style.width = aligned_widths[i];
+            titles[i].style.paddingRight = 5;
+            titles[i].style.paddingLeft = 5;
+        }
+    }
+    
     console.log(widths);
 }
 
