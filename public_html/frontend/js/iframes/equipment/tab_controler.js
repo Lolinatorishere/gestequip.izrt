@@ -57,47 +57,38 @@ function itemsUIparseWidthRows(widths){
     return width_by_row;
 }
 
+function tabLoadUi(tab , request , content_id , highlight_id, rfsh , rgin , ){
+    let tab_content = document.getElementById(content_id)
+       ,tab_element = document.getElementById(tab.id);
+    tab.addEventListener('click' , async function(){
+        setTabHighlight(tab_element , highlight_id);
+        request.custom.rfsh = rfsh;
+        request.custom.rgin = rgin;
+        response = await fetch(await urlCreateBackendRequest(request));
+        tab_html = await response.json();
+        tab_content.innerHTML = tab_html.html;
+    });
+    
+}
+
 async function searchTabFunctionality(tab){
-    let tab_content = document.getElementById("tabbar-options")
-       ,tab_element = document.getElementById(tab.id)
-       ,request = {
-        page: 'equipment'
-       ,custom: {
-            tab: 'sch_eq'
-           ,type: 'usri' 
-           ,crud: 'read'
+       let request = {
+             page: 'equipment'
+            ,custom: {
+                 tab: 'sch_eq'
+                ,type: 'usri' 
+                ,crud: 'read'
+                 }
             }
-        }
     switch(tab.id){
         case 'user-group-search':
-            tab.addEventListener('click' , async function(){
-                setTabHighlight(tab_element , 'selected-search-tab');
-                request.custom.rfsh = 'search_tab/group_user';
-                request.custom.rgin = 'none';
-                response = await fetch(await urlCreateBackendRequest(request));
-                tab_html = await response.json();
-                tab_content.innerHTML = tab_html.html;
-            });
+            tabLoadUi(tab , request , "tabbar-options" , "selected-search-tab" , 'search_tab/group_user' , 'none' )
             break;
         case 'equipment-default':
-            tab.addEventListener('click' , async function(){
-                setTabHighlight(tab_element , 'selected-search-tab');
-                request.custom.rfsh = 'search_tab/equipment';
-                request.custom.rgin = 'none';
-                response = await fetch(await urlCreateBackendRequest(request));
-                tab_html = await response.json();
-                tab_content.innerHTML = tab_html.html;
-            });
+            tabLoadUi(tab , request , "tabbar-options" , "selected-search-tab" , 'search_tab/equipment' , 'none' )
             break;
         case 'equipment-specific':
-            tab.addEventListener('click' , async function(){
-                setTabHighlight(tab_element , 'selected-search-tab');
-                request.custom.rfsh = 'search_tab/equipment_type';
-                request.custom.rgin = 'none';
-                response = await fetch(await urlCreateBackendRequest(request));
-                tab_html = await response.json();
-                tab_content.innerHTML = tab_html.html;
-            });
+            tabLoadUi(tab , request , "tabbar-options" , "selected-search-tab" , 'search_tab/equipment_type' , 'none' )
             break;
         default:
             break;
