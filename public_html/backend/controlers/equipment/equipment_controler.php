@@ -12,17 +12,21 @@ if(!defined('pdo_config_dir'))
 if(!defined('query_generator_dir'))
     define('query_generator_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/query_generator.php');
 
+if(!defined('query_generator_dir'))
+    define('common_crud' , '/var/www/html/gestequip.izrt/public_html/backend/crud');
+
 require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 
+
 // crud functions 
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/common/describe_column.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/delete/equipment_delete.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/create/equipment_create.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/create/create_logs.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/update/equipment_update.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/common_query.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/equipment_query.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/group_query.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/user_query.php";
+require_once common_crud . "/common/describe_column.php";
+require_once common_crud . "/delete/equipment_delete.php";
+require_once common_crud . "/create/equipment_create.php";
+require_once common_crud . "/create/create_logs.php";
+require_once common_crud . "/update/equipment_update.php";
+require_once common_crud . "/read/common_query.php";
+require_once common_crud . "/read/equipment_query.php";
+require_once common_crud . "/read/group_query.php";
+require_once common_crud . "/read/user_query.php";
 
 // Post request
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -159,7 +163,6 @@ function equipment_group_user_sql_metacode($queried_users){
 }
 
 // bloody hell this was a headache and a half to write
-
 function equipment_sql_query_metacode($user_data){
     $sql = '';
     $groups = array();
@@ -201,29 +204,6 @@ function equipment_sql_query_metacode($user_data){
     return $sql;
 }
 
-// this function was also a major headache to make but less than the previous one
-function user_group_sql_query_metacode($group_ids , $user_id){
-    $sql = '';
-    $i = 0;
-    foreach($group_ids as $auth => $group_id){
-        if($auth === "all_groups")
-            break;
-        if($i > 0 && $i < $group_ids["total_items"])$sql .= " or ";
-        if($auth === "auth"){
-            foreach($group_id as $id){
-                $sql .= "(group_id = " . $id . " and user_permission_level >= 0)";
-            }
-        }
-        if($auth === "own_auth" || $auth === "de_auth"){
-            foreach($group_id as $id){
-                $sql .= "(group_id = " . $id . " and user_id = " . $user_id . ")";
-            }
-        }
-        $i++;
-    }
-    return $sql;
-}
-
 function sql_array_query_metacode($inputs){
     $sql = '';
     $i = 1;
@@ -235,67 +215,6 @@ function sql_array_query_metacode($inputs){
         } 
     }
     return $sql;
-}
-
-function full_group_equipment_user_data($users_groups_equipments , $equipments , $users , $groups){
-    $items = array();
-    $all_items = array();
-    foreach($users_groups_equipments["items"] as $usr_grp_eq){
-        $data = array();
-        $eq = array("eq" => "equipment:");
-        $us = array("us" => "user:");
-        $gp = array("gp" => "group:");
-        array_push($data , $eq);
-        foreach($equipments["items"] as $equipment){
-            if($equipment["equipment_id"] === $usr_grp_eq["equipment_id"]){
-                $eq_info = array();
-                foreach($equipment as $key => $value){
-                    if($key === "id")
-                        continue;
-                    if($key === "serial_md5")
-                        continue;
-                    $eq_info[$key] = $value;
-                }
-                array_push($data , $eq_info);
-            }
-        }
-        array_push($data , $us);
-        foreach($users["items"] as $user){
-            if($user["id"] === $usr_grp_eq["user_id"]){
-                $us_info = array();
-                foreach ($user as $key => $value) {
-                    if($key === "id"){
-                        $us_info["user_id"] = $value;
-                        continue;
-                    }
-                    $us_info[$key] = $value;
-                }
-                array_push($data , $us_info);
-            }
-        }
-        array_push($data , $gp);
-        foreach($groups["items"] as $group){
-            if($group["id"] === $usr_grp_eq["group_id"]){
-                $gp_info = array();
-                foreach ($group as $key => $value) {
-                    if($key === "id"){
-                        $gp_info["group_id"] = $value;
-                        continue;
-                    }
-                    $gp_info[$key] = $value;
-                }
-                array_push($data , $gp_info);
-            }
-        }
-        $data = merge_arrays($us , $us_info , $gp , $gp_info , $eq , $eq_info);
-        array_push($all_items , $data);
-    }
-    $items["items"] = $all_items;
-    $items["pages"] = $equipments["pages"];
-    $items["current_page"] = $equipments["current_page"];
-    $items["paging"] = $equipments["paging"]; 
-    $items["total_items"] = $equipments["total_items"];
-    return $items;
 }
 
 function custom_query_filter($number){
@@ -344,6 +263,10 @@ function clean_query($filter , $items){
     return $washed_items;
 }
 
+function read_request_sch($data_request , $pdo , $user_id){
+    
+}
+
 function tab_read_request($tab , &$data_request , $user_id , $pdo){
     $group_ids = '';
     $user_ids = '';
@@ -351,171 +274,18 @@ function tab_read_request($tab , &$data_request , $user_id , $pdo){
     $data = array();
     switch($tab){
         case "yur_eq":
-            $data_request["fetch"] = " * ";
-            $data_request["table"] = "users_inside_groups_equipments";
-            $data_request["specific"] = "user_id = " . $user_id;
-            $all_equipment = get_equipments($data_request , $pdo);
-            $request = array("fetch" => " * "
-                            ,"table" => " equipment_types"
-                            ,"counted" => 1
-                            );
-            $equipment_types = get_queries($request , $pdo);
-            if(count($all_equipment["items"]) == 0)
-                break;
-            $data_request = array("equipment" => $all_equipment
-                                 ,"equipment_types" => $equipment_types 
-                                 );
-            return $data_request;
+            return read_request_yur($data_request , $pdo , $user_id);
         case "grp_eq":
-            $user_group_info = $_SESSION["group_auth"];
-                        // turn the ids from the fetched groups into a string that 
-            // can be read by mysql
-            for($i = 0 ; $i < $user_group_info["total_items"] ; $i++){
-                $group_ids .= $user_group_info["all_groups"][$i];
-                if($i !== $user_group_info["total_items"]-1)
-                    $group_ids .= ', ';
-            }
-            // user query to check the auth level of each group to dissalow
-            // non auth users from seeing all the equipment in groups that arent
-            // their own
-            if(is_user_in_groups($user_group_info) === 1)
-                break;
-            $request = array("fetch" => " distinct user_id , group_id "
-                            ,"table" => "users_inside_groups"
-                            ,"specific" => user_group_sql_query_metacode($user_group_info , $user_id)
-                            ,"counted" => 1);
-            // gets all the unique user_ids and groups
-            $equipment_groups_users_info = get_queries($request , $pdo);
-            // returns all the unique user_ids as a string
-            $unique_users = equipment_group_user_sql_metacode($equipment_groups_users_info["items"]);
-            // get the group names of where the user is part of 
-            $request = array("fetch" => " id , group_name "
-                            ,"table" => "user_groups"
-                            ,"specific" => "id IN( " . $group_ids . " ) " 
-                            ,"counted" => 1
-                        );
-            $groups_info = get_queries($request , $pdo);
-            // get the user
-            $request = array("fetch" => " id , users_name , email , phone_number , regional_indicator "
-                            ,"table" => "users"
-                            ,"specific" => "id IN( " . $unique_users . " ) " 
-                            ,"counted" => 1
-                        );
-            $users_info = get_queries($request , $pdo);
-            // get the items
-            $request = array("fetch" => " * "
-                            ,"table" => " users_inside_groups_equipments "
-                            ,"specific" => equipment_sql_query_metacode($equipment_groups_users_info["items"]) 
-                            ,"counted" => 1
-                        );
-            $links = get_queries($request , $pdo);
-            // Main query for items
-            $data_request["fetch"] = " * ";
-            $data_request["table"] = " users_inside_groups_equipments ";
-            $data_request["specific"] = equipment_sql_query_metacode($equipment_groups_users_info["items"]);
-            $equipments_info = get_equipments($data_request , $pdo);
-            $request = array("fetch" => " * "
-                            ,"table" => " equipment_types"
-                            ,"counted" => 1
-                            );
-            $equipment_types = get_queries($request , $pdo);
-            // Hydrate the request with aditional information to be sent to the frontend
-            $group_equipments = full_group_equipment_user_data($links , $equipments_info , $users_info , $groups_info);
-            $data_specific = array("group_equipments" => $group_equipments
-                                  ,"equipment_types" => $equipment_types
-                                  );
-            return $data_specific;
+            return read_request_grp($data_request , $pdo , $user_id);
+        case "sch_eq":
+            return;
         case 'add_eq':
-            // what queries can data specific have:
-            //$data_specific = array("default" => array(),types" => array(),"groups" => array(),"users" => array(),"user" => array(),"types_specific" => array());
-            if(!isset($_SESSION["group_auth"]))
-                break;
-            $auth_groups = $_SESSION["group_auth"]["auth"];
-            if(!isset($data_request["refresh"])){
-                $filter = array("filter" => array("0","1","2","3"));
-                $data_specific = array("types" => array()
-                                      ,"groups" => array()
-                                      ,"default" => array()
-                                 );
-                $request = array("fetch" => " * "
-                                ,"table" => " equipment_types "
-                                ,"counted" => 1
-                            );
-                $equipment_types = get_queries($request , $pdo);
-                $request = array("fetch" => " * " 
-                                ,"table" => " user_groups "
-                                ,"specific" => " id IN ( " . sql_array_query_metacode($auth_groups) . " ) "
-                                ,"limit" => 8
-                            );
-                $manageable_groups = get_groups($request , $pdo);
-                $request = array("table" => "equipment");
-                $default_columns = describe_table($request , $pdo);
-                $default_columns["items"] = parse_equipment_type_columns($default_columns["items"]);
-                $equipment_types["items"] = clean_query($filter  , $equipment_types["items"]);
-                $_SESSION["equipment_types"] = $equipment_types["items"];
-                $manageable_groups["items"] = clean_query($filter  , $manageable_groups["items"]);
-                $data_specific["types"] = $equipment_types;
-                $data_specific["groups"] = $manageable_groups;
-                $data_specific["default" ] = $default_columns;
-                return $data_specific;
-            }else{
-                switch($data_request["refresh"]){
-                    case "groups":
-                        $data_specific = array("groups" => array());
-                        $filter = array("filter" => array("0","1","2","3"));
-                        $request = array("fetch" => " * " 
-                                ,"table" => " user_groups "
-                                ,"specific" => " id IN ( " . sql_array_query_metacode($auth_groups) . " ) "
-                                ,"current_page" => $data_request["page"]
-                                ,"limit" => 8
-                            );
-                        $manageable_groups = get_groups($request , $pdo);
-                        $manageable_groups["items"] = clean_query($filter , $manageable_groups["items"]);
-                        $data_specific["groups"] = $manageable_groups;
-                        return $data_specific;
-                    case "grp_usrs":
-                        foreach ($auth_groups as $auth) {
-                            if($auth == $data_request["origin"]){
-                                $guard = 0;
-                            }
-                        }
-                        if(!isset($guard))
-                            break;
-                        $data_specific = array("users" => array());
-                        $request = array("fetch" => " * "
-                                        ,"table" => " users_inside_groups "
-                                        ,"specific" => " group_id = " . $data_request["origin"]
-                                        ,"limit" => 8
-                                    );
-                        $group_users = get_users($request , $pdo);
-                        $data_specific["users"] = $group_users;
-                        return $data_specific;
-                    case "eq_tables":
-                        if(!isset($_SESSION["equipment_types"]))
-                            break;
-                        foreach($_SESSION["equipment_types"] as $type) {
-                            if($data_request["origin"] === $type["equipment_type"]){
-                                $guard = 0;
-                                break;
-                            }
-                        }
-                        if(!isset($guard))
-                            break;
-                        $data_specific = array("types_specific" => array());
-                        $request = array("table" => $data_request["origin"] . "s");
-                        $columns = describe_table($request , $pdo);
-                        $columns["items"] = parse_equipment_type_columns($columns["items"]);
-                        $data_specific["types_specific"] = $columns;
-                        return $data_specific;
-                    default:
-                        break; 
-                }
-            }
-            break;
+            return read_request_add($data_request , $pdo , $user_id);
         }
     $data_request["error"] = "error";
     return $data_request;
 }
+
 
 function tab_create_request($data_request , $tab , $user_id , $pdo){
     switch($tab){
