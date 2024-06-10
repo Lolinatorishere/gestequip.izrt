@@ -158,11 +158,6 @@ function create_equipment_users_groups_query($request , $equipment_id){
     return common_insert_query($create_request);
 }
 
-//function create_return_message($request){
-//
-//    return $message;
-//}
-
 function create_equipment($request , $pdo){
 try{
     $ret = array("server_message" => ""
@@ -241,7 +236,6 @@ try{
         throw new Exception("equipment_Group query not made");
     }
     throw new Exception("Equipment Created");
-    
 }catch(Exception $e){
     switch($e->getMessage()){
         case 'Equipment Created':

@@ -30,10 +30,10 @@ async function unsetPreviousHighlight(previous_tab , tab_node){
 }
 
 async function urlCreateBackendRequest(request){
-    let page_controler = request.page + '/' + request.page +'_controler.php?'
+    let page_controller = request.page + '/' + request.page +'_controller.php?'
        ,i = 0;
-    url = '/backend/controlers/' 
-        + page_controler; 
+    url = '/backend/controllers/' 
+        + page_controller; 
     for(let [key , value] of Object.entries(request.custom)){
         if(i !== 0){
             url += '&';

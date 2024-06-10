@@ -49,7 +49,7 @@ async function createEquipmentContent(){
     link.id = 'tab-css';
     link.href = '';
     iframe.contentDocument.head.appendChild(link);
-    script.src = '/frontend/js/iframes/equipment/tab_controler.js';
+    script.src = '/frontend/js/iframes/equipment/tab_controller.js';
     iframe.contentDocument.head.appendChild(script);
     div.className = 'tabbar';
     div.innerHTML = tabbar_conent;

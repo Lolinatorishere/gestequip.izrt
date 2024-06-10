@@ -1,5 +1,22 @@
 <?php
 
+function is_user_in_groups($groups){
+    $guard = 0;
+    $group_auth = array('auth' => 1 
+                       ,'own_auth' => 1
+                       ,'de_auth' => 1
+    );
+    foreach ($group_auth as $key => $value) {
+        if(count($groups[$key]) != 0){
+            $guard++;
+        }
+    }
+    if($guard == 0){
+        return 1;
+    }
+    return 0;
+}
+
 // this function was also a major headache to make but less than the previous one
 function user_group_sql_query_metacode($group_ids , $user_id){
     $sql = '';
