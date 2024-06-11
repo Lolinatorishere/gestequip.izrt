@@ -43,7 +43,7 @@ function get_all_auth_users($request , $pdo){
     $statement = $pdo->prepare($sql);
     $statement->execute();
     $users_id = $statement->fetch(PDO::FETCH_ASSOC);
-    foreach($users_id as $user_id){
+        foreach($users_id as $user_id){
         $request_user = array("fetch" => " id , users_name "
                              ,"table" => " users "
                              ,"counted" => 1
@@ -154,11 +154,18 @@ function get_users($request , $pdo){
     $pages = $request["pages"];
     $user_ids = $statement->fetchAll();
     foreach ($user_ids as $user_id) {
-        $request = array("fetch" => " id , users_name , email , phone_number , regional_indicator "
+        if(isset($request["user_fetch"])){
+            $user_fetch = $request["user_fetch"];
+        }else{
+            $user_fetch = " id , users_name , email , phone_number , regional_indicator ";
+        }
+        $request = array("fetch" => $user_fetch
                         ,"table" => " users "
                         ,"specific" => " id = " . $user_id["user_id"]
                         ,"counted" => 1
-        );
+                        ,"limit" => $request["limit"]
+                        ,"current_page" => $request["current_page"]
+                        );
         $sql = common_select_query($request);
         $statement = $pdo->prepare($sql);
         $statement->execute();

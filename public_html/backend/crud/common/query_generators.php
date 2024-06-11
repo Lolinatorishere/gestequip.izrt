@@ -151,6 +151,12 @@ function convert_to_array(&$input){
 
 function common_select_query($request){
 try{
+    if(!isset($request["current_page"])){
+        $request["current_page"] = 1;
+    }
+    if(!isset($request["limit"])){
+        $request["limit"] = 20;
+    }
     //this function will create the sql query that does:
     // returns total amount of items from a table
     // or the items with the specific requirements 
@@ -173,7 +179,7 @@ try{
             $limit = $request["limit"];
             $page = $request["current_page"];
             $sql .= " LIMIT " . $limit
-                .  " OFFSET " . ($page * $limit) - $limit;
+                .  " OFFSET " . $page-1 * $limit;
         }
     }else{
         error_log($request["specific"]);

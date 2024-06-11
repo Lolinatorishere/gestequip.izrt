@@ -1,6 +1,6 @@
 <?php
 
-function validate_table_inputs($request , $check , $db_table , $pdo){
+function validate_create_table_inputs($request , $check , $db_table , $pdo){
     $table_check = 0;
     $table_request = array("table" => $db_table);
     $table = describe_table($table_request , $pdo);
@@ -30,11 +30,11 @@ function validate_table_inputs($request , $check , $db_table , $pdo){
                     if($request[$check][$key] !== false && $request[$check][$key] !== true)
                         return 0;
                 }
-                    if($table["items"][$i]["Type"] === "date"){
-                        list($year , $month , $day) = explode('-', $request[$check][$key]);
-                        if(!checkdate($month , $day , $year))
-                            return 0;
-                    }
+                if($table["items"][$i]["Type"] === "date"){
+                    list($year , $month , $day) = explode('-', $request[$check][$key]);
+                    if(!checkdate($month , $day , $year))
+                        return 0;
+                }
             }catch(TypeError $e){
                 error_log(print_r($e , true));
                 return 0;
@@ -58,12 +58,12 @@ function equipment_create_request_validation($request , $pdo){
         return 0;
     if(!isset($request["group_id"]))
         return 0;
-    if(validate_table_inputs($request , "default" , " equipment " , $pdo) === 0)
+    if(validate_create_table_inputs($request , "default" , " equipment " , $pdo) === 0)
         return 0;
-    if(validate_table_inputs($request , "specific" , " " . $request["equipment_type"] . "s " , $pdo) === 0)
+    if(validate_create_table_inputs($request , "specific" , " " . $request["equipment_type"] . "s " , $pdo) === 0)
         return 0;
+    return 1;
 }
-
 
 // checks if the request is even valid
 function request_crud_validation(){

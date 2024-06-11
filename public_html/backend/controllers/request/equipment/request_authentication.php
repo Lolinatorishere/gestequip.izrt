@@ -17,6 +17,19 @@ function is_user_in_groups($groups){
     return 0;
 }
 
+function check_against_auth_groups($groups){
+    $auth_groups = $_SESSION["group_auth"]["auth"];
+    $checked = array();
+    foreach($groups as $group){
+        foreach ($auth_groups as $auth_group) {
+            if($auth_group !== $group["group_id"])
+                continue;
+            array_push($checked , $group);
+        }
+    }
+    return $checked;
+}
+
 function group_auth_check($request){
     $auth_table = $_SESSION["group_auth"];
     foreach($auth_table["auth"] as $authorised_groups){
