@@ -5,8 +5,58 @@
 include_once query_generator_dir;
 include_once common_funcs;
 
-function get_user_search(){
-
+function get_all_auth_users($request , $pdo){
+    $ret = array();
+    $groups = $_SESSION["group_auth"]["auth"];
+    $limit = $request["limit"];
+    $users = array();
+    $fetch = array();
+    $table = array();
+    $what_in = array();
+    $specific = array();
+    foreach($groups as $key => $group){
+        array_push($fetch , " user_id ");
+        array_push($table , " users_inside_groups ");
+        array_push($what_in , " group_id = ");
+        array_push($specific , $group);
+    }
+    $union = union_generator(multi_query_request_generator($fetch , $table , $what_in , $specific));
+    if(!isset($request["total_items"])){
+        $sql = "SELECT count(*) FROM (" . $union . ") AS result_table";
+        error_log($sql);
+        $statement = $pdo->prepare($sql);
+        $statement->execute();
+        $union_total = $statement->fetch()[0];
+        $request["counted"] = 1;
+        $request["page"] = 1;
+        $request["pages"] = ceil($union_total / $limit);
+    }else{
+        $union_total = $request["total_items"];
+    }
+    $page = $request["page"];
+    $pages = $request["pages"];
+    $sql = "SELECT * FROM
+           (" . $union . ")
+           AS result_table
+           LIMIT ". $limit . 
+           " OFFSET " . ($page-1) * $limit;
+    $statement = $pdo->prepare($sql);
+    $statement->execute();
+    $users_id = $statement->fetch(PDO::FETCH_ASSOC);
+    foreach($users_id as $user_id){
+        $request_user = array("fetch" => " id , users_name "
+                             ,"table" => " users "
+                             ,"counted" => 1
+                             ,"specific" => "id=" . $user_id
+                             );
+        array_push($users , get_query($request_user , $pdo)["items"]);
+    }
+    $ret["items"] = $users;
+    $ret["pages"] = $pages;
+    $ret["current_page"] = $page;
+    $ret["paging"] = 1; 
+    $ret["total_items"] = $union_total;
+    return($ret);
 }
 
 function user_info(){
@@ -123,4 +173,5 @@ function get_users($request , $pdo){
     $ret["total_items"] = $t_i;
     return($ret);   
 }
+
 ?>

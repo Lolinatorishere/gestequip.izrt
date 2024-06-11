@@ -1,5 +1,70 @@
 <?php
 
+function validate_table_inputs($request , $check , $db_table , $pdo){
+    $table_check = 0;
+    $table_request = array("table" => $db_table);
+    $table = describe_table($table_request , $pdo);
+    $counted_table = count($request[$check]);
+    foreach($request[$check] as $key => $value){
+        for ($i = 0; $i < count($table["items"]) ; $i++){ 
+            try{
+                if($table["items"][$i]["Field"] !== $key)
+                    continue;
+                if(preg_match('/[<>\'`\/\\\\_]/' , $request[$check][$key]))
+                    continue;
+                if($table["items"][$i]["Key"] === "UNI"){
+                    $unique_request = array("fetch" => " " . $key . " "
+                                           ,"table" => $db_table
+                                           ,"counted" => 1
+                                           ,"specific" => " " . $key . "='" . $value . "'"
+                                        );
+                    $unique = get_queries($unique_request , $pdo);
+                    if(count($unique["items"]) >= 1)
+                        return 0;
+                }
+                if($table["items"][$i]["Null"] === "NO"){
+                    if(is_null($value))
+                        return 0;
+                }
+                if($table["items"][$i]["Type"] === "tinyint(1)"){
+                    if($request[$check][$key] !== false && $request[$check][$key] !== true)
+                        return 0;
+                }
+                    if($table["items"][$i]["Type"] === "date"){
+                        list($year , $month , $day) = explode('-', $request[$check][$key]);
+                        if(!checkdate($month , $day , $year))
+                            return 0;
+                    }
+            }catch(TypeError $e){
+                error_log(print_r($e , true));
+                return 0;
+            }
+            $table_check++;
+        }
+    }
+    if($table_check !== $counted_table)
+        return 0;
+    return 1;
+}
+
+function equipment_create_request_validation($request , $pdo){
+    if(!isset($request["default"]))
+        return 0;
+    if(!isset($request["specific"]))
+        return 0;
+    if(!isset($request["user_id"]))
+        return 0;
+    if(!isset($request["group_id"]))
+        return 0;
+    if(!isset($request["group_id"]))
+        return 0;
+    if(validate_table_inputs($request , "default" , " equipment " , $pdo) === 0)
+        return 0;
+    if(validate_table_inputs($request , "specific" , " " . $request["equipment_type"] . "s " , $pdo) === 0)
+        return 0;
+}
+
+
 // checks if the request is even valid
 function request_crud_validation(){
     switch($_GET["crud"]){

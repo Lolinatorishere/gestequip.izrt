@@ -1,46 +1,5 @@
 <?php
 
-function is_user_in_groups($groups){
-    $guard = 0;
-    $group_auth = array('auth' => 1 
-                       ,'own_auth' => 1
-                       ,'de_auth' => 1
-    );
-    foreach ($group_auth as $key => $value) {
-        if(count($groups[$key]) != 0){
-            $guard++;
-        }
-    }
-    if($guard == 0){
-        return 1;
-    }
-    return 0;
-}
-
-// this function was also a major headache to make but less than the previous one
-function user_group_sql_query_metacode($group_ids , $user_id){
-    $sql = '';
-    $i = 0;
-    foreach($group_ids as $auth => $group_id){
-        if($auth === "all_groups")
-            break;
-        if($i > 0 && $i < $group_ids["total_items"])$sql .= " or ";
-        if($auth === "auth"){
-            foreach($group_id as $id){
-                $sql .= "(group_id = " . $id . " and user_permission_level >= 0)";
-            }
-        }
-        if($auth === "own_auth" || $auth === "de_auth"){
-            foreach($group_id as $id){
-                $sql .= "(group_id = " . $id . " and user_id = " . $user_id . ")";
-            }
-        }
-        $i++;
-    }
-    return $sql;
-}
-
-
 function full_group_equipment_user_data($users_groups_equipments , $equipments , $users , $groups){
     $items = array();
     $all_items = array();
@@ -118,7 +77,7 @@ function read_request_grp($data_request , $pdo , $user_id){
         return;
     $request = array("fetch" => " distinct user_id , group_id "
                     ,"table" => "users_inside_groups"
-                    ,"specific" => user_group_sql_query_metacode($user_group_info , $user_id)
+                    ,"specific" => user_group_sql_query_metacode($user_group_info , $user_id , " OR ")
                     ,"counted" => 1);
     error_log(print_r($request , true));
     // gets all the unique user_ids and groups

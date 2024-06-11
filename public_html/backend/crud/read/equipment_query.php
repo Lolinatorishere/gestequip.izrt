@@ -3,13 +3,28 @@
 include_once query_generator_dir;
 include_once common_funcs;
 
-function handle_equipment_search($search , &$sql){
-    return 0;
-    // if($search == null)
-    //     return 0
-    // switch($search["category"]){
-    //     case "user":
-    // }
+// can get both one or the other
+// type id returns id
+// equipment_type returns the types name
+// both returns both as an array
+//
+function get_equipment_type($equipment_type , $pdo , $type){
+    $request = array("fetch" => " * "
+                    ,"table" => " equipment_types "
+                    ,"counted" => 1
+                    ,"specific" => " equipment_type='" . $equipment_type . "' "
+                    );
+    $query = get_query($request , $pdo);
+    switch($type){
+        case "both":
+            return $query["items"];
+        case "name":
+            return $query["items"]["equipment_type"];
+        case "id":
+            return $query["items"]["id"];
+        default:
+            return "error";
+    }
 }
 
 // gets all the equipments from certain ids
@@ -105,18 +120,18 @@ function get_equipment($fetch , $equipment_id , $pdo){
     $equipment_selected = array();
     // the reason this table exists is because it simplifies the querying 
     // of the equipments of a group or its users
-    $request = array("fetch" => ":fetch"
+    $request = array("fetch" => " " . $fetch . " "
                     ,"table" => "equipment"
                     ,"counted" => 1
-                    ,"specific" => "id = :equipment_id " 
+                    ,"specific" => "id = " . $equipment_id 
                     );
     $sql = common_select_query($request);
     // request is unavailable
     if($sql === "error")
         return $sql_error;
     $statement = $pdo->prepare($sql);
-    $statement->bindParam(':equipment_id' , $equipment_id);
-    $statement->bindParam(':fetch' , $fetch);
+    // $statement->bindParam(':equipment_id' , $equipment_id);
+    // $statement->bindParam(':fetch' , $fetch);
     $statement->execute();
     if(!$statement)
         return $sql_error;
@@ -145,7 +160,7 @@ function get_equipment($fetch , $equipment_id , $pdo){
         break;
     }
     $statement = $pdo->prepare($sql);
-    $statment->bindParam(':table' , $table);
+    //$statment->bindParam(':table' , $table);
     $statement->execute();
     if(!$statement)
         return $sql_error;

@@ -11,17 +11,16 @@ if(!defined('pdo_config_dir'))
     define('pdo_config_dir' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
  
 if(!defined('query_generator_dir'))
-    define('query_generator_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/query_generator.php');
+    define('query_generator_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/query_generators.php');
 
 if(!defined('common_crud'))
     define('common_crud' , '/var/www/html/gestequip.izrt/public_html/backend/crud');
 
-if(!defined('equipment_tabs'))
-    define('equipment_tabs' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/equipment/tabs');
+if(!defined('equipment_read_tabs'))
+    define('equipment_read_tabs' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/equipment/read_tabs');
 
 //random modules
 require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 
-require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/equipment/metacode_gen/common_metacode.php";
 
 //request modules
 require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/equipment/request.php";
@@ -32,24 +31,25 @@ require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/reque
 
 // crud modules 
 require_once common_crud . "/common/describe_column.php";
-require_once common_crud . "/delete/equipment_delete.php";
 require_once common_crud . "/create/equipment_create.php";
 require_once common_crud . "/create/create_logs.php";
-require_once common_crud . "/update/equipment_update.php";
 require_once common_crud . "/read/common_query.php";
 require_once common_crud . "/read/equipment_query.php";
 require_once common_crud . "/read/group_query.php";
 require_once common_crud . "/read/user_query.php";
+require_once common_crud . "/read/search_query.php";
+require_once common_crud . "/update/equipment_update.php";
+require_once common_crud . "/delete/equipment_delete.php";
 
-// tab modules
-require_once equipment_tabs . "/add_equipment_tab.php";
-require_once equipment_tabs . "/all_equipment_tab.php";
-require_once equipment_tabs . "/equipment_type_tab.php";
-require_once equipment_tabs . "/group_equipment_tab.php";
-require_once equipment_tabs . "/logs_tab.php";
-require_once equipment_tabs . "/remove_equipment_tab.php";
-require_once equipment_tabs . "/search_tab.php";
-require_once equipment_tabs . "/your_equipment_tab.php";
+// read tab modules
+require_once equipment_read_tabs . "/add_equipment_tab.php";
+require_once equipment_read_tabs . "/all_equipment_tab.php";
+require_once equipment_read_tabs . "/equipment_type_tab.php";
+require_once equipment_read_tabs . "/group_equipment_tab.php";
+require_once equipment_read_tabs . "/logs_tab.php";
+require_once equipment_read_tabs . "/remove_equipment_tab.php";
+require_once equipment_read_tabs . "/search_tab.php";
+require_once equipment_read_tabs . "/your_equipment_tab.php";
 
 // Base get requests 
 $tab_request = $_GET["tab"];

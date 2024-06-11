@@ -10,7 +10,7 @@ function read_request($tab , &$data_request , $user_id , $pdo){
         case "grp_eq":
             return read_request_grp($data_request , $pdo , $user_id);
         case "sch_eq":
-            return;
+            return read_request_sch($data_request , $pdo , $user_id);
         case 'add_eq':
             return read_request_add($data_request , $pdo , $user_id);
         }
