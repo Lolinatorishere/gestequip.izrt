@@ -1,6 +1,6 @@
 <?php
 
-include_once query_generator_dir;
+require_once query_generator_dir;
 
 function get_user_group_auth($request , $pdo){
     $sql_error = "";

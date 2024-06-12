@@ -78,7 +78,8 @@ function read_request_grp($data_request , $pdo , $user_id){
     $request = array("fetch" => " distinct user_id , group_id "
                     ,"table" => "users_inside_groups"
                     ,"specific" => user_group_sql_query_metacode($user_group_info , $user_id , " OR ")
-                    ,"counted" => 1);
+                    ,"counted" => 1
+                    );
     error_log(print_r($request , true));
     // gets all the unique user_ids and groups
     $equipment_groups_users_info = get_queries($request , $pdo);
@@ -89,21 +90,21 @@ function read_request_grp($data_request , $pdo , $user_id){
                     ,"table" => "user_groups"
                     ,"specific" => "id IN( " . $group_ids . " ) " 
                     ,"counted" => 1
-                );
+                    );
     $groups_info = get_queries($request , $pdo);
-    // get the user
+    // get the users in the groups
     $request = array("fetch" => " id , users_name , email , phone_number , regional_indicator "
                     ,"table" => "users"
                     ,"specific" => "id IN( " . $unique_users . " ) " 
                     ,"counted" => 1
-                );
+                    );
     $users_info = get_queries($request , $pdo);
     // get the items
     $request = array("fetch" => " * "
                     ,"table" => " users_inside_groups_equipments "
                     ,"specific" => equipment_sql_query_metacode($equipment_groups_users_info["items"]) 
                     ,"counted" => 1
-                );
+                    );
     $links = get_queries($request , $pdo);
     // Main query for items
     $data_request["fetch"] = " * ";

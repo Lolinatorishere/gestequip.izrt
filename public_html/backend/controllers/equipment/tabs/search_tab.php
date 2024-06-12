@@ -120,7 +120,7 @@ function on_request_sch_refresh($auth_groups , $data_request , $pdo , $user_id){
             $columns["items"] = parse_equipment_type_columns($columns["items"]);
             return $columns;
         case 'query':
-            return search_query($data_request["query"] , $pdo);
+            return search_query($data_request , $pdo);
         case 'clear':
             return on_request_sch_load($auth_groups , $data_request , $pdo , $user_id);
         default: 

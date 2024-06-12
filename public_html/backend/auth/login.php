@@ -1,7 +1,7 @@
 <?php 
 
 if(!defined('query_generator_dir'))
-    define('query_generator_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/query_generator.php');
+    define('query_generator_dir' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/query_generators.php');
 
 if(!defined('pdo_config_dir'))
     define('pdo_config_dir' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');

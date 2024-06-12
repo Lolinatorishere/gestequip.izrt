@@ -1,5 +1,28 @@
 <?php
 
+// Validate table inputs
+// uses the requests and checks against the db table to see if its a valid search
+function validate_search_table_inputs($request , $check , $db_table , $pdo){
+    $table_check = 0;
+    $table_request = array("table" => $db_table);
+    $table = describe_table($table_request , $pdo);
+    $counted_table = count($request[$check]);
+    foreach($request[$check] as $key => $value){
+        for ($i = 0; $i < count($table["items"]) ; $i++){ 
+            if($table["items"][$i]["Field"] !== $key)
+                continue;
+            if($table["items"][$i]["Key"] === "PRI")
+                continue;
+            if($table["items"][$i]["Key"] === "MUL")
+                continue;
+            $table_check++;
+        }
+    }
+    if($table_check !== $counted_table)
+        return 0;
+    return 1;
+}
+
 function validate_create_table_inputs($request , $check , $db_table , $pdo){
     $table_check = 0;
     $table_request = array("table" => $db_table);

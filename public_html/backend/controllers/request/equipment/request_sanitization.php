@@ -17,10 +17,10 @@ function tab_create_information_sanitize($tab , $user_id , $pdo){
         $specific_info = $_POST["specific"];
     }
     foreach($default_info as $key => $info){
-        $data_request["default"][$key] =  $info;
+        $data_request["default"][$key] = trim($info);
     }
     foreach($specific_info as $key => $info){
-        $data_request["specific"][$key] =  $info;
+        $data_request["specific"][$key] =  trim($info);
     }
     return create_request($data_request , $tab , $user_id , $pdo);
 }
@@ -31,7 +31,7 @@ function recursive_query_sanitize($query , $sanitize_query){
             $to_sanitize = $sanitize_query[$key];
             $sanitize_query[$key] = recursive_query_sanitize($input , $sanitize_query[$key]);
         }else{
-            $sanitize_query[$key] = preg_replace('/[^a-zA-Z0-9-]/s' , '' , $input);
+            $sanitize_query[$key] = trim(preg_replace('/[^a-zA-Z0-9-]/s' , '' , $input));
         }
     }
     return $sanitize_query;
