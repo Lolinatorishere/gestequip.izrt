@@ -1,4 +1,5 @@
 <?php
+
 function read_request($tab , &$data_request , $user_id , $pdo){
     $group_ids = '';
     $user_ids = '';
@@ -28,6 +29,12 @@ function create_request($data_request , $tab , $user_id , $pdo){
 }
 
 function update_request(){
+    switch($tab){
+        case "add_eq":
+            return update_equipment($data_request , $pdo);
+        case "grp_eq":
+            return update_equipment($data_request , $pdo);
+    }
     $data_request["error"] = "error";
     return $data_request;
 }
@@ -45,7 +52,7 @@ function data_request($tab , $pdo , $user_id){
     if(!isset($_GET["crud"]))
         return $ret;
     $crud = request_crud_validation();
-    switch ($crud) {
+    switch($crud){
         case 0:
             return $ret;
         case 1: //Create request

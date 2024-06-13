@@ -80,7 +80,6 @@ function read_request_grp($data_request , $pdo , $user_id){
                     ,"specific" => user_group_sql_query_metacode($user_group_info , $user_id , " OR ")
                     ,"counted" => 1
                     );
-    error_log(print_r($request , true));
     // gets all the unique user_ids and groups
     $equipment_groups_users_info = get_queries($request , $pdo);
     // returns all the unique user_ids as a string

@@ -53,7 +53,6 @@ try{
         default:
             return $sql_error;
     }
-    error_log(print_r($statement , true));
     $statement->execute();
     if(!$statement)
         return $sql_error;

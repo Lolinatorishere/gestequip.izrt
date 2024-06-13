@@ -65,7 +65,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         }
     }
 }
-
+//
 // The controller
 $req_tab = equipment_request_validation($tab_request);
 $req_type = equipment_type_validation($request_type);

@@ -26,6 +26,7 @@ function multi_query_request_generator($fetch , $table , $what_in , $specific){
 function union_generator($requests){
     $total = count($requests);
     $i = 1;
+    $sql = "";
     if($total === 1){
         return $request[0];
     }
@@ -41,7 +42,6 @@ function union_generator($requests){
 
 // this function was also a major headache to make but less than the previous one
 function user_group_sql_query_metacode($group_ids , $user_id , $sql_opperation){
-    error_log(print_r($group_ids , true));
     $sql = '';
     $i = 1;
     foreach($group_ids as $auth => $group_id){
@@ -64,7 +64,6 @@ function user_group_sql_query_metacode($group_ids , $user_id , $sql_opperation){
             }
         }
     }
-    error_log($sql);
     return $sql;
 }
 
@@ -181,8 +180,6 @@ try{
             $sql .= " LIMIT " . $limit
                 .  " OFFSET " . $page-1 * $limit;
         }
-    }else{
-        error_log($request["specific"]);
     }
     return $sql;
 }catch(TypeError $e){

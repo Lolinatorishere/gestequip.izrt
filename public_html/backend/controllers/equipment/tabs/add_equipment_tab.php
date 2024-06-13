@@ -16,7 +16,6 @@ function on_request_add_load($auth_groups , $data_request , $pdo , $user_id){
                     ,"specific" => " id IN ( " . sql_array_query_metacode($auth_groups) . " ) "
                     ,"limit" => 8
                 );
-    error_log(print_r($request , true));
     $manageable_groups = get_groups($request , $pdo);
     $request = array("table" => "equipment");
     $default_columns = describe_table($request , $pdo);
@@ -74,7 +73,7 @@ function on_request_add_refresh($auth_groups , $data_request , $pdo , $user_id){
             if(!isset($guard))
                 break;
             $data_specific = array("types_specific" => array());
-            $request = array("table" => $data_request["origin"] . "s ");
+            $request = array("table" => $data_request["origin"]);
             $columns = describe_table($request , $pdo);
             $columns["items"] = parse_equipment_type_columns($columns["items"]);
             $data_specific["types_specific"] = $columns;

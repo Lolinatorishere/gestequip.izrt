@@ -225,7 +225,7 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
         return;
     // todo Please for the love of god fix this buffalo buffalobuffalobuffalobuffalobuffalobuffalobuffalobuffalobuffalo
     // situation
-    if(validate_search_table_inputs($queries , "specific_query" , $db_responses["equipment_type"]["equipment_type"]["equipment_type"] . "s " , $pdo) !== 1){
+    if(validate_search_table_inputs($queries , "specific_query" , $db_responses["equipment_type"]["equipment_type"]["equipment_type"] , $pdo) !== 1){
         $info_from_server = "No Queries";
         return;
     }
@@ -245,7 +245,7 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
     $equipment_ids_string = sql_array_query_metacode($equipment_ids);
     $string_query = equipment_search_query_parse_inputs($queries["specific_query"]);
     $request = array("fetch" => " * "
-                    ,"table" => $db_responses["equipment_type"]["equipment_type"]["equipment_type"] . "s "
+                    ,"table" => $db_responses["equipment_type"]["equipment_type"]["equipment_type"]
                     ,"specific" => " equipment_id IN (" . $equipment_ids_string . ") AND (" . $string_query . ") "
                     );
     if(isset($page)){
@@ -304,11 +304,13 @@ function equipment_search($data_request , $pdo){
     $total_queries = count($search_queries);
     $query = array();
     $page = array("paged_query" => ""
-        ,"page" => $data_request["page"]
-    );
+                 ,"page" => $data_request["page"]
+                 );
     if($total_queries === 0)
         return $server_message;
     if(isset($search_queries["user_id"])){
+        //got to sanitize specifically the ids because the recursive sanitize 
+        //only removes special chars that are dangerous in an sql query
         $query["user_id"] = preg_replace('/[^0-9]/s' , '' , $search_queries["user_id"]);
         $page ["paged_query"] = "both_id";
     }

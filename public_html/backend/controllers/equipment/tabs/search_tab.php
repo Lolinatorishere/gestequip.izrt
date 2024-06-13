@@ -33,6 +33,7 @@ function on_request_sch_load($auth_groups , $data_request , $pdo , $user_id){
                     ,"counted" => 1
                     );
     $equipment_types = get_queries($request , $pdo);
+    $filter = array();
     $equipment_types["items"] = clean_query($filter , $equipment_types["items"]);
     $request = array("table" => "equipment");
     $default_columns = describe_table($request , $pdo);
@@ -115,7 +116,7 @@ function on_request_sch_refresh($auth_groups , $data_request , $pdo , $user_id){
             if(!isset($guard))
                 break;
             $data_specific = array("types_specific" => array());
-            $request = array("table" => $data_request["origin"] . "s ");
+            $request = array("table" => $data_request["origin"]);
             $columns = describe_table($request , $pdo);
             $columns["items"] = parse_equipment_type_columns($columns["items"]);
             return $columns;

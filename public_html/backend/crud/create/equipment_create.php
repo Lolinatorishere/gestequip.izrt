@@ -1,6 +1,5 @@
 <?php
 function create_equipment_create_query($request , $db_table , $input_type){
-    error_log(print_r($request[$input_type] , true));
     $values = array();
     $columns = array();
     $total_specific_inputs = count($request[$input_type]);
@@ -27,7 +26,7 @@ function create_equipment_users_groups_query($request , $equipment_id){
     $us_id = " '" . $request["user_id"] . "' ";
     $gp_id = " '" . $request["group_id"] . "' ";
     if(!isset($request["user_permission_level"])){
-        $perm_lvl = " '1' ";
+        $perm_lvl = " '0' ";
     }else{
         $perm_lvl = " '" . $request["user_permission_level"] ."' ";
     }
@@ -77,7 +76,7 @@ try{
     }
     try{
         $request["specific"]["equipment_id"] = $equipment_id;
-        $sql = create_equipment_create_query($request , " " . $request["equipment_type"] . "s " , "specific");
+        $sql = create_equipment_create_query($request , " " . $request["equipment_type"] , "specific");
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $specifics_id = $pdo->lastInsertId();
@@ -104,7 +103,7 @@ try{
             throw new PDOException($was_updated["PDOException"]);
     }catch(PDOException $e){
         array_push($loggable["exception"] , $e->getMessage());
-        $deletion_request = array("table" => $request["equipment_type"] ."s "
+        $deletion_request = array("table" => $request["equipment_type"]
                                  ,"specific" => "equipment_id=" . $equipment_id
                                  );
         delete_equipment($deletion_request , $pdo);

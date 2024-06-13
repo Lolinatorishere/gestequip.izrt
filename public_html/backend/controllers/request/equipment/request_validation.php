@@ -83,7 +83,7 @@ function equipment_create_request_validation($request , $pdo){
         return 0;
     if(validate_create_table_inputs($request , "default" , " equipment " , $pdo) === 0)
         return 0;
-    if(validate_create_table_inputs($request , "specific" , " " . $request["equipment_type"] . "s " , $pdo) === 0)
+    if(validate_create_table_inputs($request , "specific" , " " . $request["equipment_type"] , $pdo) === 0)
         return 0;
     return 1;
 }
