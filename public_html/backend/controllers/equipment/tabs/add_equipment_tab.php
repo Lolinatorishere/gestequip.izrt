@@ -74,7 +74,7 @@ function on_request_add_refresh($auth_groups , $data_request , $pdo , $user_id){
             if(!isset($guard))
                 break;
             $data_specific = array("types_specific" => array());
-            $request = array("table" => $data_request["origin"] . "s");
+            $request = array("table" => $data_request["origin"] . "s ");
             $columns = describe_table($request , $pdo);
             $columns["items"] = parse_equipment_type_columns($columns["items"]);
             $data_specific["types_specific"] = $columns;

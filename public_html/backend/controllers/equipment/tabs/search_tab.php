@@ -115,12 +115,12 @@ function on_request_sch_refresh($auth_groups , $data_request , $pdo , $user_id){
             if(!isset($guard))
                 break;
             $data_specific = array("types_specific" => array());
-            $request = array("table" => $data_request["origin"] . "s");
+            $request = array("table" => $data_request["origin"] . "s ");
             $columns = describe_table($request , $pdo);
             $columns["items"] = parse_equipment_type_columns($columns["items"]);
             return $columns;
         case 'query':
-            return search_query($data_request , $pdo);
+            return equipment_search($data_request , $pdo);
         case 'clear':
             return on_request_sch_load($auth_groups , $data_request , $pdo , $user_id);
         default: 

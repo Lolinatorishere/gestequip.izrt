@@ -31,7 +31,7 @@ function recursive_query_sanitize($query , $sanitize_query){
             $to_sanitize = $sanitize_query[$key];
             $sanitize_query[$key] = recursive_query_sanitize($input , $sanitize_query[$key]);
         }else{
-            $sanitize_query[$key] = trim(preg_replace('/[^a-zA-Z0-9-]/s' , '' , $input));
+            $sanitize_query[$key] = trim(preg_replace('/[^a-zA-Z0-9- ]/s' , '' , $input));
         }
     }
     return $sanitize_query;

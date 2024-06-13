@@ -14,7 +14,7 @@ try{
     $sql = common_select_query($request);
     if($sql == "error")
         return $sql_error;
-    if(!isset($request["counted"])){
+    if(!isset($request["counted"]) && !isset($request["current_page"])){
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $total = $statement->fetch();
