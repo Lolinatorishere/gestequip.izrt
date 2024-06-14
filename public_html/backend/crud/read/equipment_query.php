@@ -9,13 +9,14 @@ include_once common_funcs;
 // both returns both as an array
 //
 function get_equipment_type($equipment_type , $pdo , $type){
-    error_log($equipment_type);
     $request = array("fetch" => " * "
                     ,"table" => " equipment_types "
                     ,"counted" => 1
                     ,"specific" => " equipment_type='" . $equipment_type . "' OR id = '" . $equipment_type . "'"
                     );
+    error_log(print_r($request,true));
     $query = get_query($request , $pdo);
+    error_log(print_r($query,true));
     switch($type){
         case "both":
             return $query["items"];
@@ -41,6 +42,7 @@ function get_equipments($request , $pdo){
     // of the equipments of a group or its users
     page_check($request);
     $sql = common_select_query($request);
+    error_log($sql);
     // request is unavailable
     if($sql == "")
         return $sql_error;
@@ -75,11 +77,7 @@ function get_equipments($request , $pdo){
             return $sql_error;
         $sql = "SELECT *
                 FROM ";
-        // todo create a metafunction that allows the switch case 
-        // to search all possible equipments inside the DB
         $table = get_equipment_type($equipment["equipment_type"] , $pdo , "name");
-        error_log(print_r($equipment,true));
-        error_log($table);
         if($table === "error")
             continue;
         $sql .= $table;

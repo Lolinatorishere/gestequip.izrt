@@ -43,7 +43,6 @@ function tab_create_information_sanitize($tab , $user_id , $pdo){
 
 // gets the correct requests for each tab
 function tab_read_information_sanitize($tab , $user_id , $pdo){
-    error_log(print_r($_GET , true));
     if(isset($_GET["page"])){
         $data_request["page"] = preg_replace('/[^0-9]/s' , '' , $_GET["page"]); 
     } 

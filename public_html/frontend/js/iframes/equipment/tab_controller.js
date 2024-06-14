@@ -68,7 +68,6 @@ function tabLoadUi(tab , request , content_id , highlight_id, rfsh , rgin , ){
         tab_html = await response.json();
         tab_content.innerHTML = tab_html.html;
     });
-    
 }
 
 async function searchTabFunctionality(tab){
@@ -346,6 +345,7 @@ function controlsFunctionality(data , refresh , loadingFunction){
                 tab: data.tab
                ,type: 'data' 
                ,crud: 'read'
+               ,pgng: 1
                ,page: current_page-1
                ,t_i: total_items
             }
@@ -386,6 +386,7 @@ function controlsFunctionality(data , refresh , loadingFunction){
                 tab: data.tab
                ,type: 'data' 
                ,crud: 'read'
+               ,pgng: 1
                ,page: current_page+1
                ,t_i: total_items
             }   
@@ -422,6 +423,7 @@ function controlsFunctionality(data , refresh , loadingFunction){
                 tab: data.tab
                ,type: 'data' 
                ,crud: 'read'
+               ,pgng: 1
                ,page: page.innerHTML.trim()
                ,t_i: total_items
             }   

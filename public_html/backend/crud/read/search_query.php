@@ -259,9 +259,10 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
     $info_from_server = "Found Queries";
 }
 
-
+// todo create logging for search queries
 function equipment_search_query($queries , $pdo , $page_check){
     $info_from_server = "unset";
+    $loggable = array();
     $ret = array("message" => "Server Error"); 
     $db_responses = array();
     $parsed_search;

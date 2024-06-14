@@ -151,7 +151,12 @@ function convert_to_array(&$input){
 function common_select_query($request){
 try{
     if(!isset($request["current_page"])){
+        if(isset($request["paging"]))
+            $request["paging"] = 1;
         $request["current_page"] = 1;
+        if(isset($request["page"])){
+            $request["current_page"] = $request["page"];
+        }
     }
     if(!isset($request["limit"])){
         $request["limit"] = 20;
@@ -178,7 +183,7 @@ try{
             $limit = $request["limit"];
             $page = $request["current_page"];
             $sql .= " LIMIT " . $limit
-                .  " OFFSET " . $page-1 * $limit;
+                .  " OFFSET " . ($page-1) * $limit;
         }
     }
     return $sql;
