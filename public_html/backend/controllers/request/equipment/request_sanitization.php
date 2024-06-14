@@ -17,24 +17,14 @@ function sanitize_query($query){
     return recursive_query_sanitize($query , $sanitize_query);
 }
 
-
-function tab_update_information_sanitize($tab , $user_id , $pdo){
+function tab_create_information_sanitize($tab , $user_id , $pdo){
     if(isset($_POST["selected_group"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
     }
     if(isset($_POST["selected_user"])){
         $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_user"]["user_id"]);
     }
-    $data_request = sanitize_query($_POST);
-    return update_request($data_request , $tab , $user_id , $pdo);
-
-}
-
-function tab_create_information_sanitize($tab , $user_id , $pdo){
-    if(isset($_POST["selected_group"])){
-        $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
-    }
-    if(isset($_POST["selected_user"])){
+    if(isset($_POST["selected_equipment"])){
         $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_user"]["user_id"]);
     }
     $data_request = sanitize_query($_POST);
@@ -63,5 +53,20 @@ function tab_read_information_sanitize($tab , $user_id , $pdo){
     }
     return read_request($tab , $data_request , $user_id , $pdo);
 }
+
+function tab_update_information_sanitize($tab , $user_id , $pdo){
+    $data_request = sanitize_query($_POST);
+    if(isset($_POST["selected_group"])){
+        $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
+    }
+    if(isset($_POST["selected_user"])){
+        $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_user"]["user_id"]);
+    }
+    if(isset($_POST["selected_equipment"])){
+        $data_request["equipment_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_equipment"]["equipment_id"]);
+    }
+    return update_request($data_request , $tab , $user_id , $pdo);
+}
+
 
 ?>

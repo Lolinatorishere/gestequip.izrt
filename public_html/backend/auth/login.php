@@ -5,7 +5,7 @@ if(!defined('query_generator_dir'))
 
 if(!defined('pdo_config_dir'))
     define('pdo_config_dir' , '/var/www/html/gestequip.izrt/public_html/backend/config/pdo_config.php');
- 
+
 session_start();
 
 if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] === true)

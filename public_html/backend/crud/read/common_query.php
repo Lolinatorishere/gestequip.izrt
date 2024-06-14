@@ -14,7 +14,6 @@ try{
     $sql = common_select_query($request);
     if($sql == "error")
         return $sql_error;
-    error_log("common_query" . print_r($request,true));
     if(!isset($request["counted"]) && !isset($request["current_page"])){
         $statement = $pdo->prepare($sql);
         $statement->execute();

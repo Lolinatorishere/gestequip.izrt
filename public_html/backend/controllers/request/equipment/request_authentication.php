@@ -18,20 +18,32 @@ function is_user_in_groups($groups){
 }
 
 function check_against_auth_groups($groups){
-    $auth_groups = $_SESSION["group_auth"]["auth"];
+    $auth_groups = $_SESSION["group_auth"]["auth"];;
     $checked = array();
-    foreach($groups as $group){
-        foreach ($auth_groups as $auth_group) {
-            if($auth_group !== $group["group_id"])
-                continue;
-            array_push($checked , $group);
+    if(is_array($groups)){
+        foreach($groups as $group){
+            foreach ($auth_groups as $auth_group) {
+                if($auth_group !== $group["group_id"])
+                    continue;
+                array_push($checked , $group);
+            }
         }
+    }else{
+        foreach ($auth_groups as $auth_group) {
+            if($auth_group !== $groups)
+                continue;
+            array_push($checked , $groups);
+        }
+    }
+    if(count($checked) === 0){
+        array_push($checked , 0);
     }
     return $checked;
 }
 
 function group_auth_check($request){
     $auth_table = $_SESSION["group_auth"];
+    error_log(print_r($request["group_id"],true));
     foreach($auth_table["auth"] as $authorised_groups){
         if($authorised_groups == $request["group_id"]){
             return 1;
@@ -40,7 +52,7 @@ function group_auth_check($request){
     return 0;
 }
 
-function group_user_check($request , $pdo){
+function group_user_auth_check($request , $pdo){
     $group_users_request = array("fetch" => " * "
                                 ,"table" => " users_inside_groups "
                                 ,"specific" => " group_id = " . $request["group_id"]
@@ -50,7 +62,10 @@ function group_user_check($request , $pdo){
     if(count($users_in_group["items"]) <= 0)
         return 0;
     foreach ($users_in_group["items"] as $user){
-        if($user["user_id"] == $request["user_id"]){
+        if($user["user_id"] == $_SESSION["id"]){
+            if($user["user_permission_level"] > 1){
+                return 0;
+            }
             return 1;
         }
     }
@@ -62,12 +77,28 @@ function user_group_request_authentication($request , $pdo){
     $action_auth += group_auth_check($request , $pdo);
     if($action_auth !== 1)
         return 0;
-    $action_auth += group_user_check($request , $pdo);
+    $action_auth += group_user_auth_check($request , $pdo);
     if($action_auth !== 2)
         return 0;
     return 1;
-} 
+}
 
+// what was i making here
+// you were making a request to the db to get the specific equipments auth level 
+function equipment_authentication($request , $pdo){
+    if(!isset($request["group_id"])){
+        return array("error" => "error");
+    }
+    $auth = check_against_auth_groups($request["group_id"]);
+    $request = array("fetch" => " * "
+                    ,"table" => ""
+                    ,"counted" => 1
+                    ,"specific" => " user_id=" . $_SESSION["id"] 
+                                 . " and group_id=" . $auth[0]
+                                 . " and equipment_id =" . $request["equipment_id"]
+                    );
+    $request["table"] = " users_inside_groups_equipments ";
+}
 
 function tab_auth_handle($auth_level){
     if($auth_level === 1)

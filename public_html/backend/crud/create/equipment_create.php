@@ -98,7 +98,7 @@ try{
             ,"values" => array("1")
             ,"specific" => "id = " . $equipment_id
         );
-        $was_updated = update_equipment($update_request , $pdo);
+        $was_updated = internal_update_equipment($update_request , $pdo);
         if(isset($was_updated["PDOException"]))
             throw new PDOException($was_updated["PDOException"]);
     }catch(PDOException $e){

@@ -47,14 +47,23 @@ function parse_equipment_type_columns($columns){
 
 
 function page_check(&$request){
-    $pages = 0;
-    if(!isset($request["total_pages"]))
+    if(!isset($request["total_pages"])){
         $request["total_pages"] = 1;
-    if(!isset($request["page"]))
+    }
+    if(!isset($request["page"])){
         $request["page"] = 1;
-    if($pages <= 0)
-        $pages = 1;
+    }
+    if($request["total_pages"] <= 0){
+        $request["total_pages"] = 1;
+    }
+    if($request["page"] <= 0){
+        $request["page"] = 1;
+    }
     return;
+}
+
+function printLog($log){
+    error_log(print_r($log,true));
 }
 
 ?>

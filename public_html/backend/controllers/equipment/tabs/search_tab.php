@@ -138,9 +138,6 @@ function read_request_sch($data_request , $pdo , $user_id){
     if(!isset($data_request["limit"])){
         $data_request["limit"] = 8;
     }
-    if(!isset($data_request["page"])){
-        $data_request["page"] = 1;
-    }
     if(!isset($data_request["refresh"])){
         return on_request_sch_load($auth_groups , $data_request , $pdo , $user_id);
     }else{

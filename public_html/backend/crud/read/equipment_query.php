@@ -14,9 +14,7 @@ function get_equipment_type($equipment_type , $pdo , $type){
                     ,"counted" => 1
                     ,"specific" => " equipment_type='" . $equipment_type . "' OR id = '" . $equipment_type . "'"
                     );
-    error_log(print_r($request,true));
     $query = get_query($request , $pdo);
-    error_log(print_r($query,true));
     switch($type){
         case "both":
             return $query["items"];
@@ -42,7 +40,6 @@ function get_equipments($request , $pdo){
     // of the equipments of a group or its users
     page_check($request);
     $sql = common_select_query($request);
-    error_log($sql);
     // request is unavailable
     if($sql == "")
         return $sql_error;
@@ -94,6 +91,7 @@ function get_equipments($request , $pdo){
             return $sql_error;
         $item = array();
         $equipment_spec["user_permission_level"] = $eq_ids["user_permission_level"];
+        $equipment_spec["equipment_group"] = $eq_ids["group_id"];
         array_push($item, $equipment , $equipment_spec);
         array_push($equipment_all , query_merge_array($item));
     };

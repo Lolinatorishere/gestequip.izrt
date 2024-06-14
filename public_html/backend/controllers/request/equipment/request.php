@@ -28,12 +28,12 @@ function create_request($data_request , $tab , $user_id , $pdo){
     return $data_request;
 }
 
-function update_request(){
+function update_request($data_request , $tab , $user_id , $pdo){
     switch($tab){
-        case "add_eq":
-            return update_equipment($data_request , $pdo);
+        case "yur_eq":
+            return external_update_equipment($data_request , $pdo);
         case "grp_eq":
-            return update_equipment($data_request , $pdo);
+            return external_update_equipment($data_request , $pdo);
     }
     $data_request["error"] = "error";
     return $data_request;

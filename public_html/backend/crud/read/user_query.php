@@ -21,10 +21,8 @@ function get_all_auth_users($request , $pdo){
         array_push($specific , $group);
     }
     $union = union_generator(multi_query_request_generator($fetch , $table , $what_in , $specific));
-    error_log($union);
     if(!isset($request["total_items"])){
         $sql = "SELECT count(*) FROM (" . $union . ") AS result_table";
-        error_log($sql);
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $union_total = $statement->fetch()[0];

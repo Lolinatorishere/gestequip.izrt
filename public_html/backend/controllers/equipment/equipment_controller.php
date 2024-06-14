@@ -55,6 +55,7 @@ require_once equipment_read_tabs . "/your_equipment_tab.php";
 $tab_request = $_GET["tab"];
 $request_type = $_GET["type"];
 
+
 // Base Post request
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $POST_RAW = file_get_contents('php://input');
