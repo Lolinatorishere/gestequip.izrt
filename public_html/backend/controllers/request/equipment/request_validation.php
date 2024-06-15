@@ -31,10 +31,14 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
     foreach($request[$check] as $key => $value){
         for ($i = 0; $i < count($table["items"]) ; $i++){ 
             try{
-                if($table["items"][$i]["Field"] !== $key)
+                if($table["items"][$i]["Field"] !== $key){
+                    $error_message[$key] =  $table["items"][$i]["Field"] . " !== " . $key . " ";
                     continue;
-                if(preg_match('/[<>\'`\/\\\\_]/' , $request[$check][$key]))
+                }
+                if(preg_match('/[<>\'`\/\\\\_]/' , $request[$check][$key])){
+                    $error_message[$key] =  $key . " invalid Inputs";
                     continue;
+                }
                 if($table["items"][$i]["Key"] === "UNI"){
                     $unique_request = array("fetch" => " " . $key . " "
                                            ,"table" => $db_table
@@ -43,30 +47,35 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
                                         );
                     $unique = get_queries($unique_request , $pdo);
                     if(count($unique["items"]) >= 1){
-                        $error_message[$key] =  $key . " is not unique";
-                        return 0;
+                        $error_message[$key] = $key . " is not unique";
+                        throw new Exception($error_message[$key], 1);
                     }
                 }
                 if($table["items"][$i]["Null"] === "NO"){
                     if(is_null($value)){
                         $error_message[$key] =  $key . " can't be empty";
-                        return 0;
+                        throw new Exception($error_message[$key], 1);
                     }
                 }
                 if($table["items"][$i]["Type"] === "tinyint(1)"){
                     if($request[$check][$key] !== false && $request[$check][$key] !== true){
                         $error_message[$key] =  $key . " invalid choice";
-                        return 0;
+                        throw new Exception($error_message[$key] , 1);
                     }
                 }
                 if($table["items"][$i]["Type"] === "date"){
+                try{
                     list($year , $month , $day) = explode('-', $request[$check][$key]);
                     if(!checkdate($month , $day , $year)){
                         $error_message[$key] =  $key . " invalid date";
-                        return 0;
+                        throw new Exception($error_message[$key] , 1);
                     }
+                }catch(typeError $e){
+                    $error_message[$key] =  $key . " invalid date";
+                    throw new Exception($error_message[$key] , 1);
                 }
-            }catch(TypeError $e){
+                }
+            }catch(exception $e){
                 error_log(print_r($e , true));
                 return 0;
             }
@@ -91,27 +100,33 @@ function validate_equipment_in_db($equipment_id , $pdo){
     return 1;
 }
 
-function validate_external_update_inputs($request , $pdo){
-    $error_message = array();
+function validate_external_update_inputs($request , $pdo , &$error_message){
+    $ret = array();
     if(!isset($request["equipment_id"]))
-        return 0;
-    printLog($request);
-    if(validate_equipment_in_db($request["equipment_id"] , $pdo) !== 1)
-        return $error_message["eq_not_exists"] = "equipment doesnt exist";
+        return -1;
+    if(validate_equipment_in_db($request["equipment_id"] , $pdo) !== 1){
+        $ret["message"] = $error_message["eq_not_exists"] = "equipment doesnt exist";
+        return $ret;
+    }
     if(isset($request["default"])){
         if(validate_external_inputs($request , "default" , " equipment " , $pdo , $error_message) !== 1)
-            return $error_message;
+            return -3;
+        
     }
     if(isset($request["specific"])){
-        if(validate_external_inputs($request , "specific" , " " . $request["equipment_type"] , $pdo , $error_message) !== 0)
-            return $error_message;
+        if(validate_external_inputs($request , "specific" , " " . $request["equipment_type"] . " " , $pdo , $error_message) !== 1)
+            return -4;
+        
     }
-    if(!isset($request["default"]) && (!isset($request["specific"])))
-        return 0;
+    if(!isset($request["default"]) && (!isset($request["specific"]))){
+        $error_message["No query"] = "No Queries have been input";
+        return -1;
+    }
     return 1;
 }
 
-function equipment_create_request_validation($request , $pdo){
+function equipment_external_create_validation($request , $pdo){
+    $error_message = array();
     if(!isset($request["default"]))
         return 0;
     if(!isset($request["specific"]))
@@ -122,9 +137,9 @@ function equipment_create_request_validation($request , $pdo){
         return 0;
     if(!isset($request["group_id"]))
         return 0;
-    if(validate_external_inputs($request , "default" , " equipment " , $pdo) === 0)
+    if(validate_external_inputs($request , "default" , " equipment " , $pdo , $error_message) === 0)
         return 0;
-    if(validate_external_inputs($request , "specific" , " " . $request["equipment_type"] , $pdo) === 0)
+    if(validate_external_inputs($request , "specific" , " " . $request["equipment_type"] , $pdo , $error_message) === 0)
         return 0;
     return 1;
 }

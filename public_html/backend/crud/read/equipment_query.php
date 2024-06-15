@@ -133,16 +133,16 @@ function get_equipment($fetch , $equipment_id , $pdo){
     if(count($equipment_default) === 0)
         return $sql_error;
     $request = array("fetch" => " * "
-                    ,"table" => $table
                     ,"counted" => 1
                     ,"specific" => "equipment_id=" . $equipment_id
                     );
-    $sql = common_select_query($request);
     if($sql === "error")
         return $sql_error;
     $table = get_equipment_type($equipment_default["equipment_type"] , $pdo , "name");
     if($table === "error")
         return $sql_error;
+    $request["table"] = $table;
+    $sql = common_select_query($request);
     $statement = $pdo->prepare($sql);
     //$statment->bindParam(':table' , $table);
     $statement->execute();

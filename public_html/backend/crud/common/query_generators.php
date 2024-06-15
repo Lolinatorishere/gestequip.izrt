@@ -275,9 +275,9 @@ try{
     if($counted_columns !== $counted_values)
         return "error";
     for($i = 0 ; $i < $counted_columns ; $i++) { 
-        $update_sql .= $request["columns"][$i];
+        $update_sql .= "`" . $request["columns"][$i] ."`";
         $update_sql .= " = ";
-        $update_sql .= $request["values"][$i];
+        $update_sql .= "'" . $request["values"][$i] . "'";
         if($i + 1 < $counted_columns){
             $update_sql .= ", ";
         }

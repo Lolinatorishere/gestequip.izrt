@@ -43,7 +43,6 @@ function check_against_auth_groups($groups){
 
 function group_auth_check($request){
     $auth_table = $_SESSION["group_auth"];
-    error_log(print_r($request["group_id"],true));
     foreach($auth_table["auth"] as $authorised_groups){
         if($authorised_groups == $request["group_id"]){
             return 1;

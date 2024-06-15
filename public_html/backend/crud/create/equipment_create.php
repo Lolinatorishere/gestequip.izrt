@@ -1,10 +1,18 @@
 <?php
-function create_equipment_create_query($request , $db_table , $input_type){
+function create_equipment_create_insertion($request , $db_table , $input_type){
     $values = array();
     $columns = array();
     $total_specific_inputs = count($request[$input_type]);
     foreach($request[$input_type] as $key => $value){
         $column = "`" . $key . "`";
+        if(is_bool($value)){
+            if($value === true){
+                $value = 1;
+            }
+            if($value === false){
+                $value = 0;
+            }
+        }
         $input = "'" . $value . "'";
         array_push($columns, $column);
         array_push($values, $input);
@@ -19,7 +27,7 @@ function create_equipment_create_query($request , $db_table , $input_type){
     return common_insert_query($create_request);
 }
 
-function create_equipment_users_groups_query($request , $equipment_id){
+function create_equipment_users_groups_insertion($request , $equipment_id){
     $columns = array(" `user_id`, `group_id`, `equipment_id`, `user_permission_level`, `status`");
     $values = array();
     $eq_id = " '" . $equipment_id . "' ";
@@ -56,14 +64,14 @@ try{
                      ,"user_id" => $_SESSION["id"]
                      );
     $loggable["message"]["userInput"] = $request;
-    // Validates inputs
-    if(equipment_create_request_validation($request , $pdo) === 0)
-        throw new Exception("Blocked Invalid Inputs");
     // Chacks User Authentication
     if(user_group_request_authentication($request , $pdo) === 0)
-        throw new Exception("Blocked Unuthorised Creation");
+        throw new Exception("Blocked Unauthorised Creation");
+    // Validates inputs
+    if(equipment_external_create_validation($request , $pdo) === 0)
+        throw new Exception("Blocked Invalid Inputs");
     $request["default"]["equipment_type"] = get_equipment_type($request["equipment_type"] , $pdo , "id");
-    $sql = create_equipment_create_query($request , " equipment " , "default");
+    $sql = create_equipment_create_insertion($request , " equipment " , "default");
     try{
         $statement = $pdo->prepare($sql);
         $statement->execute();
@@ -71,12 +79,13 @@ try{
         $loggable["message"]["default_sql"] = $sql;
         $loggable["message"]["default_inserted_id"] = $equipment_id;
     }catch(PDOException $e){
-        array_push($loggable["exception"] , $e);
+        array_push($loggable["exception"] , $e );
+        array_push($loggable["message"] , $request , $sql);
         throw new Exception("Server Error : C0001");
     }
     try{
         $request["specific"]["equipment_id"] = $equipment_id;
-        $sql = create_equipment_create_query($request , " " . $request["equipment_type"] , "specific");
+        $sql = create_equipment_create_insertion($request , " " . $request["equipment_type"] , "specific");
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $specifics_id = $pdo->lastInsertId();
@@ -90,6 +99,7 @@ try{
                                  ,"specific" => "id=" . $equipment_id
                                  );
         delete_equipment($deletion_request , $pdo);
+        array_push($loggable["message"] , $request , $sql);
         throw new Exception("Server Error : C0002");
     }
     try{
@@ -111,16 +121,18 @@ try{
                                  ,"specific" => "id=" . $equipment_id
                                  );
         delete_equipment($deletion_request , $pdo);
+        array_push($loggable["message"] , $request , $sql);
         throw new Exception("Server Error : C0003");
     }
     try{
-        $sql = create_equipment_users_groups_query($request , $equipment_id);
+        $sql = create_equipment_users_groups_insertion($request , $equipment_id);
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $loggable["message"]["users_inside_groups_equipments_ids"] = array($request["user_id"] , $request["group_id"] , $equipment_id);
         $loggable["message"]["users_inside_groups_equipments_sql"] = $sql;
     }catch(PDOException $e){
         array_push($loggable["exception"] , $e->getMessage());
+        array_push($loggable["message"] , $request , $sql);
         throw new Exception("equipment_Group query not made");
     }
     throw new Exception("Equipment Created");

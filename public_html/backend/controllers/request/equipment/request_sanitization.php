@@ -1,12 +1,18 @@
 <?php
 
 function recursive_query_sanitize($query , $sanitize_query){
-    foreach($query as $key => $input){
-        if(is_array($input)){
-            $to_sanitize = $sanitize_query[$key];
-            $sanitize_query[$key] = recursive_query_sanitize($input , $sanitize_query[$key]);
-        }else{
-            $sanitize_query[$key] = trim(preg_replace('/[^a-zA-Z0-9-_ ]/s' , '' , $input));
+    if(!is_array($query)){
+        $sanitize_query = trim(preg_replace('/[^a-zA-Z0-9-_ ]/s' , '' , $query));
+    }else{
+        foreach($query as $key => $input){
+            if(is_array($input)){
+                $to_sanitize = $sanitize_query[$key];
+                $sanitize_query[$key] = recursive_query_sanitize($input , $sanitize_query[$key]);
+            }else{
+                if(!is_bool($sanitize_query[$key])){
+                    $sanitize_query[$key] = trim(preg_replace('/[^a-zA-Z0-9-_ ]/s' , '' , $input));
+                }
+            }
         }
     }
     return $sanitize_query;
@@ -18,16 +24,15 @@ function sanitize_query($query){
 }
 
 function tab_create_information_sanitize($tab , $user_id , $pdo){
+    $data_request = sanitize_query($_POST);
     if(isset($_POST["selected_group"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
+        unset($data_request["selected_group"]);
     }
     if(isset($_POST["selected_user"])){
         $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_user"]["user_id"]);
+        unset($data_request["selected_user"]);
     }
-    if(isset($_POST["selected_equipment"])){
-        $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_user"]["user_id"]);
-    }
-    $data_request = sanitize_query($_POST);
     return create_request($data_request , $tab , $user_id , $pdo);
 }
 
@@ -58,12 +63,15 @@ function tab_update_information_sanitize($tab , $user_id , $pdo){
     $data_request = sanitize_query($_POST);
     if(isset($_POST["selected_group"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
+        unset($data_request["selected_group"]);
     }
     if(isset($_POST["selected_user"])){
         $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_user"]["user_id"]);
+        unset($data_request["selected_user"]);
     }
     if(isset($_POST["selected_equipment"])){
         $data_request["equipment_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_equipment"]["equipment_id"]);
+        unset($data_request["selected_equipment"]);
     }
     return update_request($data_request , $tab , $user_id , $pdo);
 }
