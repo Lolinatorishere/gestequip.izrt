@@ -29,6 +29,7 @@ function get_equipment_type($equipment_type , $pdo , $type){
 
 // gets all the equipments from certain ids
 function get_equipments($request , $pdo){
+try{
     $sql_error = array("error" => "error");
     if(isset($request["error"]))
         return $sql_error;
@@ -101,9 +102,15 @@ function get_equipments($request , $pdo){
     $ret["paging"] = 1; 
     $ret["total_items"] = $request["total_items"];
     return($ret);   
+}catch(PDOException $e){
+    $ret = array("error" => "error"
+                ,"PDOException" => $e
+                );
+    return $ret;
 }
-
+}
 function get_equipment($fetch , $equipment_id , $pdo){
+try{
     if(!isset($equipment_id))
         return $sql_error;
     $sql_error = array("error" => "error");
@@ -149,11 +156,16 @@ function get_equipment($fetch , $equipment_id , $pdo){
     if(!$statement)
         return $sql_error;
     $equipment_specific = $statement->fetch(PDO::FETCH_ASSOC);
-    array_push($item, $equipment_default , $equipment_spec);
+    array_push($item, $equipment_default , $equipment_specific);
     array_push($equipment_selected , query_merge_array($item));
     $ret["success"] = "success";
-    $ret["items"] = $equipment_specific;
-    return($ret);
+    $ret["items"] = $equipment_selected;
+    return $ret;
+}catch(PDOException $e){
+    $ret = array("error" => "error"
+                ,"PDOException" => $e
+                );
+    return $ret;
 }
-
+}
 ?>

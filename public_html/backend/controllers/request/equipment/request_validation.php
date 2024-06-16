@@ -32,7 +32,6 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
         for ($i = 0; $i < count($table["items"]) ; $i++){ 
             try{
                 if($table["items"][$i]["Field"] !== $key){
-                    $error_message[$key] =  $table["items"][$i]["Field"] . " !== " . $key . " ";
                     continue;
                 }
                 if(preg_match('/[<>\'`\/\\\\_]/' , $request[$check][$key])){
@@ -101,12 +100,13 @@ function validate_equipment_in_db($equipment_id , $pdo){
 }
 
 function validate_external_update_inputs($request , $pdo , &$error_message){
-    $ret = array();
-    if(!isset($request["equipment_id"]))
+    if(!isset($request["equipment_id"])){
+        $error_message["eq_not_selected"] = "User didnt Select an Equipment";
         return -1;
+    }
     if(validate_equipment_in_db($request["equipment_id"] , $pdo) !== 1){
-        $ret["message"] = $error_message["eq_not_exists"] = "equipment doesnt exist";
-        return $ret;
+        $error_message["eq_not_exists"] = "User Selected an Equipment that Doesnt Exist";
+        return -2;
     }
     if(isset($request["default"])){
         if(validate_external_inputs($request , "default" , " equipment " , $pdo , $error_message) !== 1)
@@ -120,7 +120,7 @@ function validate_external_update_inputs($request , $pdo , &$error_message){
     }
     if(!isset($request["default"]) && (!isset($request["specific"]))){
         $error_message["No query"] = "No Queries have been input";
-        return -1;
+        return -5;
     }
     return 1;
 }

@@ -37,7 +37,7 @@ function parse_equipment_type_columns($columns){
             continue;
         if($column["Field"] === "equipment_type")
             continue;
-        if($column["Field"] === "serial_md5")
+        if($column["Field"] === "serial_brand_md5")
             continue;
         $column = merge_arrays($filter , $column);
         array_push($parsed_columns , $column);

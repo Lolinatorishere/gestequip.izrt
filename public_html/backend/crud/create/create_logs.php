@@ -1,22 +1,18 @@
 <?php
 
-function log_parse($log_type){
-    $values = array(" :user_id " , " :log_type " , " :log_message ");
-    $columns = array(" `user_id`" , "`log_type`", "`log_message`");
-    switch ($log_type) {
-        case 'equipment':
-            array_push($values , " :equipment_id ");
-            array_push($columns , "`equipment_id`");
-            break;
-        case 'user':
-            array_push($values , " :group_id ");
-            array_push($columns , "`group_id`");
-            break;
-        default:
-        return "error";
+function log_parse($log_type , $log){
+    $values = array(" :action_by_user_id " , " :log_type " , " :log_message " ," :user_id ");
+    $columns = array(" `action_by_user_id`" , "`log_type`" , "`log_message`" , "`user_id`" );
+    if($log["equipment_id"] !== "" && !empty($log["equipment_id"])){
+        array_push($values , " :equipment_id ");
+        array_push($columns , "`equipment_id`");
+    }
+    if($log["group_id"] !== "" && !empty($log["group_id"])){
+        array_push($values , " :group_id ");
+        array_push($columns , "`group_id`");
     }
     $request = array("multiple" => 1
-                    ,"table" => $log_type . "_logs"
+                    ,"table" => $log_type
                     ,"columns" => $columns
                     ,"values" => $values
                     );
@@ -28,7 +24,7 @@ try{
     $message = "";
     $sql_error = array("error" => "error");
     $ret = array();
-    $sql = log_parse($log_type);
+    $sql = log_parse($log_type , $log);
     if($sql == "error")
         return $sql_error;
     if($log["exception"] !== ""){
@@ -42,16 +38,13 @@ try{
         $message = json_encode($log["message"]);
     $statement->bindParam(':log_message' , $message);
     $statement->bindParam(':log_type' , $log["type"]);
+    $statement->bindParam(':action_by_user_id' , $log["user_id"]);
     $statement->bindParam(':user_id'  , $log["user_id"]);
-    switch ($log_type) {
-        case 'equipment':
-            $statement->bindParam(':equipment_id'  , $log["equipment_id"]);
-            break;
-        case 'user':
-            $statement->bindParam(':group_id'  , $log["group_id"]);
-            break;
-        default:
-            return $sql_error;
+    if($log["equipment_id"] !== ""){
+        $statement->bindParam(':equipment_id'  , $log["equipment_id"]);
+    }
+    if($log["group_id"] !== ""){
+        $statement->bindParam(':group_id'  , $log["group_id"]);
     }
     $statement->execute();
     if(!$statement)

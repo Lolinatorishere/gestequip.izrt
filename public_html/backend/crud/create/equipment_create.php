@@ -61,12 +61,16 @@ try{
     $loggable = array("type" => ""
                      ,"exception" => array()
                      ,"message" => array()
-                     ,"user_id" => $_SESSION["id"]
+                     ,"action_by_user_id" => $_SESSION["id"]
+                     ,"group_id" => ""
+                     ,"user_id" => ""
                      );
     $loggable["message"]["userInput"] = $request;
     // Chacks User Authentication
     if(user_group_request_authentication($request , $pdo) === 0)
         throw new Exception("Blocked Unauthorised Creation");
+    $loggable["group_id"] = $request["group_id"];
+    $loggable["user_id"] = $request["user_id"];
     // Validates inputs
     if(equipment_external_create_validation($request , $pdo) === 0)
         throw new Exception("Blocked Invalid Inputs");
@@ -108,7 +112,7 @@ try{
             ,"values" => array("1")
             ,"specific" => "id = " . $equipment_id
         );
-        $was_updated = internal_update_equipment($update_request , $pdo);
+        $was_updated = update_equipment($update_request , $pdo);
         if(isset($was_updated["PDOException"]))
             throw new PDOException($was_updated["PDOException"]);
     }catch(PDOException $e){
@@ -141,9 +145,8 @@ try{
         case 'Equipment Created':
             $loggable["type"] = "Equipment_Create";
             $loggable["equipment_id"] = $equipment_id;
-            create_log($loggable , "equipment" , $pdo);
+            create_log($loggable , "equipment_logs" , $pdo);
             $ret["server_message"] = "Equipment Created";
-            // todo equipment querying seems to not be working
             $ret["message"] = get_equipment(" * " , $equipment_id , $pdo);  
             return $ret;
         default:
@@ -152,7 +155,7 @@ try{
                 $loggable["equipment_id"] = $equipment_id;
             }
             $loggable["user_inputs"] = $request;
-            create_log($loggable , "equipment" , $pdo);
+            create_log($loggable , "equipment_logs" , $pdo);
             $ret["server_message"] = "Opperation could not Be Completed";
             $ret["message"] = $e->getMessage();
             return $ret;

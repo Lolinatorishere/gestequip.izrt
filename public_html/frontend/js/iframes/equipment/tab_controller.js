@@ -21,7 +21,6 @@ async function setTabUI(tab_html_content){
 
 async function unsetPreviousHighlight(previous_tab , tab_node){
     let first_tab = 1;
-    console.log(previous_tab);
     if(previous_tab === null) 
         return;
     previous_tab.id = '';
@@ -148,6 +147,8 @@ function getWidthsForUI(set_items , title , title_properties , individual_item_h
         set_items[itempos].style.height = individual_item_height;
         for(let j = 0 ; j < total_children ; j++){
             item = set_items[itempos].children[j];
+          //console.log(item);
+          //console.log(set_items[itempos].children[j]);
             if((item.attributes.class.nodeValue) === "equipment_type"){
                 for(let k = 0 ; k < equipment_type.length ; k++){
                     if(parseInt(item.innerText) === equipment_type[k].id){
@@ -198,6 +199,7 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type , padding)
         title = 1;
     }
     let total_children = set_items[title].children.length
+    console.log(set_items);
     let widths = getWidthsForUI(set_items , title , title_properties , individual_item_height , total_children , equipment_type);
     individual_widths = itemsUIparseWidthRows(widths);
     parsed_widths = calculateUiWidthPercentages(individual_widths , item_location_width , padding);
@@ -241,6 +243,7 @@ function setUserHasNoItems(append_controls , append_items , append_details , mes
                                 `
 }
 
+// todo not working as intended fix 
 function controlsHtml(data){
     let html = ''; 
     control_location = '';
@@ -319,6 +322,7 @@ function controlsHtml(data){
     return html;
 }
 
+// TODO fix this not working as intended
 function controlsFunctionality(data , refresh , loadingFunction){
     let current_page = parseInt(data.information.current_page)
        ,total_items = parseInt(data.information.total_items)
@@ -497,7 +501,7 @@ function itemsHtml(data , appends){
             itemsDiv.appendChild(title_div);
         }
         //equipment type, brand, model, purchase_date, equipment state
-        for(let i = 0 ; i < info.total_items ; i++){
+        for(let i = 0 ; i < info.items.length ; i++){
             let item = info.items[i];
             let items = document.createElement('div');
             let HTMLinner = '';
@@ -537,7 +541,8 @@ function itemDetailsHtml(info){
 
 function itemsFunctionality(data , append_details , appends){
     let info = data.information; 
-    for(let i = 0 ; i < info.total_items ; i++){
+    console.log(info.items.length);
+    for(let i = 0 ; i < info.items.length ; i++){
         elementid = 'item-' + appends[0] + '-' + i;
         document.getElementById(elementid)
         .addEventListener('click' ,  function(){
@@ -548,13 +553,13 @@ function itemsFunctionality(data , append_details , appends){
 
 async function addGroupsFunctionality(data , append_details , appends){
     let info = data.information
-       ,request = {}
-    for(let i = 0 ; i < info.total_items ; i++){
+       ,request = {};
+    for(let i = 0 ; i < info.items.length ; i++){
        let fetch_request = undefined
           ,group_users = undefined;
-        elementid = 'item-' + appends[0] + '-' + i;
-        document.getElementById(elementid)
-        .addEventListener('click' , async function(){
+       elementid = 'item-' + appends[0] + '-' + i;
+       document.getElementById(elementid)
+       .addEventListener('click' , async function(){
             defaultHTML = `
                           <div class="unselected-user">
                               Group User Not Selected
@@ -586,28 +591,28 @@ async function addGroupsFunctionality(data , append_details , appends){
             if(group_users !== undefined){
                 addEqUsersControlFunctionality(group_users , info.items[i].id)
             }
-        });
+       });
     }
 }
 
 async function addUsersFunctionality(data , append_details , appends){
     let info = data.information
-    for(let i = 0 ; i < info.total_items ; i++){
+    for(let i = 0 ; i < info.items.length ; i++){
        let fetch_request = undefined
           ,group_users = undefined;
-        elementid = 'item-' + appends[0] + '-' + i;
-        document.getElementById(elementid)
-        .addEventListener('click' , async function(){
-            custom_details = {
-                    selected_user_id: info.items[i].id
-                   ,selected_user_name: info.items[i].users_name
-                   ,selected_user_email: info.items[i].email
-                   ,selected_user_phone_number: info.items[i].phone_number
-                   ,selected_user_regional_indicator: info.items[i].regional_indicator
-                }
-            append_details.attributes.class.nodeValue = "neutral-input"
-            append_details.innerHTML = itemDetailsHtml(custom_details);
-        });
+       elementid = 'item-' + appends[0] + '-' + i;
+       document.getElementById(elementid)
+       .addEventListener('click' , async function(){
+           custom_details = {
+                   selected_user_id: info.items[i].id
+                  ,selected_user_name: info.items[i].users_name
+                  ,selected_user_email: info.items[i].email
+                  ,selected_user_phone_number: info.items[i].phone_number
+                  ,selected_user_regional_indicator: info.items[i].regional_indicator
+               }
+           append_details.attributes.class.nodeValue = "neutral-input"
+           append_details.innerHTML = itemDetailsHtml(custom_details);
+       });
     }
 }
 
@@ -1090,6 +1095,7 @@ async function setTab(request , button , tab){
         tab: tab
        ,type: 'data' 
        ,crud: 'read'
+       ,pgng: 1
     }
     response = await fetch(await urlCreateBackendRequest(request));
     tab_information = await response.json();

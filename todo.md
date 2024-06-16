@@ -20,7 +20,7 @@ frontend: ui and the respective links
   [x] Page content
     [x] appear the users name with a greeting like hello "username"
     [] a small tab with the ammount of notifications the user has and how many are "critical"
-  [] merge sidebar and navbar functionality to reduce visual clutter
+  [x] merge sidebar and navbar functionality to reduce visual clutter
 
 [x] profile page 
   [x] shows the username
@@ -74,7 +74,7 @@ frontend: ui and the respective links
                     [x] if page requested > total set it to the last page
                     [x] if page is a neg number set page to n1 
             [] if no items says "no equipments assigned"
-            [x] if less than one page of equipments exist shows only 1 page and no controls
+           [x] if less than one page of equipments exist shows only 1 page and no controls
             [x] else if less than 3 pages away from either begining or end shows all pages to the closses like 1... n-3 n-2 n-1 n n+1 n+max and vice versa
             [x] to the side of the page controls should show the total ammount of equipments assigned
             [] allow for the showing of a single type of equipment 
@@ -93,8 +93,9 @@ frontend: ui and the respective links
              (associated to the users type, admins get access to all groups)
           [] same page capabilities as your equipments
         [] tab search
-            [] colapsable internal sidebar with all search capabilities
-              [] search capabilities
+            [x] internal sidebar with all search capabilities
+              [] possibly turn it colapsable
+              [x] search capabilities
                 [] search by user *
                 [] search by group 
                 [] search by equipment

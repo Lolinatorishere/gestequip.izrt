@@ -5,6 +5,7 @@ include_once common_funcs;
 
 // gets all the equipments from certain ids
 function get_groups($request , $pdo){
+try{
     $sql_error = array("error" => "error");
     if(isset($request["error"]))
         return $sql_error;
@@ -39,6 +40,11 @@ function get_groups($request , $pdo){
     $ret["paging"] = 1; 
     $ret["total_items"] = $request["total_items"];
     return($ret);   
+}catch(PDOException $e){
+    $ret = array("error" => "error"
+                ,"PDOException" => $e
+                );
+}
 }
 
 ?>

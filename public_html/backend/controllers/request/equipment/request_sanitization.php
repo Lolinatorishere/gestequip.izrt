@@ -33,6 +33,10 @@ function tab_create_information_sanitize($tab , $user_id , $pdo){
         $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_user"]["user_id"]);
         unset($data_request["selected_user"]);
     }
+    if(isset($_POST["equipment_auth_level"])){
+        $data_request[""] = preg_replace('/[^0-1]/s' , '' , $_POST["selected_group"]["group_id"]);
+        unset($data_request["selected_group"]);
+    }
     return create_request($data_request , $tab , $user_id , $pdo);
 }
 
@@ -75,6 +79,23 @@ function tab_update_information_sanitize($tab , $user_id , $pdo){
     }
     return update_request($data_request , $tab , $user_id , $pdo);
 }
+
+function tab_delete_information_sanitize($tab , $user_id , $pdo){
+    if(isset($_POST["selected_group"])){
+        $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
+        unset($data_request["selected_group"]);
+    }
+    if(isset($_POST["selected_user"])){
+        $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_user"]["user_id"]);
+        unset($data_request["selected_user"]);
+    }
+    if(isset($_POST["selected_equipment"])){
+        $data_request["equipment_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_equipment"]["equipment_id"]);
+        unset($data_request["selected_equipment"]);
+    }
+    return update_request($data_request , $tab , $user_id , $pdo);
+}
+
 
 
 ?>
