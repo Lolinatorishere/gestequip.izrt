@@ -1,13 +1,23 @@
 <?php
 
 function log_parse($log_type , $log){
-    $values = array(" :action_by_user_id " , " :log_type " , " :log_message " ," :user_id ");
-    $columns = array(" `action_by_user_id`" , "`log_type`" , "`log_message`" , "`user_id`" );
-    if($log["equipment_id"] !== "" && !empty($log["equipment_id"])){
+    $values = array(" :action_by_user_id "
+                   ," :log_origin "
+                   ," :log_type "
+                   ," :log_status "
+                   ," :log_message "
+                   ," :user_id ");
+    $columns = array("`action_by_user_id`"
+                    ,"`log_origin`"
+                    ,"`log_type`"
+                    ,"`log_status`"
+                    ,"`log_message`"
+                    ,"`user_id`" );
+    if(isset($log["equipment_id"])){
         array_push($values , " :equipment_id ");
         array_push($columns , "`equipment_id`");
     }
-    if($log["group_id"] !== "" && !empty($log["group_id"])){
+    if(isset($log["group_id"])){
         array_push($values , " :group_id ");
         array_push($columns , "`group_id`");
     }
@@ -36,14 +46,16 @@ try{
     $statement = $pdo->prepare($sql);
     if(!isset($message_merge))
         $message = json_encode($log["message"]);
-    $statement->bindParam(':log_message' , $message);
+    $statement->bindParam(':log_origin' , $log["origin"]);
     $statement->bindParam(':log_type' , $log["type"]);
+    $statement->bindParam(':log_status' , $log["status"]);
+    $statement->bindParam(':log_message' , $message);
     $statement->bindParam(':action_by_user_id' , $log["user_id"]);
     $statement->bindParam(':user_id'  , $log["user_id"]);
-    if($log["equipment_id"] !== ""){
+    if(isset($log["equipment_id"])){
         $statement->bindParam(':equipment_id'  , $log["equipment_id"]);
     }
-    if($log["group_id"] !== ""){
+    if(isset($log["group_id"])){
         $statement->bindParam(':group_id'  , $log["group_id"]);
     }
     $statement->execute();

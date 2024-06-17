@@ -58,22 +58,43 @@ try{
                 ,"message" => "default"
                 );
     $insert_error = "User not created";
-    $loggable = array("type" => ""
+    $error_message = array();
+    $loggable = array("origin" => "Equipment_Create"
+                     ,"type" => ""
+                     ,"status" => ""
                      ,"exception" => array()
                      ,"message" => array()
                      ,"action_by_user_id" => $_SESSION["id"]
-                     ,"group_id" => ""
-                     ,"user_id" => ""
+                     ,"group_id" => $request["group_id"]
+                     ,"user_id" => $request["user_id"]
                      );
     $loggable["message"]["userInput"] = $request;
     // Chacks User Authentication
-    if(user_group_request_authentication($request , $pdo) === 0)
-        throw new Exception("Blocked Unauthorised Creation");
-    $loggable["group_id"] = $request["group_id"];
-    $loggable["user_id"] = $request["user_id"];
+    if(user_group_request_authentication($request , $pdo) !== 1)
+        throw new Exception("Authentication");
     // Validates inputs
-    if(equipment_external_create_validation($request , $pdo) === 0)
-        throw new Exception("Blocked Invalid Inputs");
+    $validation_guard = validate_external_create_inputs($request , $pdo , $error_message);
+    if($validation_guard !== 1){
+        $loggable["type"] = "Input_Error";
+        $loggable["status"] = "Warning";
+        switch($validation_guard){
+            case -1:
+                break;
+            case -2:
+                break;
+            case -3:
+                break;
+            case -4:
+                break;
+            case -5:
+                break;
+            default:
+                $loggable["status"] = "Error";
+                $loggable["exception"]["validation"] = "Invalid Validation Check, check validation code for possible bugs";
+                break;
+        }
+        throw new Exception("Validation", 1);
+    }
     $request["default"]["equipment_type"] = get_equipment_type($request["equipment_type"] , $pdo , "id");
     $sql = create_equipment_create_insertion($request , " equipment " , "default");
     try{
@@ -83,8 +104,9 @@ try{
         $loggable["message"]["default_sql"] = $sql;
         $loggable["message"]["default_inserted_id"] = $equipment_id;
     }catch(PDOException $e){
-        array_push($loggable["exception"] , $e );
-        array_push($loggable["message"] , $request , $sql);
+        $loggable["exception"]["PDOMessage"] = $e->getMessage();
+        $loggable["message"]["request"] = $request;
+        $loggable["message"]["sql"] =  $sql;
         throw new Exception("Server Error : C0001");
     }
     try{
@@ -95,15 +117,16 @@ try{
         $specifics_id = $pdo->lastInsertId();
         $loggable["message"]["specific_sql"] = $sql;
         $loggable["message"]["specific_inserted_id"] = array("type_id" => $specifics_id
-                                                 ,"eq_type" => $request["equipment_type"]
-                                                 );
+                                                            ,"eq_type" => $request["equipment_type"]
+                                                            );
     }catch(PDOException $e){
-        array_push($loggable["exception"] , $e->getMessage());
         $deletion_request = array("table" => " equipment "
                                  ,"specific" => "id=" . $equipment_id
                                  );
         delete_equipment($deletion_request , $pdo);
-        array_push($loggable["message"] , $request , $sql);
+        $loggable["message"]["request"] = $request;
+        $loggable["message"]["sql"] =  $sql;
+        $loggable["exception"]["PDOMessage"] = $e->getMessage();
         throw new Exception("Server Error : C0002");
     }
     try{
@@ -116,7 +139,6 @@ try{
         if(isset($was_updated["PDOException"]))
             throw new PDOException($was_updated["PDOException"]);
     }catch(PDOException $e){
-        array_push($loggable["exception"] , $e->getMessage());
         $deletion_request = array("table" => $request["equipment_type"]
                                  ,"specific" => "equipment_id=" . $equipment_id
                                  );
@@ -125,7 +147,9 @@ try{
                                  ,"specific" => "id=" . $equipment_id
                                  );
         delete_equipment($deletion_request , $pdo);
-        array_push($loggable["message"] , $request , $sql);
+        $loggable["message"]["request"] = $request;
+        $loggable["message"]["sql"] =  $sql;
+        $loggable["exception"]["PDOMessage"] = $e->getMessage();
         throw new Exception("Server Error : C0003");
     }
     try{
@@ -135,31 +159,48 @@ try{
         $loggable["message"]["users_inside_groups_equipments_ids"] = array($request["user_id"] , $request["group_id"] , $equipment_id);
         $loggable["message"]["users_inside_groups_equipments_sql"] = $sql;
     }catch(PDOException $e){
-        array_push($loggable["exception"] , $e->getMessage());
-        array_push($loggable["message"] , $request , $sql);
+        $loggable["message"]["request"] = $request;
+        $loggable["message"]["sql"] =  $sql;
+        $loggable["exception"]["PDOMessage"] = $e->getMessage();
         throw new Exception("equipment_Group query not made");
     }
     throw new Exception("Equipment Created");
 }catch(Exception $e){
     switch($e->getMessage()){
         case 'Equipment Created':
-            $loggable["type"] = "Equipment_Create";
+            $loggable["type"] = "Created_Equipment";
+            $loggable["status"] = "OK";
             $loggable["equipment_id"] = $equipment_id;
-            create_log($loggable , "equipment_logs" , $pdo);
             $ret["server_message"] = "Equipment Created";
-            $ret["message"] = get_equipment(" * " , $equipment_id , $pdo);  
-            return $ret;
+            $ret["message"] = get_equipment(" * " , $equipment_id , $pdo);
+            break;
+        case 'Authentication':
+            $loggable["type"] = "Auth_Error";
+            $loggable["status"] = "Error";
+            $loggable["exception"]["authentication"] = "Unauthorised Request";
+            $ret["server_message"] = "Unauthorised Access";
+            $ret["message"] = array("User Credentials Invalid for Action");
+            break;
+        case 'Validation':
+            //loggable set by validation_guard
+            $loggable["message"]["user_input_error"] = $error_message;
+            $ret["server_message"] = "Invalid User Inputs";
+            $ret["message"] = $error_message;
+            break;
         default:
-            $loggable["type"] = "user_input_error";
+            $loggable["type"] = "Server_Error";
+            $loggable["log_status"] = "Error";
             if(isset($equipment_id)){
                 $loggable["equipment_id"] = $equipment_id;
+                $loggable["exception"]["incomplete_creation"] = "The following equipment had an error inserting information " . $equipment_id;
             }
-            $loggable["user_inputs"] = $request;
-            create_log($loggable , "equipment_logs" , $pdo);
+            $loggable["message"]["user_inputs"] = $request;
             $ret["server_message"] = "Opperation could not Be Completed";
             $ret["message"] = $e->getMessage();
-            return $ret;
+            break;
     }
+    create_log($loggable , "equipment_logs" , $pdo);
+    return $ret;
 }
 }
 
