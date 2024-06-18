@@ -22,51 +22,55 @@ function create_profile_div(){
 }
 
 
-   $sidebar_link = array(
-        "../../../pages/dashboard.php",
-        "../../../pages/profile.php",
-        "../../../pages/notifications.php",
-        "../../../pages/groups.php",
-        "../../../pages/users.php",
-        "../../../pages/equipment.php",
-        "../../../pages/reports.php"
+    $sidebar_link = array(
+         "../../../pages/dashboard.php",
+         "../../../pages/profile.php",
+         "../../../pages/notifications.php",
+         "../../../pages/groups.php",
     );
+    if($_SESSION["user_type"] === "Admin"){
+        array_push($sidebar_link , "../../../pages/users.php");
+    }
+    array_push($sidebar_link , "../../../pages/equipment.php" , "../../../pages/reports.php");
 
-   $sidebar_icon = array(
-        "dashboard",
-        "account_circle",
-        "notifications",
-        "event_list",
-        "group",
-        "computer",
-        "summarize"
+    $sidebar_icon = array(
+         "dashboard",
+         "account_circle",
+         "notifications",
+         "event_list"
     );
+    if($_SESSION["user_type"] === "Admin"){
+        array_push($sidebar_icon , "group");
+    }
+    array_push($sidebar_icon , "computer" , "summarize");
 
     $sidebar_content = array(
         "Dashboard",
         "Profile",
         "Notifications",
         "Groups",
-        "Users",
-        "Equipment",
-        "Reports"
     );
+    if($_SESSION["user_type"] === "Admin"){
+        array_push($sidebar_content  , "Users");
+    }
+    array_push($sidebar_content , "Equipment" , "Reports");
 
     $page_compare = array(
         "dashboard",
         "profile",
         "notifications",
         "groups",
-        "users",
-        "equipment",
-        "reports"
     );
+    if($_SESSION["user_type"] === "Admin"){
+        array_push($page_compare , "users");
+    }
+    array_push($page_compare , "equipment" , "reports");
 // This is the sidebar that will be used in the dashboard page
 // The sidebar is a div that contains 7 sidebar-items
 // Each sidebar-item is a link to a different page
     $current_page = basename($_SERVER['REQUEST_URI']);
     echo("<div class=\"sidebar\"><div class=\"sidebar-nav\">");
-    for($i = 0 ; $i < 7; $i++){
+    for($i = 0 ; $i < count($page_compare); $i++){
         echo("
             <div class=\"sidebar-item\" ");
             if($i == 0){
@@ -81,7 +85,7 @@ function create_profile_div(){
                         echo("><span class=\"material-symbols-outlined sidebar-content-icon\">"
                             . $sidebar_icon[$i] . 
                         "</span>
-                        <p class=\"sidebar-content-text\">" . $sidebar_content[$i] . "</p>                    
+                        <p class=\"sidebar-content-text\">" . $sidebar_content[$i] . "</p>
                     </div>
                 </a>
             </div>
