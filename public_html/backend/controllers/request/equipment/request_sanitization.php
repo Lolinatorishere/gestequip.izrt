@@ -98,7 +98,7 @@ function tab_delete_information_sanitize($tab , $user_id , $pdo){
         unset($data_request["selected_equipment"]);
     }
     if(isset($_POST["deletion_response"])){
-        $data_request["deletion_response"] = preg_replace('/[^0-9]/s' , '' , $_POST["deletion_response"]["equipment_id"]);
+        $data_request["response"] = preg_replace('/[^a-zA-Z]/s' , '' , $_POST["deletion_response"]["response"]);
         unset($data_request["deletion_response"]);
     }
     return delete_request($data_request , $tab , $user_id , $pdo);

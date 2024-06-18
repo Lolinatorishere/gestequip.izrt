@@ -266,6 +266,7 @@ try{
     $sql .= $request["table"];
     $sql .= " WHERE ";
     $sql .= $request["specific"];
+    return $sql;
 }catch(TypeError $e){
     error_log(print_r($e , true));
     return "error";

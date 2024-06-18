@@ -81,7 +81,6 @@ function get_pre_altered_equipment_information($data_request , $pdo){
         $previous_info["specific"] = get_query($request , $pdo)["items"];
     }
     if(isset($data_request["user_permission_level"])){
-        printLog("lasdnfasdjhf");
         $request = array("fetch" => " * "
                       ,"table" => " users_inside_groups_equipments "
                       ,"counted" => 1

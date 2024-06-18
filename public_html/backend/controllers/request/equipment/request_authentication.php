@@ -42,6 +42,8 @@ function check_against_auth_groups($groups){
 }
 
 function group_auth_check($request){
+    if(!isset($request["group_id"]))
+        return 0;
     $auth_table = $_SESSION["group_auth"];
     foreach($auth_table["auth"] as $authorised_groups){
         if($authorised_groups == $request["group_id"]){
@@ -52,6 +54,8 @@ function group_auth_check($request){
 }
 
 function group_user_auth_check($request , $pdo){
+    if(!isset($request["group_id"]))
+        return 0;
     $group_users_request = array("fetch" => " * "
                                 ,"table" => " users_inside_groups "
                                 ,"specific" => " group_id = " . $request["group_id"]
@@ -92,6 +96,8 @@ function user_group_request_authentication($request , $pdo){
 // what was i making here
 // you were making a request to the db to get the specific equipments auth level 
 function equipment_authentication($request , $pdo){
+    if(!isset($request["equipment_id"]))
+        return 0;
     if($_SESSION["user_type"] === "Admin"){
         return 1;
     }

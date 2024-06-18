@@ -82,10 +82,25 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
         }
     }
     if($table_check !== $counted_table){
-        $error_message["Missmatch"] = " invalid inputs tables sent";
+        $error_message["Missmatch"] = " invalid inputs received";
         return 0;
     }
     return 1;
+}
+
+function validate_equipment_references($data_request , $pdo){
+    $request = array("fetch" => " * " 
+                    ,"table" => " users_inside_groups_equipments "
+                    ,"specific" => " equipment_id=" . $data_request["equipment_id"]
+                                . " AND group_id=" . $data_request["group_id"]
+                                . " AND user_id=" . $data_request["user_id"]
+                    );
+    $equipment = get_queries($request , $pdo);
+    if($equipment["total_items"] != 1){
+        return 0;
+    }
+    return 1;
+
 }
 
 function validate_equipment_in_db($equipment_id , $pdo){
@@ -150,6 +165,10 @@ function validate_external_update_inputs($request , $pdo , &$error_message){
         $error_message["user_not_exists"] = "User Selected a User That doesnt Exist, or is not part of the selected group";
         return 0;
     }
+    if(validate_equipment_references($request , $pdo) !== 1){
+        $error_message["invalid_ref"] = "Invalid Selected Equipment Reference";
+        return 0;
+    }
     if(isset($request["default"])){
         if(validate_external_inputs($request , "default" , " equipment " , $pdo , $error_message) !== 1)
             return 0;
@@ -181,6 +200,10 @@ function validate_external_delete_inputs($request , $pdo , &$error_message){
     }
     if(validate_user_group_in_db($request["user_id"] , $request["group_id"] , $pdo) !== 1){
         $error_message["invalid_ids"] = "Invalid Selected User or Group";
+        return 0;
+    }
+    if(validate_equipment_references($request , $pdo) !== 1){
+        $error_message["invalid_ref"] = "Invalid Selected Equipment Reference";
         return 0;
     }
     $equipment_guard = validate_equipment_in_db($request["equipment_id"] , $pdo);

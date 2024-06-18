@@ -60,7 +60,6 @@ function data_request($tab , $pdo , $user_id){
     }
 }
 
-
 function ui_request($ui){
     $dir = '/var/www/html/gestequip.izrt/public_html/frontend/iframes/equipment/tabs/';
     if(ui_refresh_origin() == 1){
@@ -72,6 +71,5 @@ function ui_request($ui){
     $dir .= $ui . '.html';
     return file_get_contents($dir);
 } 
-
 
 ?>
