@@ -24,6 +24,7 @@ function sanitize_query($query){
 }
 
 function tab_create_information_sanitize($tab , $user_id , $pdo){
+    $data_request = array();
     $data_request = sanitize_query($_POST);
     if(isset($_POST["selected_group"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
@@ -42,6 +43,7 @@ function tab_create_information_sanitize($tab , $user_id , $pdo){
 
 // gets the correct requests for each tab
 function tab_read_information_sanitize($tab , $user_id , $pdo){
+    $data_request = array();
     if(isset($_GET["page"])){
         $data_request["page"] = preg_replace('/[^0-9]/s' , '' , $_GET["page"]); 
     } 
@@ -64,6 +66,7 @@ function tab_read_information_sanitize($tab , $user_id , $pdo){
 }
 
 function tab_update_information_sanitize($tab , $user_id , $pdo){
+    $data_request = array();
     $data_request = sanitize_query($_POST);
     if(isset($_POST["selected_group"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
@@ -81,6 +84,7 @@ function tab_update_information_sanitize($tab , $user_id , $pdo){
 }
 
 function tab_delete_information_sanitize($tab , $user_id , $pdo){
+    $data_request = array();
     if(isset($_POST["selected_group"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
         unset($data_request["selected_group"]);
@@ -93,7 +97,11 @@ function tab_delete_information_sanitize($tab , $user_id , $pdo){
         $data_request["equipment_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_equipment"]["equipment_id"]);
         unset($data_request["selected_equipment"]);
     }
-    return update_request($data_request , $tab , $user_id , $pdo);
+    if(isset($_POST["deletion_response"])){
+        $data_request["deletion_response"] = preg_replace('/[^0-9]/s' , '' , $_POST["deletion_response"]["equipment_id"]);
+        unset($data_request["deletion_response"]);
+    }
+    return delete_request($data_request , $tab , $user_id , $pdo);
 }
 
 

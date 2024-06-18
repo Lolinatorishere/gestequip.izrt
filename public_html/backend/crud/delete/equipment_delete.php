@@ -1,40 +1,204 @@
 <?php
 
-function external_delete_equipment($data_request , $pdo){
-    $error_message = array();
-    if(user_group_request_authentication($data_request , $pdo) !== 1){
-        if(equipment_authentication($data_request , $pdo) !== 1)
-            return 0;
-    }
-    if(validate_external_update_inputs($data_request , $pdo , $error_message) !== 1)
-        return 0;
-    printLog($error_message);
-    if(isset($data_request["default"])){
-        printLog("good shit");
-        $columns = array();
-        $values = array();
-        foreach($data_request["default"] as $key => $value){
-            array_push($columns , $key);
-            array_push($values , $value);
-        }
-        $request = array("table" => " equipment "
-                        ,"columns" => $columns
-                        ,"values" => $values
-                        ,"specific" => "id =" . $data_request["equipment_id"]
-                        );
-        $update = update_equipment($request , $pdo);
-        printLog($update);
-    }
+include_once query_generator_dir;
+
+function unaltered_equipment_information_full($data_request , $pdo){
+    $requst = array("fetch" => " * "
+                   ,"table" => " equipment "
+                   ,"counted" => 1
+                   ,"specific" => "id=" . $data_request["equipment_id"]
+                   );
+    $previous_info["default"] = get_queries($request , $pdo)["items"];
+    $equipment_type = get_equipment_type($previous_info["specific"][0]["equipment_type"] , $pdo , "name");
+    $requst = array("fetch" => " * "
+                   ,"table" => $euipment_type
+                   ,"counted" => 1
+                   ,"specific" => "equipment_id=" . $data_request["equipment_id"]
+                   );
+    $previous_info["specific"] = get_queries($request , $pdo)["items"];
+    $requst = array("fetch" => " * "
+                   ,"table" => " users_inside_groups_equipments "
+                   ,"counted" => 1
+                   ,"specific" => "equipment_id=" . $data_request["equipment_id"]
+                   );
+    $previous_info["user_references"] = get_queries($request , $pdo)["items"];
+    return $previous_info;
 }
 
+function unaltered_equipment_information_reference($data_request , $pdo){
+    $requst = array("fetch" => " * "
+                   ,"table" => " users_inside_groups_equipments "
+                   ,"counted" => 1
+                   ,"specific" => " equipment_id=" . $data_request["equipment_id"]
+                                . " group_id=" . $data_request["group_id"]
+                                . " user_id=" . $data_request["user_id"]
+                    );
+   $previous_info["user_references"] = get_queries($request , $pdo)["items"];
+   return $previous_info;
+}
 
-
-function delete_equipment($request , $pdo){
-    $loggable = array("type" => " Delete Equipment"
+function external_delete_equipment($data_request , $pdo){
+    printLog($data_request);
+try{
+    $loggable = array("origin" => "Equipment_Delete"
+                     ,"type" => ""
+                     ,"status" => ""
                      ,"exception" => array()
                      ,"message" => array()
-                     ,"user_id" => $_SESSION["id"]
-    );
+                     ,"user_id" => $data_request["user_id"]
+                     ,"group_id" => $data_request["group_id"]
+                     ,"equipment_id" => $data_request["equipment_id"]
+                     );
+    $loggable["message"]["userInput"] = $data_request;
+    $error_message = array();
+    $ret = array("server_message" => ""
+                ,"message" => array()
+                );
+    if(user_group_request_authentication($data_request , $pdo) !== 1){
+        if(equipment_authentication($data_request , $pdo) !== 1)
+            throw new Exception("Authentication");
+    }
+    $validation_guard = validate_external_delete_inputs($data_request , $pdo , $error_message);
+    if($validation_guard !== 1){
+        switch($validation_guard){
+        case 0:
+            $deletion_guard = 0;
+            break;
+        //Multiple Equipment detected return to frontend 
+        //a question if they want to remove the association to the user
+        // or the equipment (thus removing all references to it from the db)
+        case -1:
+            if(isset($data_request["deletion_response"])){
+                switch ($data_request["deletion_response"]) {
+                case 'user':
+                    $deletion_guard = 1;
+                    break;
+                case 'equipment':
+                    $deletion_guard = 0;
+                    break;
+                default:
+                    throw new Exception("Question");
+                }
+            }else{
+                throw new Exception("Question");
+            }
+            break;
+        case -2:
+            //no equipment in the db with the id
+            $loggable["type"] = "Input_Error";
+            $loggable["status"] = "Warning";
+            throw new Exception("Validation");
+        default:
+            $loggable["status"] = "Error";
+            $loggable["exception"]["validation"] = "Invalid Validation Check, check validation code for possible bugs";
+            throw new Exception("Validation");
+        }
+    }
+    switch($deletion_guard){
+        case 0:
+        try{
+            $loggable["message"]["previousInfo"] = unaltered_equipment_information_full($data_request , $pdo);
+            $request = array("fetch" => "equipment_type"
+                            ,"table" => " equipment "
+                            ,"counted" => 1
+                            ,"specific" => "id=" . $data_request["equipment_id"]
+                            );
+            $equipment_type_id = get_equipment($request , $pdo , "name");
+            $equipment_type = get_equipment_type($equipment_type_id , $pdo , "name");
+            $delete_specific_request = array("table" => $equipment_type
+                                            ,"specific" => "equipment_id=" . $data_request["equipment_id"]
+                                            );
+            $delete = delete_equipment($delete_specific_request, $pdo);
+            if(isset($delete["PDOException"]))
+                throw new PDOException($update["PDOException"]);
+            $loggable["message"]["deletion_request"] = $delete_specific_request;
+        }catch(PDOException $e){
+            $loggable["exception"]["specific"] = $e->getMessage();
+            throw new Exception("Server_Error");
+        }
+        try{
+            $delete_default_request = array("table" => " equipment "
+                                           ,"specific" => "id=" . $data_request["equipment_id"]
+                                           );
+            $delete = delete_equipment($delete_default_request, $pdo);
+            if(isset($delete["PDOException"]))
+                throw new PDOException($update["PDOException"]);
+            $loggable["message"]["default"] = $delete_default_request;
+        }catch(PDOException $e){
+            $loggable["exception"]["default"] = $e->getMessage();
+            throw new Exception("Server_Error");
+        }
+        try{
+            $delete_user_reference_request = array("table" => " users_inside_groups_equipments "
+                                                  ,"specific" => "equipment_id=" . $data_request["equipment_id"]
+                                                  );
+            $delete = delete_equipment($delete_user_reference_request , $pdo);
+            if(isset($delete["PDOException"]))
+                throw new PDOException($update["PDOException"]);
+            $loggable["message"]["reference"] = $delete_specific_request;
+            throw new Exception("Deleted");
+        }catch(PDOException $e){
+            $loggable["exception"]["reference"] = $e->getMessage();
+            throw new Exception("Server_Error");
+        }
+        case 1:
+        try{
+            $loggable["message"]["previousInfo"] = unaltered_equipment_information_reference($data_request , $pdo);
+            $delete_user_reference_request = array("table" => " users_inside_groups_equipments "
+                                                  ,"specific" => " equipment_id=" . $data_request["equipment_id"]
+                                                               . " group_id=" . $data_request["group_id"]
+                                                               . " user_id=" . $data_request["user_id"]
+                                                  );
+            $delete = delete_equipment($delete_user_reference_request , $pdo);
+            if(isset($delete["PDOException"]))
+                throw new PDOException($update["PDOException"]);
+            $loggable["message"]["deletion_request"] = $delete_user_reference_request;
+            throw new Exception("Deleted");
+            break;
+        }catch(PDOException $e){
+            $loggable["exception"]["specific"] = $e->getMessage();
+            throw new Exception("Server_Error");
+        }
+    }
+}catch(Exception $e){
+    switch($e->getMessage()){
+        case "Question":
+            $ret["server_message"] = "Multiple Users/Groups Assigned To Equipment";
+            $ret["message"]["title"] = "There are multiple people or groups assigned to the equipment being deleted";
+            $ret["message"]["content"] = "Please Choose between removing the equipment and all the references or just the specific reference";
+            return $ret;
+        case "Deleted":
+            $loggable["type"] = "Deleted_Equipment";
+            $loggable["status"] = "OK";
+            $ret["server_message"] = "Deleted Requested Input";
+            $ret["message"]["title"] = "Success";
+            $ret["message"]["content"] = "Equipment Deleted";
+            break;
+        case "Authentication":
+            $loggable["type"] = "Auth_Error";
+            $loggable["status"] = "Error";
+            $loggable["exception"]["authentication"] = "Unauthorised Request";
+            $ret["server_message"] = "User not Authorized";
+            $ret["message"] = "User Credentials Invalid for Action";
+            break;
+        case "Validation":
+            //set in validation_guard
+            $loggable["message"]["user_input_error"] = $error_message;
+            $ret["server_message"] = "Invalid User Input";
+            $ret["message"] = $error_message;
+            break;
+        default:
+            $loggable["type"] = "Server_Error";
+            $loggable["status"] = "Error";
+            $ret["message"]["title"] =  "Issue Deleting The Equipment";
+            break;
+    }
+    create_log($loggable , "equipment_logs" , $pdo);
+    return $ret;
+}
+}
+
+function delete_equipment($request , $pdo){
 try{
     $sql_error = array("error" => "error");
     if(isset($request["error"]))

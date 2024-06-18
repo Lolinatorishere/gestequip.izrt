@@ -1,9 +1,10 @@
 <?php
 
+include_once query_generator_dir;
+
 function get_pre_updated_equipment_information($data_request , $pdo){
     $previous_info = array();
     if(isset($data_request["default"])){
-        printLog("lasdnfasdjhf");
         $request = array("fetch" => " * "
                          ,"table" => " equipment "
                          ,"counted" => 1
@@ -12,7 +13,6 @@ function get_pre_updated_equipment_information($data_request , $pdo){
         $previous_info["default"] = get_query($request , $pdo)["items"];
     }
     if(isset($data_request["default"])){
-        printLog("lasdnfasdjhf");
         $request = array("fetch" => " * "
             ,"table" => $data_request["equipment_type"]
             ,"counted" => 1
@@ -21,7 +21,6 @@ function get_pre_updated_equipment_information($data_request , $pdo){
         $previous_info["specific"] = get_query($request , $pdo)["items"];
     }
     if(isset($data_request["user_permission_level"])){
-        printLog("lasdnfasdjhf");
         $request = array("fetch" => " * "
                       ,"table" => " users_inside_groups_equipments "
                       ,"counted" => 1
@@ -41,9 +40,9 @@ function external_update_equipment($data_request , $pdo){
                      ,"status" => ""
                      ,"exception" => array()
                      ,"message" => array()
-                     ,"user_id" => $_SESSION["id"]
-                     ,"equipment_id" => $data_request["equipment_id"]
+                     ,"user_id" => $data_request["user_id"]
                      ,"group_id" => $data_request["group_id"]
+                     ,"equipment_id" => $data_request["equipment_id"]
                      );
 try{
     $loggable["message"]["userInput"] = $data_request;
@@ -61,25 +60,13 @@ try{
     if($validation_guard !== 1){
         $loggable["type"] = "Input_Error";
         $loggable["status"] = "Warning";
-        switch($validation_guard){
-            case -1:
-                break;
-            case -2:
-                break;
-            case -3:
-                break;
-            case -4:
-                break;
-            case -5:
-                break;
-            default:
-                $loggable["status"] = "Error";
-                $loggable["exception"]["validation"] = "Invalid Validation Check, check validation code for possible bugs";
-                break;
+        if($validation_guard !== 0){
+            $loggable["status"] = "Error";
+            $loggable["exception"]["validation"] = "Invalid Validation Check, check validation code for possible bugs";
         }
         throw new Exception("Validation");
     }
-    $loggable["message"]["previousInfo"] = get_pre_updated_equipment_information($data_request , $pdo); 
+    $loggable["message"]["previousInfo"] = get_pre_altered_equipment_information($data_request , $pdo); 
     if(isset($data_request["default"])){
     try{
         $columns = array();
@@ -121,10 +108,6 @@ try{
         $update = update_equipment($request , $pdo);
         if(isset($update["PDOException"]))
             throw new PDOException($update["PDOException"]);
-        if(!isset($update["success"])){
-            $loggable["exception"]["specific"] = $e->getMessage();
-            throw new Exception("Specific");
-        }
         foreach($data_request["specific"] as $key => $value){
             array_push($internal_message , "input " , $value , " updated");
         }
@@ -144,6 +127,8 @@ try{
                                      . " user_id=" . $data_request["user_id"]
                         );
         $update = update_equipment($request , $pdo);
+        if(isset($update["PDOException"]))
+            throw new PDOException($update["PDOException"]);
         array_push($internal_message , "user permission level updated");
         $loggable["message"]["user_permission_level"] = $request;
     }catch(PDOException $e){
@@ -172,6 +157,7 @@ try{
             //set in validation_guard
             $loggable["message"]["user_input_error"] = $error_message;
             $ret["server_message"] = "Invalid User Input";
+            $ret["message"] = $error_message;
             break;
         default:
             $loggable["type"] = "Server_Error";

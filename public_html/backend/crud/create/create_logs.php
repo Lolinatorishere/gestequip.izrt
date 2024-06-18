@@ -1,5 +1,7 @@
 <?php
 
+include_once query_generator_dir;
+
 function log_parse($log_type , $log){
     $values = array(" :action_by_user_id "
                    ," :log_origin "
@@ -50,7 +52,7 @@ try{
     $statement->bindParam(':log_type' , $log["type"]);
     $statement->bindParam(':log_status' , $log["status"]);
     $statement->bindParam(':log_message' , $message);
-    $statement->bindParam(':action_by_user_id' , $log["user_id"]);
+    $statement->bindParam(':action_by_user_id' , $_SESSION["id"]);
     $statement->bindParam(':user_id'  , $log["user_id"]);
     if(isset($log["equipment_id"])){
         $statement->bindParam(':equipment_id'  , $log["equipment_id"]);

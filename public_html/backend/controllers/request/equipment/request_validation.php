@@ -94,7 +94,11 @@ function validate_equipment_in_db($equipment_id , $pdo){
                     ,"specific" => " equipment_id=\"" . $equipment_id ."\""
                     );
     $equipment = get_queries($request , $pdo);
-    if($equipment["total_items"] !== 1)
+    if($equipment["total_items"] === 1)
+        return 1;
+    if($equipment["total_items"] > 1)
+        return 2;
+    if($equipment["total_items"] === 0)
         return 0;
     return 1;
 }
@@ -112,49 +116,89 @@ function validate_user_group_in_db($user_id , $group_id , $pdo){
     return 1;
 }
 
-function validate_external_update_inputs($request , $pdo , &$error_message){
-    if(!isset($request["equipment_id"])){
-        $error_message["eq_not_selected"] = "User didnt Select an Equipment";
-        return -1;
-    }
-    $error_message["eq_not_exists"] = "User Selected an Equipment that Doesnt Exist";
-    if(validate_equipment_in_db($request["equipment_id"] , $pdo) !== 1){
-        return -2;
-    }
-    if(isset($request["default"])){
-        if(validate_external_inputs($request , "default" , " equipment " , $pdo , $error_message) !== 1)
-            return -3;
-        
-    }
-    if(isset($request["specific"])){
-        if(validate_external_inputs($request , "specific" , " " . $request["equipment_type"] . " " , $pdo , $error_message) !== 1)
-            return -4;
-    }
-    if(!isset($request["default"]) && (!isset($request["specific"]))){
-        $error_message["No_query"] = "No Queries have been input";
-        return -5;
-    }
-    return 1;
-}
-
 function validate_external_create_inputs($request , $pdo , &$error_message){
     $error_message = array();
     if(!isset($request["default"]) || !isset($request["specific"])){
         $error_message["unset_input"] = "Unset Inputs";
-        return -1;
+        return 0;
     }
     if(!isset($request["user_id"]) || !isset($request["group_id"])){
         $error_message["unset_id"] = "Unset Ids";
-        return -2;
+        return 0;
     }
     if(validate_user_group_in_db($request["user_id"] , $request["group_id"] , $pdo) !== 1){
         $error_message["invalid_ids"] = "Invalid Selected User or Group";
-        return -3;
+        return 0;
     }
     if(validate_external_inputs($request , "default" , " equipment " , $pdo , $error_message) !== 1)
-        return -4;
+        return 0;
     if(validate_external_inputs($request , "specific" , " " . $request["equipment_type"] , $pdo , $error_message) !== 1)
-        return -5;
+        return 0;
+    return 1;
+}
+
+function validate_external_update_inputs($request , $pdo , &$error_message){
+    if(!isset($request["equipment_id"])){
+        $error_message["eq_not_selected"] = "User didnt Select an Equipment";
+        return 0;
+    }
+    if(validate_equipment_in_db($request["equipment_id"] , $pdo) === 0){
+        $error_message["eq_not_exists"] = "User Selected an Equipment that Doesnt Exist";
+        return 0;
+    }
+    if(validate_user_group_in_db($request["user_id"] , $request["group_id"] , $pdo) !== 1){
+        $error_message["user_not_exists"] = "User Selected a User That doesnt Exist, or is not part of the selected group";
+        return 0;
+    }
+    if(isset($request["default"])){
+        if(validate_external_inputs($request , "default" , " equipment " , $pdo , $error_message) !== 1)
+            return 0;
+    }
+    if(isset($request["specific"])){
+        if(validate_external_inputs($request , "specific" , " " . $request["equipment_type"] . " " , $pdo , $error_message) !== 1)
+            return 0;
+    }
+    if(!isset($request["default"]) && !isset($request["specific"])){
+        $error_message["No_query"] = "No Queries have been input";
+        return 0;
+    }
+    return 1;
+}
+
+function validate_external_delete_inputs($request , $pdo , &$error_message){
+    $error_message = array();
+    if(!isset($request["user_id"])){
+        $error_message["unset_user"] = "Unset User Id";
+        return 0;
+    }
+    if(!isset($request["group_id"])){
+        $error_message["unset_group"] = "Unset Group Id";
+        return 0;
+    }
+    if(!isset($request["equipment_id"])){
+        $error_message["unset_id"] = "Unset Equipment Id";
+        return 0;
+    }
+    if(validate_user_group_in_db($request["user_id"] , $request["group_id"] , $pdo) !== 1){
+        $error_message["invalid_ids"] = "Invalid Selected User or Group";
+        return 0;
+    }
+    $equipment_guard = validate_equipment_in_db($request["equipment_id"] , $pdo);
+    switch($equipment_guard){
+        case 1:
+            return 1;
+        //more than one user , or group is associated to this equipment
+        case 2:
+            return -1;
+        //no equipment exists with the requested values
+        case 0:
+            $error_message["error"] = "Server Error";
+            return -2;
+        //thats weird the code didnt work properly 
+        default:
+            $error_message["error"] = "Server Error";
+            return 0;
+    }
     return 1;
 }
 

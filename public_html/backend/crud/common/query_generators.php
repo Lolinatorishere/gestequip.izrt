@@ -1,5 +1,19 @@
 <?php
 
+function equipment_search_query_parse_inputs($queries){
+    $sql = "";
+    $i = 1;
+    $total_parameters = count($queries);
+    foreach($queries as $key => $value){
+        $sql .= "`". $key ."`" . " LIKE '" . $value . "%' ";
+        if($i < $total_parameters){
+            $sql .= " AND ";
+        }
+        $i++;
+    }
+    return $sql;
+}
+
 function multi_query_request_generator($fetch , $table , $what_in , $specific){
     $ret = array();
     $internal_fetch = count($fetch);

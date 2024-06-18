@@ -1,4 +1,7 @@
 <?php
+
+include_once query_generator_dir;
+
 function create_equipment_create_insertion($request , $db_table , $input_type){
     $values = array();
     $columns = array();
@@ -77,21 +80,9 @@ try{
     if($validation_guard !== 1){
         $loggable["type"] = "Input_Error";
         $loggable["status"] = "Warning";
-        switch($validation_guard){
-            case -1:
-                break;
-            case -2:
-                break;
-            case -3:
-                break;
-            case -4:
-                break;
-            case -5:
-                break;
-            default:
-                $loggable["status"] = "Error";
-                $loggable["exception"]["validation"] = "Invalid Validation Check, check validation code for possible bugs";
-                break;
+        if($validation_guard !== 0){
+            $loggable["status"] = "Error";
+            $loggable["exception"]["validation"] = "Invalid Validation Check, check validation code for possible bugs";
         }
         throw new Exception("Validation", 1);
     }

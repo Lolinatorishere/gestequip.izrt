@@ -29,19 +29,11 @@ function create_request($data_request , $tab , $user_id , $pdo){
 }
 
 function update_request($data_request , $tab , $user_id , $pdo){
-    switch($tab){
-        case "yur_eq":
-            return external_update_equipment($data_request , $pdo);
-        case "grp_eq":
-            return external_update_equipment($data_request , $pdo);
-    }
-    $data_request["error"] = "error";
-    return $data_request;
+    return external_update_equipment($data_request , $pdo);
 }
 
-function delete_request(){
-    $data_request["error"] = "error";
-    return $data_request;
+function delete_request($data_request , $tab , $user_id , $pdo){
+    return external_delete_equipment($data_request , $pdo);
 }
 
 // function to handle crud requests from tabs

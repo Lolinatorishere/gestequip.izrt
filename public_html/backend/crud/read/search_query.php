@@ -1,18 +1,6 @@
 <?php
 
-function equipment_search_query_parse_inputs($queries){
-    $sql = "";
-    $i = 1;
-    $total_parameters = count($queries);
-    foreach($queries as $key => $value){
-        $sql .= "`". $key ."`" . " LIKE '" . $value . "%' ";
-        if($i < $total_parameters){
-            $sql .= " AND ";
-        }
-        $i++;
-    }
-    return $sql;
-}
+include_once query_generator_dir;
 
 function equipment_search_query_get_previous_equipment_ids($db_responses , $pdo){
     $equipment_ids = array();

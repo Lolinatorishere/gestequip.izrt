@@ -62,6 +62,40 @@ function page_check(&$request){
     return;
 }
 
+function get_pre_altered_equipment_information($data_request , $pdo){
+    $previous_info = array();
+    if(isset($data_request["default"])){
+        $request = array("fetch" => " * "
+                         ,"table" => " equipment "
+                         ,"counted" => 1
+                         ,"specific" => "id=\"" . $data_request["equipment_id"] . "\""
+                     );
+        $previous_info["default"] = get_query($request , $pdo)["items"];
+    }
+    if(isset($data_request["default"])){
+        $request = array("fetch" => " * "
+            ,"table" => $data_request["equipment_type"]
+            ,"counted" => 1
+            ,"specific" => "equipment_id=\"" . $data_request["equipment_id"] . "\""
+        );
+        $previous_info["specific"] = get_query($request , $pdo)["items"];
+    }
+    if(isset($data_request["user_permission_level"])){
+        printLog("lasdnfasdjhf");
+        $request = array("fetch" => " * "
+                      ,"table" => " users_inside_groups_equipments "
+                      ,"counted" => 1
+                      ,"specific" => " equipment_id=" . $data_request["equipment_id"]
+                                     . " group_id=" . $data_request["group_id"]
+                                     . " user_id=" . $data_request["user_id"]
+                      );
+        $previous_info["user_group_equipment"] = get_query($request , $pdo)["items"];
+    }
+    return $previous_info;
+}
+
+
+
 function printLog($log){
     error_log(print_r($log,true));
 }
