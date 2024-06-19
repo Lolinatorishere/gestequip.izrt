@@ -39,7 +39,7 @@ function unaltered_equipment_information_reference($data_request , $pdo){
    return $previous_info;
 }
 
-function external_delete_equipment($data_request , $pdo){
+function delete_equipment($data_request , $pdo){
 try{
     $loggable = array("origin" => "Equipment_Delete"
                      ,"type" => ""
@@ -107,7 +107,7 @@ try{
             $delete_specific_request = array("table" => $equipment_type
                                             ,"specific" => "equipment_id=" . $data_request["equipment_id"]
                                             );
-            $delete = delete_equipment($delete_specific_request, $pdo);
+            $delete = delete_query($delete_specific_request, $pdo);
             if(isset($delete["PDOException"]))
                 throw new PDOException($update["PDOException"]);
             $loggable["message"]["deletion_request"] = $delete_specific_request;
@@ -119,7 +119,7 @@ try{
             $delete_default_request = array("table" => " equipment "
                                            ,"specific" => "id=" . $data_request["equipment_id"]
                                            );
-            $delete = delete_equipment($delete_default_request, $pdo);
+            $delete = delete_query($delete_default_request, $pdo);
             if(isset($delete["PDOException"]))
                 throw new PDOException($update["PDOException"]);
             $loggable["message"]["default"] = $delete_default_request;
@@ -131,7 +131,7 @@ try{
             $delete_user_reference_request = array("table" => " users_inside_groups_equipments "
                                                   ,"specific" => "equipment_id=" . $data_request["equipment_id"]
                                                   );
-            $delete = delete_equipment($delete_user_reference_request , $pdo);
+            $delete = delete_query($delete_user_reference_request , $pdo);
             if(isset($delete["PDOException"]))
                 throw new PDOException($update["PDOException"]);
             $loggable["message"]["reference"] = $delete_user_reference_request;
@@ -148,7 +148,7 @@ try{
                                                                . " AND group_id=" . $data_request["group_id"]
                                                                . " AND user_id=" . $data_request["user_id"]
                                                   );
-            $delete = delete_equipment($delete_user_reference_request , $pdo);
+            $delete = delete_query($delete_user_reference_request , $pdo);
             if(isset($delete["PDOException"]))
                 throw new PDOException($update["PDOException"]);
             $loggable["message"]["deletion_request"] = $delete_user_reference_request;
@@ -194,27 +194,6 @@ try{
     }
     create_log($loggable , "equipment_logs" , $pdo);
     return $ret;
-}
-}
-
-function delete_equipment($request , $pdo){
-try{
-    $sql_error = array("error" => "error");
-    if(isset($request["error"]))
-        return $sql_error;
-    $ret = array();
-    $sql = common_delete_query($request);
-    if($sql == "error")
-        return $sql_error;
-    $statement = $pdo->prepare($sql);
-    $statement->execute();
-    if(!$statement)
-        return $sql_error;
-    $ret["success"] = "success";
-    return $ret;
-}catch(PDOException $e){
-    error_log(print_r($e,true));
-    return $sql_error;
 }
 }
 

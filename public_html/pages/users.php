@@ -1,4 +1,5 @@
 <?php
+session_start();
 if($_SESSION["user_type"] !== "Admin"){
     header("location: /pages/dashboard.php");
     exit;

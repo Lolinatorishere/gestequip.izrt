@@ -1,39 +1,37 @@
 <?php
 
+if($_SESSION["user_type"] !== "Admin"){
+    die;
+}
+
 function read_request($tab , &$data_request , $user_id , $pdo){
-    $group_ids = '';
-    $user_ids = '';
-    $equipment_ids ='';
     $data = array();
     switch($tab){
-        case "yur_eq":
-            return read_request_yur($data_request , $pdo , $user_id);
-        case "grp_eq":
-            return read_request_grp($data_request , $pdo , $user_id);
-        case "sch_eq":
-            return read_request_sch($data_request , $pdo , $user_id);
-        case 'add_eq':
+        case "allusr":
+            return read_request_usr($data_request , $pdo , $user_id);
+        case "addusr":
             return read_request_add($data_request , $pdo , $user_id);
+        case "schusr":
+            return read_request_sch($data_request , $pdo , $user_id);
+        case 'delusr':
+            return read_request_del($data_request , $pdo , $user_id);
+        case 'logusr':
+            return read_request_log($data_request , $pdo , $user_id);
         }
     $data_request["error"] = "error";
     return $data_request;
 }
 
 function create_request($data_request , $tab , $user_id , $pdo){
-    switch($tab){
-        case "add_eq":
-            return create_equipment($data_request , $pdo);
-    }
-    $data_request["error"] = "error";
-    return $data_request;
+    return create_user($data_request , $pdo);
 }
 
 function update_request($data_request , $tab , $user_id , $pdo){
-    return update_equipment($data_request , $pdo);
+    return external_update_user($data_request , $pdo);
 }
 
 function delete_request($data_request , $tab , $user_id , $pdo){
-    return delete_equipment($data_request , $pdo);
+    return external_delete_user($data_request , $pdo);
 }
 
 // function to handle crud requests from tabs
@@ -61,10 +59,9 @@ function data_request($tab , $pdo , $user_id){
 }
 
 function ui_request($ui){
-    $dir = '/var/www/html/gestequip.izrt/public_html/frontend/iframes/equipment/tabs/';
+    $dir = '/var/www/html/gestequip.izrt/public_html/frontend/iframes/user/tabs/';
     if(ui_refresh_origin() == 1){
         $ui_dir = preg_replace('/[^a-zA-Z\/_]/s' , '' , $_GET["rfsh"]);
-        $ui_dir3 = preg_replace('/[^a-zA-Z\/_]/s' , '' , $_GET["rgin"]);
         $dir .= $ui_dir . '.html';
         return file_get_contents($dir);
     }

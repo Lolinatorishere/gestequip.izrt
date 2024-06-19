@@ -34,7 +34,7 @@ function get_pre_updated_equipment_information($data_request , $pdo){
 }
 
 // i swear to god im jumping off a cliff due to stupidity
-function external_update_equipment($data_request , $pdo){
+function update_equipment($data_request , $pdo){
     $loggable = array("origin" => "Equipment_Update"
                      ,"type" => ""
                      ,"status" => ""
@@ -80,7 +80,7 @@ try{
             ,"values" => $values
             ,"specific" => "id =" . $data_request["equipment_id"]
         );
-        $update = update_equipment($request , $pdo);
+        $update = update_query($request , $pdo);
         if(isset($update["PDOException"]))
             throw new PDOException($update["PDOException"]);
         foreach($data_request["default"] as $key => $value){
@@ -105,7 +105,7 @@ try{
                         ,"values" => $values
                         ,"specific" => "equipment_id =" . $data_request["equipment_id"]
                         );
-        $update = update_equipment($request , $pdo);
+        $update = update_query($request , $pdo);
         if(isset($update["PDOException"]))
             throw new PDOException($update["PDOException"]);
         foreach($data_request["specific"] as $key => $value){
@@ -126,7 +126,7 @@ try{
                                      . " group_id=" . $data_request["group_id"]
                                      . " user_id=" . $data_request["user_id"]
                         );
-        $update = update_equipment($request , $pdo);
+        $update = update_query($request , $pdo);
         if(isset($update["PDOException"]))
             throw new PDOException($update["PDOException"]);
         array_push($internal_message , "user permission level updated");
@@ -174,21 +174,4 @@ try{
 }
 }
 
-function update_equipment($request , $pdo){
-try{
-    $sql_error = array("error" => "error");
-    $ret = array();
-    if($request === "error")
-        return $sql_error;
-    $sql = common_update_query($request);
-    $statement = $pdo->prepare($sql);
-    $statement->execute();
-    $ret["success"] = "success";
-    return $ret;
-}catch(PDOException $e){
-    error_log(print_r($e,true));
-    $sql_error["PDOException"] = $e;
-    return $sql_error;
-}
-}
 ?>

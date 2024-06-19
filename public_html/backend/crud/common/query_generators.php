@@ -14,6 +14,34 @@ function equipment_search_query_parse_inputs($queries){
     return $sql;
 }
 
+function create_insertion_generator($request , $db_table , $input_type){
+    $values = array();
+    $columns = array();
+    foreach($request[$input_type] as $key => $value){
+        $column = "`" . $key . "`";
+        if(is_bool($value)){
+            if($value === true){
+                $value = 1;
+            }
+            if($value === false){
+                $value = 0;
+            }
+        }
+        $input = "'" . $value . "'";
+        array_push($columns, $column);
+        array_push($values, $input);
+    }
+    if(count($columns) !== count($values))
+        return 0;
+    $create_request = array("multiple" => 1
+                           ,"table" => $db_table
+                           ,"columns" => $columns
+                           ,"values" => $values
+                           );
+    return common_insert_query($create_request);
+}
+
+
 function multi_query_request_generator($fetch , $table , $what_in , $specific){
     $ret = array();
     $internal_fetch = count($fetch);

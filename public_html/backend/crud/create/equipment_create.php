@@ -2,34 +2,6 @@
 
 include_once query_generator_dir;
 
-function create_equipment_create_insertion($request , $db_table , $input_type){
-    $values = array();
-    $columns = array();
-    $total_specific_inputs = count($request[$input_type]);
-    foreach($request[$input_type] as $key => $value){
-        $column = "`" . $key . "`";
-        if(is_bool($value)){
-            if($value === true){
-                $value = 1;
-            }
-            if($value === false){
-                $value = 0;
-            }
-        }
-        $input = "'" . $value . "'";
-        array_push($columns, $column);
-        array_push($values, $input);
-    }
-    if(count($columns) !== count($values))
-        return 0;
-    $create_request = array("multiple" => 1
-                           ,"table" => $db_table
-                           ,"columns" => $columns
-                           ,"values" => $values
-                           );
-    return common_insert_query($create_request);
-}
-
 function create_equipment_users_groups_insertion($request , $equipment_id){
     $columns = array(" `user_id`, `group_id`, `equipment_id`, `user_permission_level`, `status`");
     $values = array();
@@ -83,11 +55,11 @@ try{
         if($validation_guard !== 0){
             $loggable["status"] = "Error";
             $loggable["exception"]["validation"] = "Invalid Validation Check, check validation code for possible bugs";
-        }
+        } 
         throw new Exception("Validation", 1);
     }
     $request["default"]["equipment_type"] = get_equipment_type($request["equipment_type"] , $pdo , "id");
-    $sql = create_equipment_create_insertion($request , " equipment " , "default");
+    $sql = create_insertion_metacode($request , " equipment " , "default");
     try{
         $statement = $pdo->prepare($sql);
         $statement->execute();
@@ -102,7 +74,7 @@ try{
     }
     try{
         $request["specific"]["equipment_id"] = $equipment_id;
-        $sql = create_equipment_create_insertion($request , " " . $request["equipment_type"] , "specific");
+        $sql = create_insertion_metacode($request , " " . $request["equipment_type"] , "specific");
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $specifics_id = $pdo->lastInsertId();
