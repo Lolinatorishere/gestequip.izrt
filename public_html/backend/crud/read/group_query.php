@@ -3,6 +3,11 @@
 include_once query_generator_dir;
 include_once common_funcs;
 
+function get_users_groups($user_id , $pdo){
+    
+    $user_inside_groups = get_queries($request , $pdo);
+}
+
 // gets all the equipments from certain ids
 function get_groups($request , $pdo){
 try{

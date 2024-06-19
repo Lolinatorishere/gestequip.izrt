@@ -12,7 +12,7 @@ function describe_table($request , $pdo){
     $statement->execute();
     if(!$statement)
         return $sql_error;
-    $ids = $statement->fetchAll();
+    $ids = $statement->fetchAll(PDO::FETCH_ASSOC);
     $ret["success"] = "success";
     $ret["items"] = $ids;
     return $ret;

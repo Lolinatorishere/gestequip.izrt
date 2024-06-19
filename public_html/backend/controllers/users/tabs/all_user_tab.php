@@ -1,6 +1,7 @@
 <?php
 
-function on_request_all_load($data_request , $pdo , $user_id){
+function on_request_all_load($data_request , $pdo){
+    $ret = array();
     $user_return = " id , username , users_name , email , phone_number , regional_indicator , date_created , account_status";
     $request = array("fetch" => $user_return
                     ,"table" => " users "
@@ -17,13 +18,30 @@ function on_request_all_load($data_request , $pdo , $user_id){
     return $all_users;
 }
 
-function read_request_usr($data_request , $pdo , $user_id){
+function on_request_all_refresh($data_request , $pdo){
+    switch($data_request["refresh"]){
+        case: 'group':
+            $request = array("fetch" => " * "
+                            ,"table" => " users_inside_groups "
+                            ,"table" => " "
+                            )
+            return $user_groups;
+            break;
+    }
+}
+
+function read_request_usr($data_request , $pdo){
     if($_SESSION["user_type"] !== "Admin"){
         return array("Error" => "Error", "Auth_Error" => "Error");
     }
     // what queries can data specific have:
-    //$data_specific = array("default" => array(),types" => array(),"groups" => array(),"users" => akrrayrray(),"user" => array(),"types_specific" => array());
-    return on_request_all_load($data_request , $pdo , $user_id);
+    //$data_specific = array("user" => array() ,"group_id" = "");
+    if(!isset($data_request["refresh"])){
+        return on_request_all_load($data_request , $pdo , $user_id);
+    }else{
+        return on_request_all_refresh($auth_groups , $data_request , $pdo , $user_id);
+    }
+    
 }
 
 ?>

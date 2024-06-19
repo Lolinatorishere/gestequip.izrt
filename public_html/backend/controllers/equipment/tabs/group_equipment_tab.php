@@ -40,8 +40,7 @@ function full_group_equipment_user_data($users_groups_equipments , $equipments ,
         foreach($groups["items"] as $group){
             if($group["id"] === $usr_grp_eq["group_id"]){
                 $gp_info = array();
-                foreach ($group as $key => $value) {
-                    if($key === "id"){
+                foreach ($group as $key => $value) { if($key === "id"){
                         $gp_info["group_id"] = $value;
                         continue;
                     }
@@ -62,6 +61,7 @@ function full_group_equipment_user_data($users_groups_equipments , $equipments ,
 }
 
 function read_request_grp($data_request , $pdo , $user_id){
+    $data_request["requests"] = array();
     $user_group_info = $_SESSION["group_auth"];
     // turn the ids from the fetched groups into a string that 
     // can be read by mysql
@@ -105,7 +105,22 @@ function read_request_grp($data_request , $pdo , $user_id){
                     ,"counted" => 1
                     );
     $links = get_queries($request , $pdo);
-    // Main query for items
+    $request = array("fetch" => " * "
+                    ,"table" => " equipment_types "
+                    ,"counted" => 1
+                    );
+    $equipment_types = get_queries($request , $pdo);
+    for($i = 0 ; $i < count($equipment_types) ; $i++){
+        $table = array("users_inside_groups_equipments" , "equipment" , $equipment_types["items"][$i]["equipment_type"]);
+        $request = array("fetch" => " * "
+                        ,"table" => $table
+                        ,"values" => array("equipment_id" , "id" , "equipment_id")
+                        ,"specific" => " users_inside_groups_equipments.user_id = " . $user_id
+                        );
+        array_push($data_request["requests"] , $request); 
+    }
+
+     // Main query for items
     $data_request["fetch"] = " * ";
     $data_request["table"] = " users_inside_groups_equipments ";
     $data_request["specific"] = equipment_sql_query_metacode($equipment_groups_users_info["items"]);
@@ -114,9 +129,9 @@ function read_request_grp($data_request , $pdo , $user_id){
                     ,"table" => " equipment_types"
                     ,"counted" => 1
                     );
-    $equipment_types = get_queries($request , $pdo);
     // Hydrate the request with aditional information to be sent to the frontend
     $group_equipments = full_group_equipment_user_data($links , $equipments_info , $users_info , $groups_info);
+
     $data_specific = array("group_equipments" => $group_equipments
                           ,"equipment_types" => $equipment_types
                           );

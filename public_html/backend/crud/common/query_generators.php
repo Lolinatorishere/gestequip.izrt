@@ -190,6 +190,57 @@ function convert_to_array(&$input){
     $input = array($input);
 }
 
+function join_select_query($request){
+try{
+    if(count($request["table"]) < 2)
+        return "error";
+    if(count($request["table"]) != count($request["values"]))
+        return "error";
+    if(!isset($request["current_page"])){
+        if(isset($request["paging"]))
+            $request["paging"] = 1;
+        $request["current_page"] = 1;
+        if(isset($request["page"])){
+            $request["current_page"] = $request["page"];
+        }
+    }
+    if(!isset($request["limit"])){
+        $request["limit"] = 20;
+    }
+    $sql = " SELECT ";
+    if(!isset($request["counted"]) && !isset($request["total_items"])){
+        $sql .= (" COUNT(*) AS ibtt_total ");
+    }else{
+        $sql .= $request["fetch"];
+    }
+        $sql .= " FROM ";
+    $sql .= $request["table"][0];
+    for($i = 1 ; $i < count($request["table"]) ; $i++){
+        $sql .= " JOIN " . $request["table"][$i]
+              . " ON "
+              . $request["table"][$i-1] . "." . $request["values"][$i-1] 
+              . " = "
+              . $request["table"][$i] . "." . $request["values"][$i];
+    }
+    if(!isset($request["specific"]))
+        return $sql;
+    if(!is_array($request["specific"])){
+        $sql .= " WHERE "
+            . $request["specific"];
+    }
+    if(isset($request["paging"])){
+        $limit = $request["limit"];
+        $page = $request["current_page"];
+        $sql .= " LIMIT " . $limit
+             .  " OFFSET " . ($page-1) * $limit;
+    }
+    return $sql;
+}catch(TypeError $e){
+    error_log(print_r($e , true));
+    return "error";
+}
+}
+
 function common_select_query($request){
 try{
     if(!isset($request["current_page"])){
@@ -221,12 +272,12 @@ try{
     if(!is_array($request["specific"])){
         $sql .= " WHERE "
             . $request["specific"];
-        if(isset($request["paging"])){
-            $limit = $request["limit"];
-            $page = $request["current_page"];
-            $sql .= " LIMIT " . $limit
-                .  " OFFSET " . ($page-1) * $limit;
-        }
+    }
+    if(isset($request["paging"])){
+        $limit = $request["limit"];
+        $page = $request["current_page"];
+        $sql .= " LIMIT " . $limit
+             .  " OFFSET " . ($page-1) * $limit;
     }
     return $sql;
 }catch(TypeError $e){

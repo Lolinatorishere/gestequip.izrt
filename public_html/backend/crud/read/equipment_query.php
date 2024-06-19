@@ -27,21 +27,57 @@ function get_equipment_type($equipment_type , $pdo , $type){
     }
 }
 
+function get_equipments_foreach($requests , $request){
+    $sql_array = array();
+    foreach($requests as $requester){
+        if(isset($request["total_items"])){
+            $requester["counted"] = 1;
+        }
+        array_push($sql_array , join_select_query($requester));
+    }
+    return $sql_array;
+}
+
+function get_equipments_query($union_sql , $request){
+    $sql = "("
+          .  $union_sql
+          . ") ";
+    if(isset($request["paging"])){
+        printLog($request);
+        $limit = $request["limit"];
+        $page = $request["page"];
+        $sql .= " LIMIT " . $limit
+             .  " OFFSET " . ($page-1) * $limit;
+    }
+    return $sql;
+}
+
 // gets all the equipments from certain ids
 function get_equipments($request , $pdo){
 try{
     $sql_error = array("error" => "error");
-    if(isset($request["error"]))
-        return $sql_error;
     if(!isset($request["limit"]))
         $request["limit"] = 20;
+    $sql = "";
     $ret = array();
     $equipment_all = array();
+    $sql_array = array();
     // the reason this table exists is because it simplifies the querying 
     // of the equipments of a group or its users
     page_check($request);
-    $sql = common_select_query($request);
-    // request is unavailable
+    printLog($request);
+    $requests = $request["requests"];
+    $sql_array = get_equipments_foreach($requests , $request);
+    if(!isset($request["total_items"])){
+        $sql = "SELECT SUM(ibtt_total) as total_items FROM (";
+        $sql .= union_generator($sql_array);
+        $sql .= ") as sum_queries";
+    }
+    else{
+        $sql = get_equipments_query(union_generator($sql_array) , $request);
+    }
+        //printLog($sql);
+    // request is unavailable 
     if($sql == "")
         return $sql_error;
     $statement = $pdo->prepare($sql);
@@ -54,48 +90,13 @@ try{
         $request["counted"] = 1;
         $request["page"] = 1;
         $request["pages"] = ceil($request["total_items"] / $request["limit"]);
-        $sql = common_select_query($request);
+        $sql_array = get_equipments_foreach($requests , $request);
+        $sql = get_equipments_query(union_generator($sql_array) , $request);
         $statement = $pdo->prepare($sql);
+        printLog($sql);
         $statement->execute();
     }
-    $equipment_ids = $statement->fetchAll(PDO::FETCH_ASSOC);
-    foreach($equipment_ids as $eq_ids){
-        $sql = "SELECT *
-                from equipment
-                where id = ?";
-        $statement = $pdo->prepare($sql);
-        if(!$statement)
-            return $sql_error;
-        $statement->bindParam(1 , $eq_ids["equipment_id"] , PDO::PARAM_INT);
-        $statement->execute();
-        if(!$statement)
-            return $sql_error;
-        $equipment = $statement->fetch(PDO::FETCH_ASSOC);
-        if(!$statement)
-            return $sql_error;
-        $sql = "SELECT *
-                FROM ";
-        $table = get_equipment_type($equipment["equipment_type"] , $pdo , "name");
-        if($table === "error")
-            continue;
-        $sql .= $table;
-        $sql .= " WHERE equipment_id = ?";
-        $statement = $pdo->prepare($sql);
-        if(!$statement)
-            return $sql_error;
-        $statement->bindParam(1 , $equipment["id"] , PDO::PARAM_INT);
-        $statement->execute();
-        if(!$statement)
-            return $sql_error;
-        $equipment_spec = $statement->fetch(PDO::FETCH_ASSOC);
-        if(!$statement)
-            return $sql_error;
-        $item = array();
-        $equipment_spec["user_permission_level"] = $eq_ids["user_permission_level"];
-        $equipment_spec["equipment_group"] = $eq_ids["group_id"];
-        array_push($item, $equipment , $equipment_spec);
-        array_push($equipment_all , query_merge_array($item));
-    };
+    $equipment_all = $statement->fetchAll(PDO::FETCH_ASSOC);
     $ret["items"] = $equipment_all;
     $ret["pages"] = $request["total_pages"];
     $ret["current_page"] = $request["page"];
