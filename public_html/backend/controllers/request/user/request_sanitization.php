@@ -2,13 +2,20 @@
 
 function tab_create_information_sanitize($tab , $user_id , $pdo){
     $data_request = array();
-    $password = $_POST["user"]["password"];
+    $password = $_POST["user"]["pass"];
     $data_request = sanitize_query($_POST);
     if(isset($_POST["selected_group"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["selected_group"]["group_id"]);
         unset($data_request["selected_group"]);
     }
-    $data_request["user"]["password"] = $password;
+    if(isset($_POST["selected_virtual"])){
+        $data_request["virtual"] = preg_replace('/[^a-zA-Z0-9]/s' , '' , $_POST["selected_virtual"]["virtual"]);
+        unset($data_request["selected_virtual"]);
+    }
+    if(isset($data_request["user"]["pass"])){
+       $data_request["user"]["pass"] = "0";
+    }
+    $data_request["pass"] = $password;
     return create_request($data_request , $tab , $user_id , $pdo);
 }
 

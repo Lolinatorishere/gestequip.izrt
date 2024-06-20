@@ -20,13 +20,8 @@ function on_request_all_load($data_request , $pdo){
 
 function on_request_all_refresh($data_request , $pdo){
     switch($data_request["refresh"]){
-        case: 'group':
-            $request = array("fetch" => " * "
-                            ,"table" => " users_inside_groups "
-                            ,"table" => " "
-                            )
-            return $user_groups;
-            break;
+        case 'group':
+            return get_users_groups($data_request , $pdo);
     }
 }
 
@@ -37,9 +32,9 @@ function read_request_usr($data_request , $pdo){
     // what queries can data specific have:
     //$data_specific = array("user" => array() ,"group_id" = "");
     if(!isset($data_request["refresh"])){
-        return on_request_all_load($data_request , $pdo , $user_id);
+        return on_request_all_load($data_request , $pdo);
     }else{
-        return on_request_all_refresh($auth_groups , $data_request , $pdo , $user_id);
+        return on_request_all_refresh($data_request , $pdo);
     }
     
 }

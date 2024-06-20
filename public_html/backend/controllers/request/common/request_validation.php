@@ -63,7 +63,7 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
                     }
                 }
                 try{
-                    if(preg_match('/^date.*' , $table["items"][$i]["Type"])){
+                    if(preg_match('/^date.*/' , $table["items"][$i]["Type"])){
                         list($year , $month , $day) = explode('-', $request[$check][$key]);
                         if(!checkdate($month , $day , $year)){
                             $error_message[$key] =  $key . " invalid date";

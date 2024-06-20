@@ -1,7 +1,34 @@
 <?php
 
 function validate_external_create_inputs($request , $pdo , &$error_message){
-    $error_message = array();
+    if(!isset($request["virtual"])){
+        $error_message["invalid_inputs"] = "Incomplete Request";
+        return 0;
+    }
+    if(!isset($request["user"]["email"])){
+        if($request["virtual"] !== "1"){
+            $error_message["unset_email"];
+        }
+    }
+    if(!filter_var($request["user"]["email"] , FILTER_VALIDATE_EMAIL)){
+        if($request["virtual"] !== "1"){
+            $error_message["invalid_email"] = "Invalid Email Inserted";
+            $error_message["virtual"] = $request["virtual"];
+            return 0;
+        }
+    }
+    if($request["user"]["email"] === ""){
+        $request["user"]["pass"] = "null";
+    }
+    if(!isset($request["user"]["pass"])){
+        if($request["virtual"] !== "1"){
+            $error_message["unset_password"] = "The users password has not been set";
+            return 0;
+        }
+    }
+    if($request["user"]["pass"] === ""){
+        $request["user"]["pass"] = "null";
+    }
     if(validate_external_inputs($request , "user" , " users " , $pdo , $error_message) !== 1)
         return 0;
     return 1;

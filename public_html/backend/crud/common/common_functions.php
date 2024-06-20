@@ -46,6 +46,30 @@ function parse_equipment_type_columns($columns){
 }
 
 
+function parse_users_type_columns($columns){
+    $parsed_columns = array();
+    $i = 1;
+    foreach($columns as $column){
+        if($column["Key"] === "PRI")
+            continue;
+        if($column["Key"] === "MUL")
+            continue;
+        if(isset($column["Default"]))
+            continue;
+        if($column["Field"] === "id")
+            continue;
+        if($column["Field"] === "equipment_id")
+            continue;
+        if($column["Field"] === "date_created")
+            continue;
+        $column = merge_arrays($column);
+        array_push($parsed_columns , $column);
+    }
+    return $parsed_columns;
+}
+
+
+
 function page_check(&$request){
     if(!isset($request["total_pages"])){
         $request["total_pages"] = 1;

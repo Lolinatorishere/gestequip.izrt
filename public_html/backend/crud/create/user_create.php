@@ -15,15 +15,17 @@ try{
                      ,"exception" => array()
                      ,"message" => array()
                      ,"action_by_user_id" => $_SESSION["id"]
-                     ,"group_id" => $request["group_id"]
+                     ,"group_id" => $data_request["group_id"]
                      );
-    $loggable["message"]["userInput"] = $request;
+    $loggable["message"]["userInput"] = $data_request;
     if($_SESSION["user_type"] !== "Admin")
         throw new Exception("Authentication");
-    if(validate_external_create_inputs($data_request , $pdo , $error_message) !== 1)
+    $validation_guard = validate_external_create_inputs($data_request ,  $pdo , $error_message);
+    if($validation_guard !== 1)
         throw new Exception("Validation");
     try{
-        $sql = create_insertion_generator($request , " users " , "user" );
+        //todo make it so the insertion generator has a PDO function kek
+        $sql = create_insertion_generator($data_request , " users " , "user" );
         printLog($sql);
     }catch(PDOException $e){
         

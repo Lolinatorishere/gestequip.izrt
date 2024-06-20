@@ -43,7 +43,6 @@ function get_equipments_query($union_sql , $request){
           .  $union_sql
           . ") ";
     if(isset($request["paging"])){
-        printLog($request);
         $limit = $request["limit"];
         $page = $request["page"];
         $sql .= " LIMIT " . $limit
