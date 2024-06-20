@@ -70,7 +70,7 @@ try{
         $loggable["exception"]["PDOMessage"] = $e->getMessage();
         $loggable["message"]["request"] = $request;
         $loggable["message"]["sql"] =  $sql;
-        throw new Exception("Server Error : C0001");
+        throw new Exception("Server_Error_CE0001");
     }
     try{
         $request["specific"]["equipment_id"] = $equipment_id;
@@ -90,7 +90,7 @@ try{
         $loggable["message"]["request"] = $request;
         $loggable["message"]["sql"] =  $sql;
         $loggable["exception"]["PDOMessage"] = $e->getMessage();
-        throw new Exception("Server Error : C0002");
+        throw new Exception("Server_Error_CE0002");
     }
     try{
         $update_request = array("table" => " equipment "
@@ -113,7 +113,7 @@ try{
         $loggable["message"]["request"] = $request;
         $loggable["message"]["sql"] =  $sql;
         $loggable["exception"]["PDOMessage"] = $e->getMessage();
-        throw new Exception("Server Error : C0003");
+        throw new Exception("Server_Error_CE0003");
     }
     try{
         $sql = create_equipment_users_groups_insertion($request , $equipment_id);
@@ -157,6 +157,7 @@ try{
                 $loggable["equipment_id"] = $equipment_id;
                 $loggable["exception"]["incomplete_creation"] = "The following equipment had an error inserting information " . $equipment_id;
             }
+            $loggable["exception"]["thrown_exception"] = $e->getMessage();
             $loggable["message"]["user_inputs"] = $request;
             $ret["server_message"] = "Opperation could not Be Completed";
             $ret["message"] = $e->getMessage();
