@@ -24,7 +24,6 @@ function get_all_auth_users($request , $pdo){
     if(!isset($request["total_items"])){
         $sql = "SELECT count(*) FROM (" . $union . ") AS result_table";
         $statement = $pdo->prepare($sql);
-        printLog($sql);
         $statement->execute();
         $union_total = $statement->fetch()[0];
         $request["counted"] = 1;

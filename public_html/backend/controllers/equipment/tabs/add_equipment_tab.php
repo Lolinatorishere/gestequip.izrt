@@ -58,7 +58,7 @@ function on_request_add_refresh($auth_groups , $data_request , $pdo , $user_id){
                             ,"specific" => " group_id = " . $data_request["origin"]
                             ,"limit" => 8
                         );
-            $group_users = get_users($request , $pdo);
+            $group_users = get_queries($request , $pdo);
             $data_specific["users"] = $group_users;
             return $data_specific;
         case "eq_tables":

@@ -45,8 +45,10 @@ try{
                      );
     $loggable["message"]["userInput"] = $request;
     // Chacks User Authentication
-    if(user_group_request_authentication($request , $pdo) !== 1)
-        throw new Exception("Authentication");
+    if($_SESSION["user_type"]!== "Admin"){
+        if(user_group_request_authentication($request , $pdo) !== 1)
+            throw new Exception("Authentication");
+    }
     // Validates inputs
     $validation_guard = validate_external_create_inputs($request , $pdo , $error_message);
     if($validation_guard !== 1){
@@ -59,7 +61,7 @@ try{
         throw new Exception("Validation", 1);
     }
     $request["default"]["equipment_type"] = get_equipment_type($request["equipment_type"] , $pdo , "id");
-    $sql = create_insertion_metacode($request , " equipment " , "default");
+    $sql = create_insertion_generator($request , " equipment " , "default" , 0);
     try{
         $statement = $pdo->prepare($sql);
         $statement->execute();
@@ -74,7 +76,7 @@ try{
     }
     try{
         $request["specific"]["equipment_id"] = $equipment_id;
-        $sql = create_insertion_metacode($request , " " . $request["equipment_type"] , "specific");
+        $sql = create_insertion_generator($request , " " . $request["equipment_type"] , "specific" , 0);
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $specifics_id = $pdo->lastInsertId();

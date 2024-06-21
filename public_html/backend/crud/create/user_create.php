@@ -18,8 +18,8 @@ try{
                      ,"exception" => array()
                      ,"message" => array()
                      ,"action_by_user_id" => $_SESSION["id"]
-                     ,"group_id" => $data_request["group_id"]
-                     ,"user_id" => "0"
+                     ,"group_id" => " 1 "
+                     ,"user_id" => " 0 "
                      );
     $loggable["message"]["userInput"] = $data_request["user"];
     $loggable["message"]["userInput"]["email"] = $data_request["email"];
@@ -28,8 +28,7 @@ try{
     $validation_guard = validate_external_create_inputs($data_request ,  $pdo , $error_message);
     if($validation_guard !== 1)
         throw new Exception("Validation");
-
-    if($data_request["admin"] === "1" && $data_request["virtual"] === "1"){
+    if($data_request["admin"] == true && $data_request["virtual"] == true){
         $error_message = " You cannot create a virtual admin user";
         throw new Exception("Validation");
     }
@@ -38,11 +37,13 @@ try{
         $statement = $pdo->prepare($sql);
         foreach($data_request["user"] as $key => &$value){
             if($key === "pass"){
-                if($data_request["virtual"] !== "1"){
-                    $statement->bindParam(":" . $key , password_hash($data_request["pass"] , PASSWORD_DEFAULT));
+                if($data_request["virtual"] !== true){
+                    $userpass = password_hash($data_request["pass"] , PASSWORD_DEFAULT);
+                    $statement->bindParam(":" . $key , $userpass , PDO::PARAM_STR);
+                }else{
+                    $password = "virtual";
+                    $statement->bindParam(":" . $key , $password , PDO::PARAM_STR); 
                 }
-                $password = "virtual";
-                $statement->bindParam(":" . $key , $password , PDO::PARAM_STR); 
                 continue;
             }
             if($key === "email"){
@@ -68,7 +69,24 @@ try{
         throw new Exception("Server_Error_CU0001");
     }
     try{
-        if($data_request["admin"] === "1"){
+        $request["data"] = array("user_id" => $user_id
+                                ,"group_id" => "1"
+                                ,"user_permission_level" => "0"
+                                );
+        $sql = create_insertion_generator($request , " users_inside_groups " , "data" , 0);
+        printLog($sql);
+        $statement = $pdo->prepare($sql);
+        $statement->execute();
+    }catch(PDOException $e){
+        printLog($e->getMessage());
+        $request = array("table" => " users " , "specific" => "id=" . $user_id);
+        delete_query($request , $pdo);
+        $loggable["exception"]["PDOMessage"] = $e->getMessage();
+        $loggable["message"]["sql"] =  $sql;
+        throw new Exception("Server_Error_CU0002");
+    }
+    try{
+        if($data_request["admin"] === true){
             if($_SESSION["user_type"] === "Admin"){
                 $request["data"] = array("id_user" => $user_id
                                         ,"admin_status" => "1"
@@ -79,13 +97,12 @@ try{
                 $loggable["message"]["admin"] = "User is an Admin";
             }
         }
-        throw new Exception("User Created");
     }catch(PDOException $e){
         $loggable["exception"]["PDOMessage"] = $e->getMessage();
         $loggable["message"]["sql"] =  $sql;
-        throw new Exception("Server_Error_CU0002");
+        throw new Exception("Server_Error_CU0003");
     }
-        throw new Exception("User_Created");
+    throw new Exception("Created_User");
 }catch(Exception $e){
     switch($e->getMessage()){
         case 'User Created':

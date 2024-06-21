@@ -1,6 +1,7 @@
 <?php
 
 function validate_external_create_inputs($request , $pdo , &$error_message){
+    printLog($request);
     if(!isset($request["virtual"])){
         $error_message["invalid_inputs"] = "Incomplete Request";
         return 0;
@@ -33,6 +34,12 @@ function validate_external_update_inputs($request , $pdo , &$error_message){
     if(validate_user_in_db($request["user_id"] , $pdo) !== 1){
         $error_message = "User does not Exist";
         return 0;
+    }
+    if(isset($request["group_id"])){
+        if(validate_group_in_db($request["group_id"] , $pdo) !== 1){
+            $error_message = "group does not Exist";
+            return 0;
+        }
     }
     if(isset($request["user"]["date_created"])){
         unset($request["user"]["date_created"]);

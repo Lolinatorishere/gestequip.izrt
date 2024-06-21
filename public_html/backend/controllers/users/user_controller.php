@@ -47,6 +47,7 @@ require_once common_crud . "/read/user_query.php";
 require_once common_crud . "/read/search_query.php";
 require_once common_crud . "/update/common_update.php";
 require_once common_crud . "/update/user_update.php";
+require_once common_crud . "/delete/common_delete.php";
 require_once common_crud . "/delete/user_delete.php";
 
 // read tab modules

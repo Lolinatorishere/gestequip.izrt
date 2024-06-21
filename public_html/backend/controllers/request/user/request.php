@@ -61,8 +61,15 @@ function create_request($data_request , $tab , $user_id , $pdo){
     return create_user($data_request , $pdo);
 }
 
-function update_request($data_request , $tab , $user_id , $pdo){
-    return update_user($data_request , $pdo);
+function update_request($data_request , $tab , $user_id , $pdo , $origin){
+    switch($origin){
+        case 'user':
+            return update_user($data_request , $pdo);
+        case 'permission':
+            return update_user_group_permission($data_request , $pdo);
+        default:
+            return "Origin Error";
+    }
 }
 
 function delete_request($data_request , $tab , $user_id , $pdo){

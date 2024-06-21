@@ -31,6 +31,10 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
     foreach($request[$check] as $key => $value){
         for ($i = 0; $i < count($table["items"]) ; $i++){ 
             try{
+                if($table["items"][$i]["Key"] === "PRI")
+                    continue;
+                if($table["items"][$i]["Key"] === "MUL")
+                    continue;
                 if($table["items"][$i]["Field"] !== $key){
                     continue;
                 }
@@ -121,6 +125,18 @@ function validate_user_in_db($user_id , $pdo){
     $request = array("fetch" => " * " 
                     ,"table" => " users "
                     ,"specific" => " id=" . $user_id
+                    );
+    $user = get_queries($request , $pdo);
+    if($user["total_items"] !== 1){
+        return 0;
+    }
+    return 1;
+}
+
+function validate_group_in_db($group_id , $pdo){
+    $request = array("fetch" => " * " 
+                    ,"table" => " user_groups "
+                    ,"specific" => " id=" . $group_id . " AND id > 1"
                     );
     $user = get_queries($request , $pdo);
     if($user["total_items"] !== 1){
