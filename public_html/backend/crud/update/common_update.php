@@ -6,7 +6,6 @@ try{
     if($request === "error")
         return $sql_error;
     $sql = common_update_query($request);
-    printLog($sql);
     $statement = $pdo->prepare($sql);
     $statement->execute();
     $ret["success"] = "success";

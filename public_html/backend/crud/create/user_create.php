@@ -74,11 +74,9 @@ try{
                                 ,"user_permission_level" => "0"
                                 );
         $sql = create_insertion_generator($request , " users_inside_groups " , "data" , 0);
-        printLog($sql);
         $statement = $pdo->prepare($sql);
         $statement->execute();
     }catch(PDOException $e){
-        printLog($e->getMessage());
         $request = array("table" => " users " , "specific" => "id=" . $user_id);
         delete_query($request , $pdo);
         $loggable["exception"]["PDOMessage"] = $e->getMessage();

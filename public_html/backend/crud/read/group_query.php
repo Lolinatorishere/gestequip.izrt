@@ -45,7 +45,6 @@ try{
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $user_group = $statement->fetch(PDO::FETCH_ASSOC);
-        printLog($user_group);
         foreach($user_group as $key => $value){
             if($key === "id"){
                 continue;

@@ -74,7 +74,6 @@ try{
     else{
         $sql = get_equipments_query(union_generator($sql_array) , $request);
     }
-        //printLog($sql);
     // request is unavailable 
     if($sql == "")
         return $sql_error;

@@ -1,7 +1,6 @@
 <?php
 
 function validate_external_create_inputs($request , $pdo , &$error_message){
-    printLog($request);
     if(!isset($request["virtual"])){
         $error_message["invalid_inputs"] = "Incomplete Request";
         return 0;
@@ -9,7 +8,6 @@ function validate_external_create_inputs($request , $pdo , &$error_message){
     if(!isset($request["email"])){
         $error_message["unset_email"];
     }
-    printLog($request["email"]);
     if(!filter_var($request["email"] , FILTER_VALIDATE_EMAIL)){
         $error_message["invalid_email"] = "Invalid Email Inserted";
         $error_message["email"] = $request["email"];
@@ -103,7 +101,9 @@ function user_request_validation($tab){
             return 1;
         case "remusr":
             return 1;
-        case "log_eq":
+        case "logusr":
+            return 1;
+        case "schusr":
             return 1;
         default:
             return 0;

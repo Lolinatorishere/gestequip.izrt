@@ -19,7 +19,6 @@ function on_request_all_load($data_request , $pdo){
 }
 
 function on_request_all_refresh($data_request , $pdo){
-    printLog($data_request);
     switch($data_request["refresh"]){
         case 'group':
             return get_users_groups($data_request , $pdo);
@@ -27,7 +26,6 @@ function on_request_all_refresh($data_request , $pdo){
 }
 
 function read_request_usr($data_request , $pdo){
-    printLog($data_request);
     if($_SESSION["user_type"] !== "Admin"){
         return array("Error" => "Error", "Auth_Error" => "Error");
     }
