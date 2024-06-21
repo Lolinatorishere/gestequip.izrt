@@ -5,7 +5,7 @@ if($_SESSION["user_type"] !== "Admin")
 function get_logs_by_status($log_status , $log_table ,  $pdo){
     $request = array("fetch" => " * "
                     ,"table" => $log_table
-                    ,"specific" => "log_status=" . $log_status
+                    ,"specific" => "log_status='" . $log_status . "'"
                     );
     return get_queries($request , $pdo);
 }

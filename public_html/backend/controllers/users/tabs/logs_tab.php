@@ -9,14 +9,18 @@ function on_request_user_logs_load($data_request , $pdo){
 }
 
 function on_request_logs_refresh($data_request , $pdo){
-    $log_type;
-    switch($data_request["origin"]){
+    $log_status;
+    $origin = trim($data_request["origin"]);
+    switch($origin){
         case 'Error':
-            $log_type = " Error ";
+            $log_status = "Error";
+            break;
         case 'Warning':
-            $log_type = " Warning ";
+            $log_status = "Warning";
+            break;
         case 'OK':
-            $log_type = " OK ";
+            $log_status = "OK";
+            break;
         default:
             return "invalid log type requested";
     }
@@ -32,7 +36,7 @@ function read_request_log($data_request , $pdo){
     if(!isset($data_request["refresh"])){
         return on_request_user_logs_load($data_request , $pdo);
     }else{
-        return on_request_user_logs_refresh($data_request , $pdo);
+        return on_request_logs_refresh($data_request , $pdo);
     }
     
 }

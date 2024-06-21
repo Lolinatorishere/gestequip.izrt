@@ -38,6 +38,7 @@ require_once common_crud . "/create/create_logs.php";
 require_once common_crud . "/read/common_query.php";
 require_once common_crud . "/read/equipment_query.php";
 require_once common_crud . "/read/group_query.php";
+require_once common_crud . "/read/logs_query.php";
 require_once common_crud . "/read/user_query.php";
 require_once common_crud . "/read/search_query.php";
 require_once common_crud . "/update/common_update.php";

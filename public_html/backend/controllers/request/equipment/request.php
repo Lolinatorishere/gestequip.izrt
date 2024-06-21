@@ -14,6 +14,8 @@ function read_request($tab , &$data_request , $user_id , $pdo){
             return read_request_sch($data_request , $pdo , $user_id);
         case 'add_eq':
             return read_request_add($data_request , $pdo , $user_id);
+        case 'log_eq':
+            return read_request_log($data_request , $pdo , $user_id);
         }
     $data_request["error"] = "error";
     return $data_request;
