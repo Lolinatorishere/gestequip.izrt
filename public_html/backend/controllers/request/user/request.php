@@ -62,11 +62,11 @@ function create_request($data_request , $tab , $user_id , $pdo){
 }
 
 function update_request($data_request , $tab , $user_id , $pdo){
-    return external_update_user($data_request , $pdo);
+    return update_user($data_request , $pdo);
 }
 
 function delete_request($data_request , $tab , $user_id , $pdo){
-    return external_delete_user($data_request , $pdo);
+    return delete_user($data_request , $pdo);
 }
 
 ?>

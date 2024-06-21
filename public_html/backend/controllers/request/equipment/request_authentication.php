@@ -6,7 +6,7 @@ function is_user_in_groups($groups){
                        ,'own_auth' => 1
                        ,'de_auth' => 1
     );
-    foreach($group_auth as $key => $value) {
+    foreach($group_auth as $key => $value){
         if(count($groups[$key]) != 0){
             $guard++;
         }

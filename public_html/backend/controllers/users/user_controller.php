@@ -5,6 +5,7 @@ session_start();
 
 // verifies if the user sending information is legit
 if($_SESSION["user_type"] !== "Admin"){
+    error_log(print_r($_SESSION , true));
     die;
 }
 
@@ -44,6 +45,7 @@ require_once common_crud . "/read/common_query.php";
 require_once common_crud . "/read/group_query.php";
 require_once common_crud . "/read/user_query.php";
 require_once common_crud . "/read/search_query.php";
+require_once common_crud . "/update/common_update.php";
 require_once common_crud . "/update/user_update.php";
 require_once common_crud . "/delete/user_delete.php";
 

@@ -14,6 +14,7 @@ function equipment_search_query_parse_inputs($queries){
     return $sql;
 }
 
+//todo change this shit :kekw:
 function create_insertion_generator($request , $db_table , $input_type , $pdo_mode){
     $values = array();
     $columns = array();
@@ -91,7 +92,7 @@ function union_generator($requests){
     $i = 1;
     $sql = "";
     if($total === 1){
-        return $request[0];
+        return $requests[0];
     }
     foreach ($requests as $request){
         $sql .= $request;
@@ -405,6 +406,5 @@ try{
     error_log(print_r($e , true));
     return "error";
 }
-}
 
-?>
+}?>

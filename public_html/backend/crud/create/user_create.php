@@ -62,7 +62,7 @@ try{
             preg_match_all("/'([^']+)'/" , $error[2] , $error_messages);
             $error_messages[0][1] = explode('.' , $error_messages[0][1])[1];
             $error_messages[0][1] = explode('\'' , $error_messages[0][1])[0];
-            $exception = $error_messages[0][1] . " is not unique inserted " . $error_messages[0][0];
+            $exception = $error_messages[0][1] . " is not unique, inserted " . $error_messages[0][0];
             throw new Exception($exception);
         }
         throw new Exception("Server_Error_CU0001");

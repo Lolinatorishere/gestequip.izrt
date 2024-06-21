@@ -117,6 +117,18 @@ function validate_equipment_in_db($equipment_id , $pdo){
     return 1;
 }
 
+function validate_user_in_db($user_id , $pdo){
+    $request = array("fetch" => " * " 
+                    ,"table" => " users "
+                    ,"specific" => " id=" . $user_id
+                    );
+    $user = get_queries($request , $pdo);
+    if($user["total_items"] !== 1){
+        return 0;
+    }
+    return 1;
+}
+
 function validate_user_group_in_db($user_id , $group_id , $pdo){
     $request = array("fetch" => " * " 
                     ,"table" => " users_inside_groups"
@@ -124,8 +136,8 @@ function validate_user_group_in_db($user_id , $group_id , $pdo){
                                  . " AND "
                                  . " user_id= \"" . $user_id . "\""
                     );
-    $equipment = get_queries($request , $pdo);
-    if($equipment["total_items"] !== 1)
+    $user = get_queries($request , $pdo);
+    if($user["total_items"] !== 1)
         return 0;
     return 1;
 }

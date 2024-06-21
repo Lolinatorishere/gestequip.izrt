@@ -26,16 +26,24 @@ function validate_external_create_inputs($request , $pdo , &$error_message){
 }
 
 function validate_external_update_inputs($request , $pdo , &$error_message){
-    if(!isset($request["user_id"]))
+    if(!isset($request["user_id"])){
+        $error_message = "User was not selected";
         return 0;
+    }
+    if(validate_user_in_db($request["user_id"] , $pdo) !== 1){
+        $error_message = "User does not Exist";
+        return 0;
+    }
     if(isset($request["user"]["date_created"])){
         unset($request["user"]["date_created"]);
     }
     if(isset($request["user"])){
         if(validate_external_inputs($request , "user" , " users " , $pdo , $error_message) !== 1)
             return 0;
-    }else
+    }else{
+        $error_message = "User didnt request any changes";
         return 0;
+    }
     return 1;
 }
 
