@@ -4,6 +4,41 @@ if($_SESSION["user_type"] !== "Admin"){
     die;
 }
 
+function ui_request($ui){
+    $dir = '/var/www/html/gestequip.izrt/public_html/frontend/iframes/user/tabs/';
+    if(ui_refresh_origin() == 1){
+        $ui_dir = preg_replace('/[^a-zA-Z\/_]/s' , '' , $_GET["rfsh"]);
+        $dir .= $ui_dir . '.html';
+        return file_get_contents($dir);
+    }
+    $dir .= $ui . '.html';
+    return file_get_contents($dir);
+} 
+
+// function to handle crud requests from tabs
+function data_request($tab , $pdo , $user_id){
+    //default return value
+    $ret = array(
+        'success' => 'false');
+    if(!isset($_GET["crud"]))
+        return $ret;
+    $crud = request_crud_validation();
+    switch($crud){
+        case 0:
+            return $ret;
+        case 1: //Create request
+            return tab_create_information_sanitize($tab , $user_id , $pdo);
+        case 2: //Read request
+            return tab_read_information_sanitize($tab , $user_id , $pdo);
+        case 3: //Update request
+            return tab_update_information_sanitize($tab , $user_id , $pdo);
+        case 4: //Delete request
+            return tab_delete_information_sanitize($tab , $user_id , $pdo);
+        default:
+            return $ret;
+    }
+}
+
 function read_request($tab , &$data_request , $user_id , $pdo){
     $data = array();
     switch($tab){
@@ -33,40 +68,5 @@ function update_request($data_request , $tab , $user_id , $pdo){
 function delete_request($data_request , $tab , $user_id , $pdo){
     return external_delete_user($data_request , $pdo);
 }
-
-// function to handle crud requests from tabs
-function data_request($tab , $pdo , $user_id){
-    //default return value
-    $ret = array(
-        'success' => 'false');
-    if(!isset($_GET["crud"]))
-        return $ret;
-    $crud = request_crud_validation();
-    switch($crud){
-        case 0:
-            return $ret;
-        case 1: //Create request
-            return tab_create_information_sanitize($tab , $user_id , $pdo);
-        case 2: //Reat request
-            return tab_read_information_sanitize($tab , $user_id , $pdo);
-        case 3: //Update request
-            return tab_update_information_sanitize($tab , $user_id , $pdo);
-        case 4: //Delete request
-            return tab_delete_information_sanitize($tab , $user_id , $pdo);
-        default:
-            return $ret;
-    }
-}
-
-function ui_request($ui){
-    $dir = '/var/www/html/gestequip.izrt/public_html/frontend/iframes/user/tabs/';
-    if(ui_refresh_origin() == 1){
-        $ui_dir = preg_replace('/[^a-zA-Z\/_]/s' , '' , $_GET["rfsh"]);
-        $dir .= $ui_dir . '.html';
-        return file_get_contents($dir);
-    }
-    $dir .= $ui . '.html';
-    return file_get_contents($dir);
-} 
 
 ?>

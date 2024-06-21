@@ -74,7 +74,6 @@ function get_users($request , $pdo){
     page_check($request);
     $sql = common_select_query($request);
     // request is unavailable
-    printLog($sql);
     if($sql == "")
         return $sql_error;
     $statement = $pdo->prepare($sql);

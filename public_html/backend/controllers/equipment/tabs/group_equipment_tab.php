@@ -65,6 +65,7 @@ function read_request_grp($data_request , $pdo , $user_id){
     $user_group_info = $_SESSION["group_auth"];
     // turn the ids from the fetched groups into a string that 
     // can be read by mysql
+    $group_ids = "";
     for($i = 0 ; $i < $user_group_info["total_items"] ; $i++){
         $group_ids .= $user_group_info["all_groups"][$i];
         if($i !== $user_group_info["total_items"]-1)
@@ -115,7 +116,7 @@ function read_request_grp($data_request , $pdo , $user_id){
         $request = array("fetch" => " * "
                         ,"table" => $table
                         ,"values" => array("equipment_id" , "id" , "equipment_id")
-                        ,"specific" => " users_inside_groups_equipments.user_id = " . $user_id
+                        ,"specific" => " users_inside_groups_equipments.user_id = " . $user_id . " AND group_id > 1 "
                         );
         array_push($data_request["requests"] , $request); 
     }

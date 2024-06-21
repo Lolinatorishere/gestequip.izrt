@@ -1,5 +1,8 @@
 <?php
 
+if($_SESSION["user_type"] !== "Admin")
+    die;
+
 include_once query_generator_dir;
 
 function create_user($data_request , $pdo){
@@ -25,6 +28,11 @@ try{
     $validation_guard = validate_external_create_inputs($data_request ,  $pdo , $error_message);
     if($validation_guard !== 1)
         throw new Exception("Validation");
+
+    if($data_request["admin"] === "1" && $data_request["virtual"] === "1"){
+        $error_message = " You cannot create a virtual admin user";
+        throw new Exception("Validation");
+    }
     try{
         $sql = create_insertion_generator($data_request , " users " , "user" , 1);
         $statement = $pdo->prepare($sql);
@@ -45,16 +53,13 @@ try{
         }
         $statement->execute();
         $user_id = $pdo->lastInsertId();
-        throw new Exception("User_Created");
     }catch(PDOException $e){
         $loggable["exception"]["PDOMessage"] = $e->getMessage();
         $loggable["message"]["sql"] =  $sql;
-        printLog($e->getMessage());
         $error = explode(':' , $e->getMessage());
         if($error[0] === "SQLSTATE[23000]"){
             $error_messages;
             preg_match_all("/'([^']+)'/" , $error[2] , $error_messages);
-            printLog($error_messages);
             $error_messages[0][1] = explode('.' , $error_messages[0][1])[1];
             $error_messages[0][1] = explode('\'' , $error_messages[0][1])[0];
             $exception = $error_messages[0][1] . " is not unique inserted " . $error_messages[0][0];
@@ -62,9 +67,28 @@ try{
         }
         throw new Exception("Server_Error_CU0001");
     }
+    try{
+        if($data_request["admin"] === "1"){
+            if($_SESSION["user_type"] === "Admin"){
+                $request["data"] = array("id_user" => $user_id
+                                        ,"admin_status" => "1"
+                                        );
+                $sql = create_insertion_generator($request , " sudo_group " , "data" , 0);
+                $statement = $pdo->prepare($sql);
+                $statement->execute();
+                $loggable["message"]["admin"] = "User is an Admin";
+            }
+        }
+        throw new Exception("User Created");
+    }catch(PDOException $e){
+        $loggable["exception"]["PDOMessage"] = $e->getMessage();
+        $loggable["message"]["sql"] =  $sql;
+        throw new Exception("Server_Error_CU0002");
+    }
+        throw new Exception("User_Created");
 }catch(Exception $e){
     switch($e->getMessage()){
-        case 'User_Created':
+        case 'User Created':
             $loggable["type"] = "Created_User";
             $loggable["status"] = "OK";
             $loggable["user_id"] = $user_id;

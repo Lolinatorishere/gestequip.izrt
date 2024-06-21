@@ -28,7 +28,6 @@ function on_request_add_refresh($data_request , $pdo , $user_id){
         $manageable_groups["items"] = clean_query($manageable_groups["items"]);
         $data_specific["groups"] = $manageable_groups;
         return $data_specific;
-        case "create":
             return create_user($data_request , $pdo);
     }
 }

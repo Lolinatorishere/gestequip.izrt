@@ -64,7 +64,6 @@ try{
     // the reason this table exists is because it simplifies the querying 
     // of the equipments of a group or its users
     page_check($request);
-    printLog($request);
     $requests = $request["requests"];
     $sql_array = get_equipments_foreach($requests , $request);
     if(!isset($request["total_items"])){
@@ -92,7 +91,6 @@ try{
         $sql_array = get_equipments_foreach($requests , $request);
         $sql = get_equipments_query(union_generator($sql_array) , $request);
         $statement = $pdo->prepare($sql);
-        printLog($sql);
         $statement->execute();
     }
     $equipment_all = $statement->fetchAll(PDO::FETCH_ASSOC);

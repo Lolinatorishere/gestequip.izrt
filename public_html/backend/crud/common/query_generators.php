@@ -17,7 +17,7 @@ function equipment_search_query_parse_inputs($queries){
 function create_insertion_generator($request , $db_table , $input_type , $pdo_mode){
     $values = array();
     $columns = array();
-    if(!isset($pdo_mode)){
+    if($pdo_mode === 0){
         foreach($request[$input_type] as $key => $value){
             $column = "`" . $key . "`";
             if(is_bool($value)){
@@ -106,23 +106,23 @@ function union_generator($requests){
 // this function was also a major headache to make but less than the previous one
 function user_group_sql_query_metacode($group_ids , $user_id , $sql_opperation){
     $sql = '';
-    $i = 1;
+    $i = 0;
     foreach($group_ids as $auth => $group_id){
-        if($i >= $group_ids["total_items"])
+        if($i > $group_ids["total_items"])
             break;
         if($auth === "all_groups")
             break;
         if($auth === "auth"){
             foreach($group_id as $id){
                 $sql .= "(group_id = " . $id . " and user_permission_level >= 0)";
-                if($i < $group_ids["total_items"])$sql .= $sql_opperation;
+                if($i+1 < $group_ids["total_items"])$sql .= $sql_opperation;
                 $i++;
             }
         }
         if($auth === "own_auth" || $auth === "de_auth"){
             foreach($group_id as $id){
                 $sql .= "(group_id = " . $id . " and user_id = " . $user_id . ")";
-                if($i < $group_ids["total_items"])$sql .= $sql_opperation;
+                if($i+1 < $group_ids["total_items"])$sql .= $sql_opperation;
                 $i++;
             }
         }
@@ -377,18 +377,18 @@ function common_update_query($request){
 try{
     if(!isset($request["specific"]))
         return "error";
-    $sql = " UPDATE ";
-    $sql .= $request["table"];
-    $sql .= " SET ";
     if(!is_array($request["columns"]))
         return "error";
     if(!is_array($request["values"]))
         return "error";
     $counted_columns = count($request["columns"]);
     $counted_values = count($request["values"]);
-    $update_sql = "";
     if($counted_columns !== $counted_values)
         return "error";
+    $sql = " UPDATE ";
+    $sql .= $request["table"];
+    $sql .= " SET ";
+    $update_sql = "";
     for($i = 0 ; $i < $counted_columns ; $i++) { 
         $update_sql .= "`" . $request["columns"][$i] ."`";
         $update_sql .= " = ";

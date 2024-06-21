@@ -63,7 +63,6 @@ function login_check($pdo , $errors , $email , $password ){
         return $sql_error;
     if($statement->rowCount() != 1)
         return $login_err;
-
     $row = $statement->fetch();
 
     if(!$row)
@@ -84,7 +83,7 @@ function login_check($pdo , $errors , $email , $password ){
     // loads the auth levels of every group
     $request = array("fetch" => " * "
                     ,"table" => "users_inside_groups"
-                    ,"specific" => "user_id = ". $id 
+                    ,"specific" => "user_id = ". $id . " and group_id > 1"
                     ,"counted" => 1
                 );
     $group_auth = get_user_group_auth($request , $pdo);
@@ -92,18 +91,14 @@ function login_check($pdo , $errors , $email , $password ){
         $auth = 2;
     }
     // checks if is an admin 
-    $sql = "SELECT * FROM sudo_group WHERE id_user = ?";
+    $sql = "SELECT * FROM sudo_group WHERE id_user = ? and admin_status = 1";
     $statement = $pdo->prepare($sql);
     if(!$statement)
         return $sql_error;
     $statement->bindParam(1 , $id, PDO::PARAM_STR);
     $statement->execute();
-
     if($statement->rowCount() == 1){
-        $row = $statement->fetch();
-        if($row["admin_status"] == 1){
-            $auth = 1;
-        }
+        $auth = 1;
     }
     $_SESSION["logged_in"] = true;
     $_SESSION["id"] = $id;
