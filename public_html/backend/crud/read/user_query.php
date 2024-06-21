@@ -73,6 +73,7 @@ function get_users($request , $pdo){
     // of the equipments of a group or its users
     page_check($request);
     $sql = common_select_query($request);
+    printLog($sql);
     // request is unavailable
     if($sql == "")
         return $sql_error;

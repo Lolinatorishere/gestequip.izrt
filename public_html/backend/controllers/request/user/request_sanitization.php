@@ -43,8 +43,8 @@ function tab_read_information_sanitize($tab , $user_id , $pdo){
     if(isset($_GET["rgin"])){// origin of refresh
         $data_request["origin"] = preg_replace('/[^a-zA-Z0-9]/s' , '' , $_GET["rgin"]);
     }
-    if(isset($_GET["qury"])){// origin of query not 
-        $data_request["query"] = sanitize_query(json_decode($_GET["qury"] , true));
+    if(isset($_POST["query"])){// origin of query not 
+        $data_request["query"] = sanitize_query($_POST["query"]);
     }
     return read_request($tab , $data_request , $user_id , $pdo);
 }
