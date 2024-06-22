@@ -16,16 +16,24 @@ function on_request_add_load($auth_groups , $data_request , $pdo , $user_id){
                     ,"specific" => " id IN ( " . sql_array_query_metacode($auth_groups) . " ) "
                     ,"limit" => 8
                 );
+    if($_SESSION["user_type"] === "Admin"){
+        $request["specific"] = " id > 1";
+    }
     $manageable_groups = get_groups($request , $pdo);
+    if(empty($manageable_groups)){
+        $manageable_groups = array("items" => array("User Has No Authorised Groups to add equipment to")
+                                  ,"pages" => 0
+                                  ,"current_page" => 0
+                                  ,"paging" => 1
+                                  ,"total_items" => 0
+                                  );
+    }
     $request = array("table" => "equipment");
     $default_columns = describe_table($request , $pdo);
     $default_columns["items"] = parse_equipment_type_columns($default_columns["items"]);
-    $equipment_types["items"] = clean_query($filter  , $equipment_types["items"]);
-    $_SESSION["equipment_types"] = $equipment_types["items"];
-    $manageable_groups["items"] = clean_query($filter  , $manageable_groups["items"]);
     $data_specific["types"] = $equipment_types;
     $data_specific["groups"] = $manageable_groups;
-    $data_specific["default" ] = $default_columns;
+    $data_specific["default"] = $default_columns;
     return $data_specific;
 }
 
@@ -40,7 +48,7 @@ function on_request_add_refresh($auth_groups , $data_request , $pdo , $user_id){
                     ,"current_page" => $data_request["page"]
                     ,"limit" => 8
                 );
-            $manageable_groups = get_groups($request , $pdo);
+            $manageable_groups = get_queries($request , $pdo);
             $manageable_groups["items"] = clean_query($filter , $manageable_groups["items"]);
             $data_specific["groups"] = $manageable_groups;
             return $data_specific;
@@ -50,12 +58,15 @@ function on_request_add_refresh($auth_groups , $data_request , $pdo , $user_id){
                     $guard = 0;
                 }
             }
+            if($_SESSION["user_type"] === "Admin"){
+                $guard = 0;
+            }
             if(!isset($guard))
                 break;
             $data_specific = array("users" => array());
             $request = array("fetch" => " * "
                             ,"table" => " users_inside_groups "
-                            ,"specific" => " group_id = " . $data_request["origin"]
+                            ,"specific" => " group_id = " . $data_request["origin"] . " AND user_id > 1"
                             ,"limit" => 8
                         );
             $group_users = get_queries($request , $pdo);

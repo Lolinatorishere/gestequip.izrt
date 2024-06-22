@@ -18,6 +18,10 @@ function validate_external_create_inputs($request , $pdo , &$error_message){
         return 0;
     if(validate_external_inputs($request , "specific" , " " . $request["equipment_type"] , $pdo , $error_message) !== 1)
         return 0;
+    if(validate_full_input($request , "default" , " equipment " , $pdo , $error_message) !== 1)
+        return 0;
+    if(validate_full_input($request , "specific" , " " . $request["equipment_type"] , $pdo , $error_message) !== 1)
+        return 0;
     return 1;
 }
 

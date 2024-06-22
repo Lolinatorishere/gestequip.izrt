@@ -21,6 +21,8 @@ function validate_external_create_inputs($request , $pdo , &$error_message){
     }
     if(validate_external_inputs($request , "user" , " users " , $pdo , $error_message) !== 1)
         return 0;
+    if(validate_full_input($request , "user" , " users " , $pdo , $error_message) !== 1)
+        return 0;
     return 1;
 }
 

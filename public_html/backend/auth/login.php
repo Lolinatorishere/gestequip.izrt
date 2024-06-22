@@ -9,7 +9,7 @@ if(!defined('pdo_config_dir'))
 session_start();
 
 if(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] === true)
-    header("Location: /pages/dashboard.php");
+    header("Location: /pages/profile.php");
 
 require_once pdo_config_dir;
 require_once "/var/www/html/gestequip.izrt/public_html/backend/crud/read/common_query.php";
@@ -36,7 +36,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     unset($pdo);
 }
 
-function login_check($pdo , $errors , $email , $password ){
+function login_check($pdo , $errors , $email , $password){
 
     $login_err = "Invalid Email or Password";
     $sql_error = "Well thats weird, Something didnt go well.<br> Try again Later.";
@@ -117,6 +117,6 @@ function login_check($pdo , $errors , $email , $password ){
             break;
     }
     $_SESSION["group_auth"] = $group_auth;
-    header("Location: /pages/dashboard.php");
+    header("Location: /pages/profile.php");
 }
 ?>

@@ -14,13 +14,15 @@ function get_all_auth_users($request , $pdo){
     $table = array();
     $what_in = array();
     $specific = array();
+    printLog($_SESSION);
     foreach($groups as $key => $group){
         array_push($fetch , " user_id ");
         array_push($table , " users_inside_groups ");
         array_push($what_in , " group_id = ");
         array_push($specific , $group);
     }
-    $union = union_generator(multi_query_request_generator($fetch , $table , $what_in , $specific));
+    $multi = multi_query_request_generator($fetch , $table , $what_in , $specific);
+    $union = union_generator($multi);
     if(!isset($request["total_items"])){
         $sql = "SELECT count(*) FROM (" . $union . ") AS result_table";
         $statement = $pdo->prepare($sql);

@@ -146,7 +146,6 @@ try{
                     $update = update_query($request , $pdo);
                     if(isset($update["PDOException"]))
                         throw new PDOException($update["PDOException"]);
-
                 }
             }
         }

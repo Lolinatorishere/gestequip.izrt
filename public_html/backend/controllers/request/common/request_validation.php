@@ -92,6 +92,50 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
     return 1;
 }
 
+function validate_full_input($request , $check , $db_table , $pdo , &$error_message){
+    $table_check = 0;
+    $table_request = array("table" => $db_table);
+    $table = describe_table($table_request , $pdo);
+    $better_table = array();
+    $full_table = 0;
+    foreach($table["items"] as $key => $value){
+        if($value["Key"] === "PRI")
+            continue;
+        if($value["Key"] === "MUL")
+            continue;
+        if(!empty($value["Extra"]))
+            continue;
+        if($value["Default"] === "-1")
+            continue;
+        array_push($better_table , $table["items"][$key]);
+        $full_table++;
+    }
+    foreach($request[$check] as $key => $value){
+        for($i = 0 ; $i < $full_table  ; $i++){ 
+        try{
+            if(!empty($better_table[$i]["Key"])){
+                if($better_table[$i]["Key"] === "PRI")
+                    continue;
+                if($better_table[$i]["Key"] === "MUL")
+                    continue;
+            }
+            if($better_table[$i]["Field"] !== $key)
+                continue;
+            $table_check++;
+        }catch(exception $e){
+            error_log(print_r($e , true));
+            return 0;
+        }
+        }
+    }
+    if($table_check !== $full_table){
+        $error_message["Missmatch"] = " Necessary Inputs not Recieved ";
+        return 0;
+    }
+    return 1;
+}
+
+
 function validate_equipment_references($data_request , $pdo){
     $request = array("fetch" => " * " 
                     ,"table" => " users_inside_groups_equipments "

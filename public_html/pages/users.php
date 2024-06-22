@@ -1,7 +1,7 @@
 <?php
 session_start();
 if($_SESSION["user_type"] !== "Admin"){
-    header("location: /pages/dashboard.php");
+    header("location: /pages/profile.php");
     exit;
 }
 include_once __DIR__."/../frontend/html/html_head.php";

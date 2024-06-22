@@ -37,7 +37,6 @@ function read_request_log($data_request , $pdo){
     }else{
         return on_request_equipment_refresh($data_request , $pdo);
     }
-    
 }
 
 ?>

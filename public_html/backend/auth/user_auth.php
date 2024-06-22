@@ -19,7 +19,7 @@ function get_user_group_auth($request , $pdo){
                         ,"total_items" => 0);
     foreach($groups as $group){
         switch($group["user_permission_level"]){
-            case 0: // user is a group manager
+            case 2: // user is a group manager
                 array_push($user_groups["auth"] , $group["group_id"])  ;
                 array_push($user_groups["all_groups"] , $group["group_id"]);
                 break;
@@ -27,7 +27,7 @@ function get_user_group_auth($request , $pdo){
                 array_push($user_groups["own_auth"] , $group["group_id"]);
                 array_push($user_groups["all_groups"] , $group["group_id"]);
                 break;
-            case 2: // user is only permited to view own equipment
+            case 0: // user is only permited to view own equipment
                 array_push($user_groups["de_auth"] , $group["group_id"]);
                 array_push($user_groups["all_groups"] , $group["group_id"]);
                 break;

@@ -8,13 +8,17 @@ function log_parse($log_type , $log){
                    ," :log_type "
                    ," :log_status "
                    ," :log_message "
-                   ," :user_id ");
+                   );
     $columns = array("`action_by_user_id`"
                     ,"`log_origin`"
                     ,"`log_type`"
                     ,"`log_status`"
                     ,"`log_message`"
-                    ,"`user_id`" );
+                    );
+    if(isset($log["equipment_id"])){
+        array_push($values , " :user_id");
+        array_push($columns , "`user_id`");
+    }
     if(isset($log["equipment_id"])){
         array_push($values , " :equipment_id ");
         array_push($columns , "`equipment_id`");
@@ -53,7 +57,9 @@ try{
     $statement->bindParam(':log_status' , $log["status"]);
     $statement->bindParam(':log_message' , $message);
     $statement->bindParam(':action_by_user_id' , $_SESSION["id"]);
-    $statement->bindParam(':user_id'  , $log["user_id"]);
+    if(isset($log["equipment_id"])){
+        $statement->bindParam(':user_id'  , $log["user_id"]);
+    }
     if(isset($log["equipment_id"])){
         $statement->bindParam(':equipment_id'  , $log["equipment_id"]);
     }

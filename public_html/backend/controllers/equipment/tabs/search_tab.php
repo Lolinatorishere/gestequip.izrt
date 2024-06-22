@@ -22,6 +22,7 @@ function on_request_sch_load($auth_groups , $data_request , $pdo , $user_id){
                         ,"counted" => 1
                         ,"specific" => "id=" . $auth_group
                         );
+        printLog($request);
         array_push($groups["items"] , get_query($request , $pdo)["items"]);
     }
     $groups["pages"] = ceil(count($auth_groups)/$limit);
