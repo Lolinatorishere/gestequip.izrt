@@ -14,12 +14,10 @@ function get_all_auth_users($request , $pdo){
     $table = array();
     $what_in = array();
     $specific = array();
-    printLog($_SESSION);
     foreach($groups as $key => $group){
         array_push($fetch , " user_id ");
         array_push($table , " users_inside_groups ");
-        array_push($what_in , " group_id = ");
-        array_push($specific , $group);
+        array_push($specific , "group_id =" . $group . " AND user_id > 1");
     }
     $multi = multi_query_request_generator($fetch , $table , $what_in , $specific);
     $union = union_generator($multi);
@@ -41,17 +39,20 @@ function get_all_auth_users($request , $pdo){
            AS result_table
            LIMIT ". $limit . 
            " OFFSET " . ($page-1) * $limit;
+    printLog($sql);
     $statement = $pdo->prepare($sql);
     $statement->execute();
-    $users_id = $statement->fetch(PDO::FETCH_ASSOC);
-        foreach($users_id as $user_id){
-        $request_user = array("fetch" => " id , users_name "
-                             ,"table" => " users "
-                             ,"counted" => 1
-                             ,"specific" => "id=" . $user_id
-                             );
-        array_push($users , get_query($request_user , $pdo)["items"]);
+    $users_id = $statement->fetchAll(PDO::FETCH_ASSOC);
+    printLog($users_id);
+    foreach ($users_id as $key => $value) {
+        $user_ids[$key] = $value["user_id"];
     }
+    $request_user = array("fetch" => " id , users_name "
+                          ,"table" => " users "
+                          ,"counted" => 1
+                          ,"specific" => "id IN(" . sql_array_query_metacode($user_ids) . ") "
+                          );
+    $users = get_queries($request_user , $pdo);
     $ret["items"] = $users;
     $ret["pages"] = $pages;
     $ret["current_page"] = $page;

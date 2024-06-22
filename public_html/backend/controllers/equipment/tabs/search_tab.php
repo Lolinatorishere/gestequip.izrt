@@ -14,21 +14,11 @@ function on_request_sch_load($auth_groups , $data_request , $pdo , $user_id){
         $data_request["limit"] = $limit;
     }
     $users = get_all_auth_users($data_request , $pdo);
-    foreach($auth_groups as $auth_group){
-        if($i > $limit-1)
-            break;
-        $request = array("fetch" => " id , group_name "
+    $request = array("fetch" => " id , group_name "
                         ,"table" => " user_groups "
-                        ,"counted" => 1
-                        ,"specific" => "id=" . $auth_group
+                        ,"specific" => "id IN (" . sql_array_query_metacode($_SESSION["group_auth"]["auth"]) . ") "
                         );
-        printLog($request);
-        array_push($groups["items"] , get_query($request , $pdo)["items"]);
-    }
-    $groups["pages"] = ceil(count($auth_groups)/$limit);
-    $groups["curent_page"] = 1;
-    $groups["paging"] = 1;
-    $groups["total_items"] = count($auth_groups);
+    $groups = get_queries($request , $pdo);
     $request = array("fetch" => " * " 
                     ,"table" => " equipment_types "
                     ,"counted" => 1
@@ -56,28 +46,15 @@ function refresh_get_users_groups($data_request , $pdo){
                     ,"table" => " users_inside_groups "
                     ,"counted" => 1
                     ,"specific" => " user_id=\"" . $request_id . "\""
+                                 . " AND "
+                                 . " group_id IN (" . sql_array_query_metacode($_SESSION["group_auth"]["auth"]) . ") "
                     );
-    $groups = get_queries($group_request , $pdo);
-    $auth_groups = check_against_auth_groups($groups["items"]);
-    $total_items = count($auth_groups);
-    for($i = 0 ; $i + $offset < $total_items ; $i++){
-        $ioff = $i + $offset;
-        $group_id = $auth_groups[$ioff]["group_id"];
-        $request = array("fetch" => " id , group_name "
-            ,"table" => " user_groups "
-            ,"counted" => 1
-            ,"specific" => " id=\"" . $group_id . "\" "
-        );
-        if($i > $limit + $offset)
-            break;
-        array_push($accepted_groups , get_query($request , $pdo)["items"]);
+    if($_SESSION["user_type"] === "Admin"){
+        $group_request["specific"] = " user_id=\"" . $request_id . "\""
+                                   . " AND "
+                                   . " group_id > 1";
     }
-    $ret["items"] = $accepted_groups;
-    $ret["total_items"] = $total_items;
-    $ret["pages"] = ceil($total_items/$limit);
-    $ret["page"] = $data_request["page"];
-    $ret["counted"] = 1;
-    return $ret;
+    return get_queries($group_request , $pdo);
 }
 
 function refresh_get_groups_users($auth_groups , $data_request , $pdo){

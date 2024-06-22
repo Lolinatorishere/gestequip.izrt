@@ -25,9 +25,9 @@ require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arra
 //request modules
 require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/common/request_sanitize.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/common/request_validation.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/common/request_handling.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/common/request_authentication.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/equipment/request.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/equipment/request_authentication.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/equipment/request_handling.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/equipment/request_sanitization.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/equipment/request_validation.php";
 
@@ -57,8 +57,16 @@ require_once equipment_tabs . "/search_tab.php";
 require_once equipment_tabs . "/your_equipment_tab.php";
 
 // Base get requests 
-$tab_request = $_GET["tab"];
-$request_type = $_GET["type"];
+if(isset($_GET["tab"])){
+    $tab_request = $_GET["tab"];
+}else{
+    $tab_request = "unset";
+}
+if(isset($_GET["type"])){
+    $request_type = $_GET["type"];
+}else{
+    $tab_request = "unset";
+}
 
 
 // Base Post request
@@ -75,14 +83,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 // The controller
 $req_tab = equipment_request_validation($tab_request);
 $req_type = request_type_validation($request_type);
-$ret = equipment_request_handle($req_tab , $tab_request , $req_type);
+$ret = request_handle($req_tab , $tab_request , $req_type);
 if($req_type === 1){
     echo json_encode(array('ui' => $ret[0]
                           ,'html' => $ret[1]));
 }
 if($req_type === 2){
     echo json_encode(array('data' => $ret[0]
-                          ,'tab' => $tab_request
                           ,'information' => $ret[1]));
 }
 unset($pdo);

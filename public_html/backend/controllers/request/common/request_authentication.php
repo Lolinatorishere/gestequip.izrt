@@ -1,5 +1,4 @@
 <?php
-
 function is_user_in_groups($groups){
     $guard = 0;
     $group_auth = array('auth' => 1 

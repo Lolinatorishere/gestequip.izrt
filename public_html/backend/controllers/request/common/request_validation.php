@@ -67,6 +67,17 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
                     }
                 }
                 try{
+                    if(preg_match('/^int.*/' , $table["items"][$i]["Type"])){
+                        if(!ctype_digit($request[$check][$key])){
+                            $error_message[$key] =  $key . " Invalid Input";
+                            throw new Exception($error_message[$key] , 1);
+                        }
+                    }
+                }catch(typeError $e){
+                    $error_message[$key] =  $key . " Invalid Input";
+                    throw new Exception($error_message[$key] , 1);
+                }
+                try{
                     if(preg_match('/^date.*/' , $table["items"][$i]["Type"])){
                         list($year , $month , $day) = explode('-', $request[$check][$key]);
                         if(!checkdate($month , $day , $year)){

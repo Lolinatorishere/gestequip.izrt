@@ -3,12 +3,6 @@ session_start();
 // defines section 
 // to avoid other files from working without the controller
 
-// verifies if the user sending information is legit
-if($_SESSION["user_type"] !== "Admin"){
-    error_log(print_r($_SESSION , true));
-    die;
-}
-
 //Inner Module Definitions
 if(!defined('common_funcs'))
     define('common_funcs' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_functions.php');
@@ -33,23 +27,24 @@ require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/reque
 require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/common/request_validation.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/common/request_handling.php";
 require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/common/request_authentication.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/user/request.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/user/request_sanitization.php";
-require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/user/request_validation.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/group/request.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/group/request_sanitization.php";
+require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/request/group/request_validation.php";
 
 // crud modules 
 require_once common_crud . "/common/describe_column.php";
-require_once common_crud . "/create/user_create.php";
+require_once common_crud . "/create/group_create.php";
 require_once common_crud . "/create/create_logs.php";
 require_once common_crud . "/read/logs_query.php";
 require_once common_crud . "/read/common_query.php";
 require_once common_crud . "/read/group_query.php";
+require_once common_crud . "/read/equipment_query.php";
 require_once common_crud . "/read/user_query.php";
 require_once common_crud . "/read/search_query.php";
 require_once common_crud . "/update/common_update.php";
-require_once common_crud . "/update/user_update.php";
+require_once common_crud . "/update/group_update.php";
 require_once common_crud . "/delete/common_delete.php";
-require_once common_crud . "/delete/user_delete.php";
+require_once common_crud . "/delete/group_delete.php";
 
 // read tab modules
 require_once user_tabs . "/add_user_tab.php";

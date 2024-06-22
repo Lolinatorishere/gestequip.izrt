@@ -68,11 +68,8 @@ function multi_query_request_generator($fetch , $table , $what_in , $specific){
     $ret = array();
     $internal_fetch = count($fetch);
     $internal_table = count($table);
-    $internal_what_in = count($what_in);
     $internal_specific = count($specific);
     if($internal_fetch !== $internal_table)
-        return "error";
-    if($internal_fetch !== $internal_what_in)
         return "error";
     if($internal_fetch !== $internal_specific)
         return "error";
@@ -80,7 +77,7 @@ function multi_query_request_generator($fetch , $table , $what_in , $specific){
         $request = array("fetch" => " " . $fetch[$i] . " "
                         ,"table" => " " . $table[$i] . " "
                         ,"counted" => 1
-                        ,"specific" => $what_in[$i] . "\"" .$specific[$i] . "\""
+                        ,"specific" => $specific[$i]
                         );
         array_push($ret , common_select_query($request));
     }
@@ -115,14 +112,14 @@ function user_group_sql_query_metacode($group_ids , $user_id , $sql_opperation){
             break;
         if($auth === "auth"){
             foreach($group_id as $id){
-                $sql .= "(group_id = " . $id . " and user_permission_level >= 0)";
+                $sql .= "(group_id = " . $id . " and user_permission_level >= 0 and user_id > 1)";
                 if($i+1 < $group_ids["total_items"])$sql .= $sql_opperation;
                 $i++;
             }
         }
         if($auth === "own_auth" || $auth === "de_auth"){
             foreach($group_id as $id){
-                $sql .= "(group_id = " . $id . " and user_id = " . $user_id . ")";
+                $sql .= "(group_id = " . $id . " and user_id = " . $user_id . " and user_id > 1" .")";
                 if($i+1 < $group_ids["total_items"])$sql .= $sql_opperation;
                 $i++;
             }
