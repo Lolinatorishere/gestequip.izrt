@@ -46,9 +46,12 @@ try{
                      ,"status" => ""
                      ,"exception" => array()
                      ,"message" => array()
+                     ,"action_by_user_id" => $_SESSION["id"]
                      ,"user_id" => $data_request["user_id"]
+                     ,"destination" => "user_logs"
                      );
     $loggable["message"]["userInput"] = $data_request;
+    $success = "Deleted";
     $error_message = array();
     $deletion_guard = 0;
     $ret = array("server_message" => ""
@@ -111,6 +114,9 @@ try{
             $loggable["message"]["deletion_request"] = $delete_specific_request;
         }catch(PDOException $e){
             $loggable["exception"]["specific"] = $e->getMessage();
+            $loggable["type"] = "Server_Error";
+            $loggable["status"] = "Error";
+            $ret["message"]["title"] =  "Issue Deleting The Equipment";
             throw new Exception("Server_Error");
         }
         try{
@@ -123,6 +129,9 @@ try{
             $loggable["message"]["default"] = $delete_default_request;
         }catch(PDOException $e){
             $loggable["exception"]["default"] = $e->getMessage();
+            $loggable["type"] = "Server_Error";
+            $loggable["status"] = "Error";
+            $ret["message"]["title"] =  "Issue Deleting The Equipment";
             throw new Exception("Server_Error");
         }
         try{
@@ -132,10 +141,16 @@ try{
             $delete = delete_query($delete_user_reference_request , $pdo);
             if(isset($delete["PDOException"]))
                 throw new PDOException($update["PDOException"]);
-            $loggable["message"]["reference"] = $delete_user_reference_request;
+            $loggable["type"] = "Deleted_Equipment";
+            $loggable["message"]["deletion_request"] = $delete_user_reference_request;
+            $ret["message"]["title"] = "Success";
+            $ret["message"]["content"] = "Equipment Deleted";
             throw new Exception("Deleted");
         }catch(PDOException $e){
-            $loggable["exception"]["reference"] = $e->getMessage();
+            $loggable["exception"]["specific"] = $e->getMessage();
+            $loggable["type"] = "Server_Error";
+            $loggable["status"] = "Error";
+            $ret["message"]["title"] =  "Issue Deleting The Equipment";
             throw new Exception("Server_Error");
         }
         case 1:
@@ -149,11 +164,17 @@ try{
             $delete = delete_query($delete_user_reference_request , $pdo);
             if(isset($delete["PDOException"]))
                 throw new PDOException($update["PDOException"]);
+            $loggable["type"] = "Deleted_Equipment";
             $loggable["message"]["deletion_request"] = $delete_user_reference_request;
+            $ret["message"]["title"] = "Success";
+            $ret["message"]["content"] = "Equipment Deleted";
             throw new Exception("Deleted");
             break;
         }catch(PDOException $e){
             $loggable["exception"]["specific"] = $e->getMessage();
+            $loggable["type"] = "Server_Error";
+            $loggable["status"] = "Error";
+            $ret["message"]["title"] =  "Issue Deleting The Equipment";
             throw new Exception("Server_Error");
         }
     }
@@ -164,33 +185,8 @@ try{
             $ret["message"]["title"] = "There are multiple people or groups assigned to the equipment being deleted";
             $ret["message"]["content"] = "Please Choose between removing the equipment and all the references or just the specific reference";
             return $ret;
-        case "Deleted":
-            $loggable["type"] = "Deleted_Equipment";
-            $loggable["status"] = "OK";
-            $ret["server_message"] = "Deleted Requested Input";
-            $ret["message"]["title"] = "Success";
-            $ret["message"]["content"] = "Equipment Deleted";
-            break;
-        case "Authentication":
-            $loggable["type"] = "Auth_Error";
-            $loggable["status"] = "Error";
-            $loggable["exception"]["authentication"] = "Unauthorised Request";
-            $ret["server_message"] = "User not Authorized";
-            $ret["message"] = "User Credentials Invalid for Action";
-            break;
-        case "Validation":
-            //set in validation_guard
-            $loggable["message"]["user_input_error"] = $error_message;
-            $ret["server_message"] = "Invalid User Input";
-            $ret["message"] = $error_message;
-            break;
-        default:
-            $loggable["type"] = "Server_Error";
-            $loggable["status"] = "Error";
-            $ret["message"]["title"] =  "Issue Deleting The Equipment";
-            break;
     }
-    create_log($loggable , "equipment_logs" , $pdo);
+    log_create($ret , $success , $e , $loggable , $error_message , $pdo);
     return $ret;
 }
 }

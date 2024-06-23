@@ -39,11 +39,9 @@ function get_all_auth_users($request , $pdo){
            AS result_table
            LIMIT ". $limit . 
            " OFFSET " . ($page-1) * $limit;
-    printLog($sql);
     $statement = $pdo->prepare($sql);
     $statement->execute();
     $users_id = $statement->fetchAll(PDO::FETCH_ASSOC);
-    printLog($users_id);
     foreach ($users_id as $key => $value) {
         $user_ids[$key] = $value["user_id"];
     }

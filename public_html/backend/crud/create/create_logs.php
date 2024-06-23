@@ -78,4 +78,35 @@ try{
     return $sql_error;
 }
 }
+
+function log_create(&$ret , $success , $e , $loggable , $error_message , $pdo ){
+    switch($e->getMessage()){
+        case $success:
+            $loggable["status"] = "OK";
+            $ret["server_message"] = "Group Created";
+            break;
+        case 'Authentication':
+            $loggable["type"] = "Auth_Error";
+            $loggable["status"] = "Error";
+            $loggable["exception"]["authentication"] = "Unauthorised Request";
+            $ret["server_message"] = "Unauthorised Access";
+            $ret["message"] = array("User Credentials Invalid for Action");
+            break;
+        case 'Validation':
+            $loggable["type"] = "Input_Error";
+            $loggable["status"] = "Error";
+            $loggable["message"]["user_input_error"] = $error_message;
+            $ret["server_message"] = "Invalid User Inputs";
+            $ret["message"] = $error_message;
+            break;
+        default:
+            $loggable["type"] = "Server_Error";
+            $loggable["log_status"] = "Error";
+            $loggable["exception"]["thrown_exception"] = $e->getMessage();
+            $ret["server_message"] = "Opperation could not Be Completed";
+            $ret["message"] = $e->getMessage();
+            break;
+    }
+    create_log($loggable , $loggable["destination"] , $pdo);
+}
 ?>

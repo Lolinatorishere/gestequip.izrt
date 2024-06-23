@@ -1,8 +1,38 @@
 <?php
 
 function validate_external_create_inputs($request , $pdo , &$error_message){
-    if(validate_external_inputs($request , "user" , " users " , $pdo , $error_message) !== 1)
+    printLog($request);
+    if($request["origin"] === "reference"){
+        if(!isset($request["user_id"])){
+            $error_message = "User was not selected";
+            return 0;
+        }
+        if(validate_user_in_db($request["user_id"] , $pdo) !== 1){
+            $error_message = "User does not Exist";
+            return 0;
+        }
+        if(isset($request["group_id"])){
+            if(validate_group_in_db($request["group_id"] , $pdo) !== 1){
+                $error_message = "group does not Exist";
+                return 0;
+            }
+        }
+    }
+    if(isset($request["group"])){
+        if(validate_external_inputs($request , "group" , " user_groups " , $pdo , $error_message) !== 1)
+            return 0;
+        if(intval($request["group"]["user_permission_level"]) < 0){
+            $error_message = "Permission Level Invalid";
+            return 0;
+        }
+        if(intval($request["group"]["status"]) < 0 || intval($request["group"]["status"]) > 1){
+            $error_message = "Status Invalid";
+            return 0;
+        }
+    }else{
+        $error_message = "User didnt request any changes";
         return 0;
+    }
     return 1;
 }
 
@@ -21,15 +51,13 @@ function validate_external_update_inputs($request , $pdo , &$error_message){
             return 0;
         }
     }
-    if(isset($request["user"]["date_created"])){
-        unset($request["user"]["date_created"]);
-    }
-    if(isset($request["user"])){
-        if(validate_external_inputs($request , "user" , " users " , $pdo , $error_message) !== 1)
-            return 0;
-    }else{
+    if(!isset($data_request["group"])){
         $error_message = "User didnt request any changes";
         return 0;
+    }
+    if(isset($request["group"])){
+        if(validate_external_inputs($request , "group" , " user_groups " , $pdo , $error_message) !== 1)
+            return 0;
     }
     return 1;
 }

@@ -57,7 +57,9 @@ function group_user_auth_check($request , $pdo){
         return 0;
     $group_users_request = array("fetch" => " * "
                                 ,"table" => " users_inside_groups "
-                                ,"specific" => " group_id = " . $request["group_id"]
+                                ,"specific" => " group_id = " . $request["group_id"] 
+                                             . " AND " 
+                                             . " group_id > 1"
                                 ,"counted" => 1
                            );
     $users_in_group = get_queries($group_users_request , $pdo);

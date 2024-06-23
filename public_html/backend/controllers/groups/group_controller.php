@@ -34,6 +34,7 @@ require_once "/var/www/html/gestequip.izrt/public_html/backend/controllers/reque
 // crud modules 
 require_once common_crud . "/common/describe_column.php";
 require_once common_crud . "/create/group_create.php";
+require_once common_crud . "/create/reference_create.php";
 require_once common_crud . "/create/create_logs.php";
 require_once common_crud . "/read/logs_query.php";
 require_once common_crud . "/read/common_query.php";

@@ -20,7 +20,9 @@ try{
                      ,"action_by_user_id" => $_SESSION["id"]
                      ,"group_id" => " 1 "
                      ,"user_id" => " 0 "
+                     ,"destination" => "user_logs"
                      );
+    $success = "User_Created";
     $loggable["message"]["userInput"] = $data_request["user"];
     $loggable["message"]["userInput"]["email"] = $data_request["email"];
     if($_SESSION["user_type"] !== "Admin")
@@ -100,49 +102,19 @@ try{
         $loggable["message"]["sql"] =  $sql;
         throw new Exception("Server_Error_CU0003");
     }
+    $user_return = " id , username , users_name , email , phone_number , regional_indicator , date_created , account_status";
+    $request = array("fetch" => $user_return
+                    ,"table" => " users "
+                    ,"counted" => 1
+                    ,"specific" => " id =" . $user_id
+                    );
+    $ret["server_message"] = "User Created";
+    $ret["message"] = get_query($request , $pdo);
+    $loggable["user_id"] = $user_id;
+    $loggable["type"] = "Created_User";
     throw new Exception("Created_User");
 }catch(Exception $e){
-    switch($e->getMessage()){
-        case 'User Created':
-            $loggable["type"] = "Created_User";
-            $loggable["status"] = "OK";
-            $loggable["user_id"] = $user_id;
-            $ret["server_message"] = "Equipment Created";
-            $user_return = " id , username , users_name , email , phone_number , regional_indicator , date_created , account_status";
-            $request = array("fetch" => $user_return
-                            ,"table" => " users "
-                            ,"counted" => 1
-                            ,"specific" => " id =" . $user_id
-                            );
-            $ret["message"] = get_query($request , $pdo);
-            break;
-        case 'Authentication':
-            $loggable["type"] = "Auth_Error";
-            $loggable["status"] = "Error";
-            $loggable["exception"]["authentication"] = "Unauthorised Request";
-            $ret["server_message"] = "Unauthorised Access";
-            $ret["message"] = array("User Credentials Invalid for Action");
-            break;
-        case 'Validation':
-            $loggable["type"] = "Input_Error";
-            $loggable["status"] = "Error";
-            $loggable["message"]["user_input_error"] = $error_message;
-            $ret["server_message"] = "Invalid User Inputs";
-            $ret["message"] = $error_message;
-            break;
-        default:
-            $loggable["type"] = "Server_Error";
-            $loggable["log_status"] = "Error";
-            if(isset($equipment_id)){
-                $loggable["equipment_id"] = $equipment_id;
-                $loggable["exception"]["incomplete_creation"] = "The following User had an error inserting information " . $equipment_id;
-            }
-            $loggable["exception"]["thrown_exception"] = $e->getMessage();
-            $ret["server_message"] = "Opperation could not Be Completed";
-            $ret["message"] = $e->getMessage();
-            break;
-    }
-    create_log($loggable , "user_logs" , $pdo);
+    log_create($ret , $success , $e , $loggable , $error_message , $pdo);
     return $ret;
 }
 }

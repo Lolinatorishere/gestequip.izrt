@@ -72,6 +72,12 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
                             $error_message[$key] =  $key . " Invalid Input";
                             throw new Exception($error_message[$key] , 1);
                         }
+                        if($table["items"][$i]["Default"] === "-1"){
+                            if(intval($request[$check][$key]) <= 0){
+                            $error_message[$key] =  $key . " This Input can not be Negative";
+                            throw new Exception($error_message[$key] , 1);
+                            }
+                        }
                     }
                 }catch(typeError $e){
                     $error_message[$key] =  $key . " Invalid Input";
@@ -147,12 +153,38 @@ function validate_full_input($request , $check , $db_table , $pdo , &$error_mess
 }
 
 
+function validate_reference_existence($data_request , $pdo){
+    if(isset($data_request["equipment_id"])){
+        if(validate_equipment_references($data_request , $pdo) === 1){
+            return 1;
+        }
+    }else{
+        if(validate_user_references($data_request , $pdo)){
+            return 1;
+        }
+    }
+}
+
+
+function validate_user_references($data_request , $pdo){
+    $request = array("fetch" => " * " 
+                    ,"table" => " users_inside_groups "
+                    ,"specific" => " group_id=" . $data_request["group_id"]
+                                 . " and user_id=" . $data_request["user_id"]
+                    );
+    $equipment = get_queries($request , $pdo);
+    if($equipment["total_items"] != 1){
+        return 0;
+    }
+    return 1;
+}
+
 function validate_equipment_references($data_request , $pdo){
     $request = array("fetch" => " * " 
                     ,"table" => " users_inside_groups_equipments "
                     ,"specific" => " equipment_id=" . $data_request["equipment_id"]
-                                . " AND group_id=" . $data_request["group_id"]
-                                . " AND user_id=" . $data_request["user_id"]
+                                . " and group_id=" . $data_request["group_id"]
+                                . " and user_id=" . $data_request["user_id"]
                     );
     $equipment = get_queries($request , $pdo);
     if($equipment["total_items"] != 1){

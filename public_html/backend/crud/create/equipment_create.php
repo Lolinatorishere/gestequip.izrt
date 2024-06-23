@@ -42,8 +42,9 @@ try{
                      ,"action_by_user_id" => $_SESSION["id"]
                      ,"group_id" => $request["group_id"]
                      ,"user_id" => $request["user_id"]
+                     ,"destination" => "equipment_logs"
                      );
-    $loggable["message"]["userInput"] = $request;
+    $success = "Equipment_Created";
     // Chacks User Authentication
     if($_SESSION["user_type"]!== "Admin"){
         if(user_group_request_authentication($request , $pdo) !== 1)
@@ -60,6 +61,7 @@ try{
         } 
         throw new Exception("Validation", 1);
     }
+    $loggable["message"]["userInput"] = $request;
     $request["default"]["equipment_type"] = get_equipment_type($request["equipment_type"] , $pdo , "id");
     $sql = create_insertion_generator($request , " equipment " , "default" , 0);
     try{
@@ -129,43 +131,13 @@ try{
         $loggable["exception"]["PDOMessage"] = $e->getMessage();
         throw new Exception("equipment_Group query not made");
     }
-    throw new Exception("Equipment Created");
+    $loggable["type"] = "Created_Equipment";
+    $loggable["group_id"] = $group_id;
+    $ret["server_message"] = "Equipment Created";
+    $ret["message"] = get_equipment(" * " , $equipment_id , $pdo);
+    throw new Exception("Equipment_Created");
 }catch(Exception $e){
-    switch($e->getMessage()){
-        case 'Equipment Created':
-            $loggable["type"] = "Created_Equipment";
-            $loggable["status"] = "OK";
-            $loggable["equipment_id"] = $equipment_id;
-            $ret["server_message"] = "Equipment Created";
-            $ret["message"] = get_equipment(" * " , $equipment_id , $pdo);
-            break;
-        case 'Authentication':
-            $loggable["type"] = "Auth_Error";
-            $loggable["status"] = "Error";
-            $loggable["exception"]["authentication"] = "Unauthorised Request";
-            $ret["server_message"] = "Unauthorised Access";
-            $ret["message"] = array("User Credentials Invalid for Action");
-            break;
-        case 'Validation':
-            //loggable set by validation_guard
-            $loggable["message"]["user_input_error"] = $error_message;
-            $ret["server_message"] = "Invalid User Inputs";
-            $ret["message"] = $error_message;
-            break;
-        default:
-            $loggable["type"] = "Server_Error";
-            $loggable["log_status"] = "Error";
-            if(isset($equipment_id)){
-                $loggable["equipment_id"] = $equipment_id;
-                $loggable["exception"]["incomplete_creation"] = "The following equipment had an error inserting information " . $equipment_id;
-            }
-            $loggable["exception"]["thrown_exception"] = $e->getMessage();
-            $loggable["message"]["user_inputs"] = $request;
-            $ret["server_message"] = "Opperation could not Be Completed";
-            $ret["message"] = $e->getMessage();
-            break;
-    }
-    create_log($loggable , "equipment_logs" , $pdo);
+    log_create($ret , $success , $e , $loggable , $error_message , $pdo);
     return $ret;
 }
 }
