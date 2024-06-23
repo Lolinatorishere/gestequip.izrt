@@ -180,6 +180,9 @@ function validate_user_references($data_request , $pdo){
 }
 
 function validate_equipment_references($data_request , $pdo){
+    if(!isset($data_request["equipment_id"])){
+        return 0;
+    }
     $request = array("fetch" => " * " 
                     ,"table" => " users_inside_groups_equipments "
                     ,"specific" => " equipment_id=" . $data_request["equipment_id"]
@@ -193,7 +196,31 @@ function validate_equipment_references($data_request , $pdo){
     return 1;
 }
 
-function validate_equipment_in_db($equipment_id , $pdo){
+function validate_group_users_references_in_db($ids , $pdo){
+    $request = array("fetch" => " * " 
+                ,"table" => " users_inside_groups"
+                );
+    if(isset($ids["group_id"])){
+        $request["specific"] = "group_id=" . $ids["group_id"];
+    }
+    if(isset($ids["user_id"])){
+        $request["specific"] = "user_id=" . $ids["user_id"];
+    }
+    if(!isset($request["specific"])){
+        return 0;
+    }
+    $references = get_queries($request , $pdo);
+    if($equipment["total_items"] === 1)
+        return 1;
+    if($equipment["total_items"] > 1)
+        return 2;
+    if($equipment["total_items"] === 0)
+        return 0;
+    return 1;
+
+}
+
+function validate_equipment_references_in_db($equipment_id , $pdo){
     $request = array("fetch" => " * " 
                     ,"table" => " users_inside_groups_equipments "
                     ,"specific" => " equipment_id=\"" . $equipment_id ."\""
@@ -223,7 +250,19 @@ function validate_user_in_db($user_id , $pdo){
 function validate_group_in_db($group_id , $pdo){
     $request = array("fetch" => " * " 
                     ,"table" => " user_groups "
-                    ,"specific" => " id=" . $group_id . " AND id > 1"
+                    ,"specific" => " id=" . $group_id 
+                    );
+    $user = get_queries($request , $pdo);
+    if($user["total_items"] !== 1){
+        return 0;
+    }
+    return 1;
+}
+
+function validate_equipment_in_db($equipment_id , $pdo){
+    $request = array("fetch" => " * " 
+                    ,"table" => " equipment "
+                    ,"specific" => " id=\"" . $equipment_id ."\""
                     );
     $user = get_queries($request , $pdo);
     if($user["total_items"] !== 1){

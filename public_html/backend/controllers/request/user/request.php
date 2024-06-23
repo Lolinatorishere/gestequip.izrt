@@ -72,8 +72,15 @@ function update_request($data_request , $tab , $user_id , $pdo , $origin){
     }
 }
 
-function delete_request($data_request , $tab , $user_id , $pdo){
-    return delete_user($data_request , $pdo);
+function delete_request($data_request , $tab , $user_id , $pdo , $origin){
+    switch($origin) {
+        case 'user':
+            return delete_user($data_request , $pdo);
+        case 'reference':
+            return delete_reference($data_request , $pdo)
+        default:
+            return "Server Error";
+    }
 }
 
 ?>

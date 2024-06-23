@@ -72,22 +72,6 @@ function validate_external_delete_inputs($request , $pdo , &$error_message){
         $error_message["invalid_ref"] = "Invalid Selected Equipment Reference";
         return 0;
     }
-    $equipment_guard = validate_equipment_in_db($request["equipment_id"] , $pdo);
-    switch($equipment_guard){
-        case 1:
-            return 1;
-        //more than one user , or group is associated to this equipment
-        case 2:
-            return -1;
-        //no equipment exists with the requested values
-        case 0:
-            $error_message["error"] = "Server Error";
-            return -2;
-        //thats weird the code didnt work properly 
-        default:
-            $error_message["error"] = "Server Error";
-            return 0;
-    }
     return 1;
 }
 

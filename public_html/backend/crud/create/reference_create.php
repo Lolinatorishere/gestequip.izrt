@@ -1,7 +1,7 @@
 <?php
 
 
-function create_group_user_reference($data_request , $pdo){
+function create_user_group_reference($data_request , $pdo){
 try{
     $ret = array("server_message" => ""
                 ,"message" => "default"
@@ -22,13 +22,21 @@ try{
     if($_SESSION["user_type"] !== "Admin")
         if(user_group_request_authentication($data_request , $pdo) !== 1)
             throw new Exception("Authentication");
-    $validation_guard = validate_external_inputs($data_request , "create_reference" , "users_inside_groups" , $pdo , $error_message);
+    if(validate_external_inputs($data_request , "create_reference" , "users_inside_groups" , $pdo , $error_message) !== 1){
+        throw new Exception("Validation");
+    };
+    if(validate_user_in_db($data_request["user_id"] , $pdo) !== 1 ){
+        $error_message = "User Does Not Exist";
+        throw new Exception("Validation");
+    }
+    if(validate_group_in_db($data_request["group_id"] , $pdo) !== 1){
+        $error_message = "Group Does Not Exist";
+        throw new Exception("Validation");
+    }
     if(validate_reference_existence($data_request , $pdo) === 1){
         $error_message = "Reference Already Exists";
-        $validation_guard = 0;
-    }
-    if($validation_guard !== 1)
         throw new Exception("Validation");
+    }
     $loggable["message"]["userInput"] = $data_request["create_reference"];
     try{
         if(!isset($data_request["create_reference"]["user_permission_level"])){
@@ -47,12 +55,91 @@ try{
         $loggable["exception"]["PDOMessage"] = $e->getMessage();
         $loggable["message"]["sql"] = $sql;
         $loggable["status"] = "Error";
-        throw new Exception("Server_Error_CGR0001");
+        throw new Exception("Server_Error_CUGR0001");
     }
     $loggable["type"] = "Reference_Created";
     $ret["message"] = "Successfully linked user:" . $data_request["user_id"] ." to group:" . $data_request["group_id"];
     throw new Exception("Created_Reference");
 }catch(Exception $e){
+    $loggable["group_id"] = $data_request["group_id"];
+    $loggable["user_id"] = $data_request["user_id"];
+    log_create($ret , $success , $e , $loggable , $error_message , $pdo , $pdo_previd);
+    return $ret;
+}
+}
+
+function create_user_group_equipment_reference($data_request , $pdo){
+try{
+    $ret = array("server_message" => ""
+                ,"message" => "default"
+                );
+    $insert_error = "Reference Not Created";
+    $error_message = array();
+    $loggable = array("origin" => "Reference_Create"
+                     ,"type" => ""
+                     ,"status" => ""
+                     ,"exception" => array()
+                     ,"message" => array()
+                     ,"action_by_user_id" => $_SESSION["id"]
+                     ,"group_id" => $data_request["group_id"]
+                     ,"user_id" => $data_request["user_id"]
+                     ,"equipment_id" => $data_request["equipment_id"]
+                     ,"destination" => "reference_logs"
+                     );
+    $success = "Created_Reference";
+    if($_SESSION["user_type"] !== "Admin")
+        if(user_group_request_authentication($data_request , $pdo) !== 1)
+            throw new Exception("Authentication");
+    if(validate_external_inputs($data_request , "create_reference" , "users_inside_groups" , $pdo , $error_message) !== 1){
+        throw new Exception("Validation");
+    };
+    if(validate_user_in_db($data_request["user_id"] , $pdo) !== 1){
+        $error_message = "User Does Not Exist";
+        throw new Exception("Validation");
+    }
+    if(validate_group_in_db($data_request["group_id"] , $pdo) !== 1){
+        $error_message = "Group Does Not Exist";
+        throw new Exception("Validation");
+    }
+    if(validate_reference_existence($data_request , $pdo) === 1){
+        $error_message = "Reference Already Exists";
+        throw new Exception("Validation");
+    }
+    if(validate_equipment_in_db($data_request["equipment_id"] , $pdo) < 1){
+        $error_message = "Equipment Does Not Exist";
+        throw new Exception("Validation");
+    }
+    $loggable["message"]["userInput"] = $data_request["create_reference"];
+    try{
+        if(!isset($data_request["create_reference"]["user_permission_level"])){
+            $data_request["create_reference"]["user_permission_level"] = 0;
+        }
+        if(!isset($data_request["create_reference"]["status"])){
+            $data_request["create_reference"]["status"] = 1;
+        }
+        $data_request["create_reference"]["group_id"] = $data_request["group_id"];
+        $data_request["create_reference"]["user_id"] = $data_request["user_id"];
+        $data_request["create_reference"]["equipment_id"] = $data_request["equipment_id"];
+        $sql = create_insertion_generator($data_request , " users_inside_groups_equipments " , "create_reference" , 1);
+        $statement = $pdo->prepare($sql);
+        foreach($data_request["create_reference"] as $key => &$value){
+            $statement->bindParam(":" . $key , $value);
+        }
+        $statement->execute();
+        $pdo_previd = $pdo->lastInsertId();
+    }catch(PDOException $e){
+        $loggable["group_id"] = $data_request["group_id"];
+        $loggable["user_id"] = $data_request["user_id"];
+        $loggable["exception"]["PDOMessage"] = $e->getMessage();
+        $loggable["message"]["sql"] = $sql;
+        $loggable["status"] = "Error";
+        throw new Exception("Server_Error_CUGER0001");
+    }
+    $loggable["type"] = "Reference_Created";
+    $ret["message"] = "Successfully linked equipment:" . $data_request["equipment_id"] ." to group:" . $data_request["group_id"] . " and user:" . $data_request["user_id"];
+    throw new Exception("Created_Reference");
+}catch(Exception $e){
+    printLog($data_request);
     $loggable["group_id"] = $data_request["group_id"];
     $loggable["user_id"] = $data_request["user_id"];
     log_create($ret , $success , $e , $loggable , $error_message , $pdo , $pdo_previd);
@@ -93,9 +180,9 @@ try{
             if($validation_guard !== 1){
                 throw new Exception("Validation");
             }
-            return create_group_user_reference($data_request , $pdo);
+            return create_user_group_reference($data_request , $pdo);
         case "user_group_equipment":
-            $validation_guard = validate_external_inputs($data_request , "reference" , "users_inside_groups_equipments" , $pdo , $error_message);
+            $validation_guard = validate_external_inputs($data_request , "create_reference" , "users_inside_groups_equipments" , $pdo , $error_message);
             if(!isset($data_request["equipment_id"]) ||
                !isset($data_request["user_id"]) ||
                !isset($data_request["group_id"])){
@@ -113,7 +200,7 @@ try{
             }
             return create_user_group_equipment_reference($data_request , $pdo);
         default:
-            return "Reference Invalid";
+            return "Invalid Reference";
     }
 }catch(Exception $e){
     switch ($e->getMessage()) {

@@ -79,7 +79,7 @@ function validate_external_delete_inputs($request , $pdo , &$error_message){
         $error_message["invalid_ref"] = "Invalid Selected Equipment Reference";
         return 0;
     }
-    $equipment_guard = validate_equipment_in_db($request["equipment_id"] , $pdo);
+    $equipment_guard = validate_equipment_references_in_db($request["equipment_id"] , $pdo);
     switch($equipment_guard){
         case 1:
             return 1;

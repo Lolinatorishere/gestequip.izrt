@@ -64,37 +64,26 @@ function validate_external_update_inputs($request , $pdo , &$error_message){
 
 function validate_external_delete_inputs($request , $pdo , &$error_message){
     $error_message = array();
-    if(!isset($request["user_id"])){
-        $error_message["unset_user"] = "Unset User Id";
+    if(!isset($request["group_id"])){
+        $error_message["unset_group"] = "group_id";
         return 0;
     }
-    if(!isset($request["equipment_id"])){
-        $error_message["unset_id"] = "Unset Equipment Id";
+    if(intval($request["group_id"]) <= 0){
+        $error_message["invalid_group"] = "Invalid Selected Group";
         return 0;
     }
-    if(validate_user_group_in_db($request["user_id"] , $request["group_id"] , $pdo) !== 1){
-        $error_message["invalid_ids"] = "Invalid Selected User or Group";
+    if(validate_group_in_db($request["group_id"] , $pdo) !== 1){
+        $error_message["invalid_group"] = "Invalid Selected Group";
         return 0;
-    }
-    if(validate_equipment_references($request , $pdo) !== 1){
-        $error_message["invalid_ref"] = "Invalid Selected Equipment Reference";
-        return 0;
-    }
-    $equipment_guard = validate_equipment_in_db($request["equipment_id"] , $pdo);
-    switch($equipment_guard){
-        case 1:
-            return 1;
-        //more than one user , or group is associated to this equipment
-        case 2:
-            return -1;
-        //no equipment exists with the requested values
-        case 0:
-            $error_message["error"] = "Server Error";
-            return -2;
-        //thats weird the code didnt work properly 
-        default:
-            $error_message["error"] = "Server Error";
+    }else{
+        if($request["group_id"] === "1"){
+            $error_message["invalid_group"] = "You Can NOT Delete this Group";
             return 0;
+        }
+    }
+    $ids["group_id"] = $request["group_id"];
+    if(validate_group_users_references_in_db($ids , $pdo) !== 1){
+        return -1;
     }
     return 1;
 }

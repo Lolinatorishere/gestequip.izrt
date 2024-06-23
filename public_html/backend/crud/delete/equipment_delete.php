@@ -46,6 +46,7 @@ try{
                      ,"status" => ""
                      ,"exception" => array()
                      ,"message" => array()
+                     ,"action_by_user_id" => $_SESSION["id"]
                      ,"user_id" => $data_request["user_id"]
                      ,"group_id" => $data_request["group_id"]
                      ,"equipment_id" => $data_request["equipment_id"]

@@ -146,6 +146,35 @@ CREATE TABLE IF NOT EXISTS sudo_group (
   FOREIGN KEY (id_user) REFERENCES users (id)
 );
 
+CREATE TABLE group_logs (
+  id int NOT NULL AUTO_INCREMENT,
+  date_created timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  log_type varchar(64) NOT NULL,
+  log_message longtext NOT NULL,
+  action_by_user_id int DEFAULT NULL,
+  group_id int DEFAULT NULL,
+  log_status varchar(32) DEFAULT NULL,
+  log_origin varchar(64) DEFAULT NULL,
+  PRIMARY KEY (id)
+  );
+
+CREATE TABLE reference_logs (
+  id int NOT NULL AUTO_INCREMENT,
+  date_created timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  log_type varchar(64) NOT NULL,
+  log_message longtext NOT NULL,
+  action_by_user_id int DEFAULT NULL,
+  group_id int DEFAULT NULL,
+  user_id int DEFAULT NULL,
+  equipment_id int DEFAULT NULL,
+  log_status varchar(32) DEFAULT NULL,
+  log_origin varchar(64) DEFAULT NULL,
+  PRIMARY KEY (id)
+  );
+
+
+
+
 -- 
 -- CREATE OR REPLACE VIEW computer_equipment AS
     -- SELECT 
