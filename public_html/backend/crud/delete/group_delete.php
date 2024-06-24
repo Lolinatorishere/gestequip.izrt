@@ -6,7 +6,7 @@ include_once query_generator_dir;
 //be a funciton that reinstates the previous information into the server in the correct places
 function unaltered_group_information_full($data_request , $pdo){
     $request = array("fetch" => " * "
-                   ,"table" => " users_groups "
+                   ,"table" => " user_groups "
                    ,"counted" => 1
                    ,"specific" => "id=" . $data_request["group_id"]
                    );
@@ -26,73 +26,71 @@ function unaltered_group_information_full($data_request , $pdo){
     return $previous_info;
 }
 
+function unaltered_user_group_information($data_request , $pdo){
+    $request = array("fetch" => " * "
+                   ,"table" => " user_groups "
+                   ,"counted" => 1
+                   ,"specific" => "id=" . $data_request["group_id"]
+                   );
+    $previous_info["group"] = get_queries($request , $pdo)["items"];
+    return $previous_info;
+}
+
 function delete_group($data_request , $pdo){
 try{
-    $loggable = array("origin" => "Equipment_Delete"
+    $loggable = array("origin" => "Group_Delete"
                      ,"type" => ""
                      ,"status" => ""
                      ,"exception" => array()
                      ,"message" => array()
                      ,"action_by_user_id" => $_SESSION["id"]
-                     ,"user_id" => $data_request["user_id"]
                      ,"group_id" => $data_request["group_id"]
-                     ,"equipment_id" => $data_request["equipment_id"]
                      );
     $loggable["message"]["userInput"] = $data_request;
     $error_message = array();
-    $deletion_guard = 0;
+    $deletion_guard = 10;
     $ret = array("server_message" => ""
                 ,"message" => array()
                 );
-    if($_SESSION["uset_type"] !== "Admin")
+    if($_SESSION["user_type"] !== "Admin")
         throw new Exception("Authentication");
     $validation_guard = validate_external_delete_inputs($data_request , $pdo , $error_message);
-    if($validation_guard !== 1){
-        switch($validation_guard){
-        case 0:
-            $loggable["type"] = "Input_Error";
-            $loggable["status"] = "Warning";
-            throw new Exception("Validation");
-            break;
-        //Multiple group references detected return to frontend 
-        //a question if they genuinly want to remove  
-        // the group (thus removing all references to it from the db and itself)
-        case -1:
-            if(isset($data_request["response"])){
-                switch($data_request["response"]){
-                case 'yes':
-                    $deletion_guard = 1;
-                    break;
-                case 'no':
-                    $ret["server_message"] = "Canceled Operation";
-                    $ret["message"] = "the operation has been canceled";
-                    return $ret;
-                default:
-                    throw new Exception("Question");
-                }
-            }else{
+    if($validation_guard !== 1)
+        throw new Exception("Validation");
+    $ids["group_id"] = $data_request["group_id"];
+    $reference_guard = validate_group_users_references_in_db($ids , $pdo);
+    printLog($reference_guard);
+    if($reference_guard >= 1){
+        printLog($data_request);
+        if(isset($data_request["response"])){
+            switch($data_request["response"]){
+            case 'yes':
+                $deletion_guard = 0;
+                break;
+            case 'no':
+                $ret["server_message"] = "Canceled Operation";
+                $ret["message"] = "the operation has been canceled";
+                return $ret;
+            default:
                 throw new Exception("Question");
             }
-            break;
-        case -2:
-            //no equipment in the db with the id
-            $loggable["type"] = "Input_Error";
-            $loggable["status"] = "Warning";
-            throw new Exception("Validation");
-        default:
-            $loggable["status"] = "Error";
-            $loggable["exception"]["validation"] = "Invalid Validation Check, check validation code for possible bugs";
-            throw new Exception("Validation");
+        }else{
+            throw new Exception("Question");
         }
+    }else if($reference_guard === 0){
+        $deletion_guard = 1;
+    }else{
+        $loggable["status"] = "Error";
+        $loggable["exception"]["validation"] = "Invalid Validation Check, check validation code for possible bugs";
+        $error_message = "Invalid Validation Check ";
+        throw new Exception("Validation");
     }
     switch($deletion_guard){
         case 0:
         try{
-            $loggable["message"]["previousInfo"] = unaltered_equipment_information_full($data_request , $pdo);
-            $equipment_type_id = get_equipment(" equipment_type " , $data_request["equipment_id"] , $pdo);
-            $equipment_type = get_equipment_type($equipment_type_id["items"][0]["equipment_type"] , $pdo , "name");
-            $delete_specific_request = array("table" => $equipment_type
-                                            ,"specific" => "equipment_id=" . $data_request["equipment_id"]
+            $loggable["message"]["previousInfo"] = unaltered_group_information_full($data_request , $pdo);
+            $delete_specific_request = array("table" => " users_inside_groups_equipments "
+                                            ,"specific" => "group_id=" . $data_request["group_id"]
                                             );
             $delete = delete_query($delete_specific_request, $pdo);
             if(isset($delete["PDOException"]))
@@ -103,8 +101,8 @@ try{
             throw new Exception("Server_Error");
         }
         try{
-            $delete_default_request = array("table" => " equipment "
-                                           ,"specific" => "id=" . $data_request["equipment_id"]
+            $delete_default_request = array("table" => " users_inside_groups "
+                                           ,"specific" => "group_id=" . $data_request["group_id"]
                                            );
             $delete = delete_query($delete_default_request, $pdo);
             if(isset($delete["PDOException"]))
@@ -115,11 +113,10 @@ try{
             throw new Exception("Server_Error");
         }
         try{
-            $delete_user_reference_request = array("table" => " users_inside_groups_equipments "
-                                                  ,"specific" => "equipment_id=" . $data_request["equipment_id"]
+            $delete_user_reference_request = array("table" => " user_groups "
+                                                  ,"specific" => " id=" . $data_request["group_id"]
                                                   );
-            $delete = delete_query($delete_user_reference_request , $pdo);
-            if(isset($delete["PDOException"]))
+            $delete = delete_query($delete_user_reference_request , $pdo); if(isset($delete["PDOException"]))
                 throw new PDOException($update["PDOException"]);
             $loggable["message"]["reference"] = $delete_user_reference_request;
             throw new Exception("Deleted");
@@ -129,11 +126,9 @@ try{
         }
         case 1:
         try{
-            $loggable["message"]["previousInfo"] = unaltered_equipment_information_reference($data_request , $pdo);
-            $delete_user_reference_request = array("table" => " users_inside_groups_equipments "
-                                                  ,"specific" => " equipment_id=" . $data_request["equipment_id"]
-                                                               . " AND group_id=" . $data_request["group_id"]
-                                                               . " AND user_id=" . $data_request["user_id"]
+            $loggable["message"]["previousInfo"] = unaltered_user_group_information($data_request , $pdo);
+            $delete_user_reference_request = array("table" => " user_groups "
+                                                  ,"specific" => " id=" . $data_request["group_id"]
                                                   );
             $delete = delete_query($delete_user_reference_request , $pdo);
             if(isset($delete["PDOException"]))
@@ -145,6 +140,8 @@ try{
             $loggable["exception"]["specific"] = $e->getMessage();
             throw new Exception("Server_Error");
         }
+        default:
+            return["Server Validation Error"];
     }
 }catch(Exception $e){
     switch($e->getMessage()){
@@ -179,7 +176,7 @@ try{
             $ret["message"]["title"] =  "Issue Deleting The Equipment";
             break;
     }
-    create_log($loggable , "equipment_logs" , $pdo);
+    create_log($loggable , "group_logs" , $pdo);
     return $ret;
 }
 }

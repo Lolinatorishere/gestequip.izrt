@@ -58,7 +58,15 @@ function read_request($tab , &$data_request , $user_id , $pdo){
 }
 
 function create_request($data_request , $tab , $user_id , $pdo){
-    return create_user($data_request , $pdo);
+    switch($origin) {
+        case 'user':
+            return create_user($data_request , $pdo);
+        case 'reference':
+            $data_request["reference"] = "user_group"
+            return create_reference($data_request , $pdo)
+        default:
+            return "Server Error";
+    }
 }
 
 function update_request($data_request , $tab , $user_id , $pdo , $origin){
@@ -77,6 +85,7 @@ function delete_request($data_request , $tab , $user_id , $pdo , $origin){
         case 'user':
             return delete_user($data_request , $pdo);
         case 'reference':
+            $data_request["reference"] = "user_group"
             return delete_reference($data_request , $pdo)
         default:
             return "Server Error";

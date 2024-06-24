@@ -62,26 +62,27 @@ function create_request($data_request , $tab , $user_id , $pdo , $origin){
         case 'group':
             return create_group($data_request , $pdo);
         case 'reference':
+            $data_request["reference"] = "user_group";
             return create_reference($data_request , $pdo);
         default:
-            $data_request["error"] = "error";
-            return $data_request;
+            return "Invalid Origin";
     }
 }
 
-function update_request($data_request , $tab , $user_id , $pdo , $origin){
-    switch($origin){
-        case 'user':
-            return update_user($data_request , $pdo);
-        case 'permission':
-            return update_user_group_permission($data_request , $pdo);
+function update_request($data_request , $tab , $user_id , $pdo ){
+    return update_group($data_request , $pdo);
+}
+
+function delete_request($data_request , $tab , $user_id , $pdo , $origin){
+    printLog($origin);
+    switch($origin) {
+        case 'group':
+            return delete_group($data_request , $pdo);
+        case 'reference':
+            return delete_reference($data_request , $pdo);
         default:
-            return "Origin Error";
+            return "Invalid Origin";
     }
-}
-
-function delete_request($data_request , $tab , $user_id , $pdo){
-    return delete_user($data_request , $pdo);
 }
 
 ?>

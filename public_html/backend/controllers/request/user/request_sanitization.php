@@ -61,9 +61,6 @@ function tab_update_information_sanitize($tab , $user_id , $pdo){
 
 function tab_delete_information_sanitize($tab , $user_id , $pdo){
     $data_request = array();
-    if(isset($_POST["user_id"])){
-        $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["user_id"]);
-    }
     if(isset($_POST["group_id"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["group_id"]);
     }

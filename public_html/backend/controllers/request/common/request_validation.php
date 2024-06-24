@@ -210,14 +210,13 @@ function validate_group_users_references_in_db($ids , $pdo){
         return 0;
     }
     $references = get_queries($request , $pdo);
-    if($equipment["total_items"] === 1)
+    if($references["total_items"] === 1)
         return 1;
-    if($equipment["total_items"] > 1)
+    if($references["total_items"] > 1)
         return 2;
-    if($equipment["total_items"] === 0)
+    if($references["total_items"] === 0)
         return 0;
-    return 1;
-
+    return -1;
 }
 
 function validate_equipment_references_in_db($equipment_id , $pdo){
@@ -232,7 +231,7 @@ function validate_equipment_references_in_db($equipment_id , $pdo){
         return 2;
     if($equipment["total_items"] === 0)
         return 0;
-    return 1;
+    return -1;
 }
 
 function validate_user_in_db($user_id , $pdo){
