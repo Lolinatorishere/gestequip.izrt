@@ -93,7 +93,7 @@ function equipment_search_query_default($queries , &$db_responses , $pdo , $page
     if($page_check["paged_query"] === "default_query"){
         $page = $page_check["page"];
     }
-    if(validate_external_search_inputs($queries , "default_query" , " equipment " , $pdo) !== 1){
+    if(equipment_validate_external_search_inputs($queries , "default_query" , " equipment " , $pdo) !== 1){
         $info_from_server = "No Queries";
         return;
     }
@@ -109,7 +109,7 @@ function equipment_search_query_default($queries , &$db_responses , $pdo , $page
         $equipment_ids_string = sql_array_query_metacode($equipment_ids);
         $guard = 1;
     }
-    $string_query = equipment_search_query_parse_inputs($queries["default_query"]);
+    $string_query = search_query_parse_inputs($queries["default_query"]);
     if($guard == 1){
         $specific_string = " id IN(" . $equipment_ids_string . ") AND (" . $string_query . ")";
     }else{
@@ -218,7 +218,7 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
         return;
     // todo Please for the love of god fix this buffalo buffalobuffalobuffalobuffalobuffalobuffalobuffalobuffalobuffalo
     // situation
-    if(validate_external_search_inputs($queries , "specific_query" , $db_responses["equipment_type"]["equipment_type"]["equipment_type"] , $pdo) !== 1){
+    if(equipment_validate_external_search_inputs($queries , "specific_query" , $db_responses["equipment_type"]["equipment_type"]["equipment_type"] , $pdo) !== 1){
         $info_from_server = "No Queries";
         return;
     }
@@ -236,7 +236,7 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
         array_push($equipment_ids , $item["id"]);
     }
     $equipment_ids_string = sql_array_query_metacode($equipment_ids);
-    $string_query = equipment_search_query_parse_inputs($queries["specific_query"]);
+    $string_query = search_query_parse_inputs($queries["specific_query"]);
     $request = array("fetch" => " * "
                     ,"table" => $db_responses["equipment_type"]["equipment_type"]["equipment_type"]
                     ,"specific" => " equipment_id IN (" . $equipment_ids_string . ") AND (" . $string_query . ") "

@@ -1,6 +1,6 @@
 <?php
 
-function equipment_search_query_parse_inputs($queries){
+function search_query_parse_inputs($queries){
     $sql = "";
     $i = 1;
     $total_parameters = count($queries);

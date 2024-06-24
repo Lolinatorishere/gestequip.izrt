@@ -2,7 +2,7 @@
 
 // Validate table inputs
 // uses the requests and checks against the db table to see if its a valid search
-function validate_external_search_inputs($request , $check , $db_table , $pdo){
+function equipment_validate_external_search_inputs($request , $check , $db_table , $pdo){
     $table_check = 0;
     $table_request = array("table" => $db_table);
     $table = describe_table($table_request , $pdo);
