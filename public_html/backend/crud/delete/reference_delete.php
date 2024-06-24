@@ -1,10 +1,41 @@
 <?php
 
+function unaltered_reference_information_full($data_request , $pdo){
+    $request = array("fetch" => " * "
+                   ,"table" => " users_inside_groups "
+                   ,"counted" => 1
+                   ,"specific" => "group_id=" . $data_request["group_id"]
+                                . " AND user_id=" . $data_request["user_id"]
+                   );
+    $previous_info["group_user_references"] = get_queries($request , $pdo)["items"];
+    $request = array("fetch" => " * "
+                   ,"table" => " users_inside_groups_equipments "
+                   ,"specific" => "group_id=" . $data_request["group_id"]
+                                . " AND user_id=" . $data_request["user_id"]
+                   );
+    $previous_info["group_user_equipment_references"] = get_queries($request , $pdo)["items"];
+    if(count($previous_info["group_user_equipment_references"]) < 1){
+        unset($previous_info["group_user_equipment_references"]);
+    }
+    return $previous_info;
+}
+
+function unaltered_user_group_equipment_reference_information($data_request , $pdo){
+    $request = array("fetch" => " * "
+                    ,"table" => " users_inside_groups_equipments "
+                    ,"counted" => 1
+                    ,"specific" => "group_id=" . $data_request["group_id"]
+                                 . " AND user_id=" . $data_request["user_id"]
+                                 . " AND equipment_id=" . $data_request["equipment_id"]
+                    );
+    $previous_info["group_user_equipment_references"] = get_queries($request , $pdo)["items"];
+    return $previous_info;
+}
 
 function delete_user_group_reference($data_request , $pdo){
 try{
     $ret = array("server_message" => ""
-                ,"message" => "default"
+                ,"message" => array()
                 );
     $insert_error = "Reference Not Created";
     $error_message = array();
@@ -18,7 +49,8 @@ try{
                      ,"user_id" => $data_request["user_id"]
                      ,"destination" => "reference_logs"
                      );
-    $success = "Created_Reference";
+    $success = "Deleted";
+    $deletion_guard = 10;
     if($_SESSION["user_type"] !== "Admin")
         if(user_group_request_authentication($data_request , $pdo) !== 1)
             throw new Exception("Authentication");
@@ -34,26 +66,92 @@ try{
         $error_message = "Reference Doesnt Exist";
         throw new Exception("Validation");
     }
-    $loggable["message"]["userInput"] = $data_request;
-    try{
-        $request = array("table" => " users_inside_groups "
-                        ,"specific" => " user_id=" . $data_request["user_id"]
-                                     . " AND group_id=" . $data_request["group_id"]
-                        );
-        $delete = delete_query($request , $pdo);
-        if(isset($delete["PDOException"]))
-            throw new PDOException($delete["PDOException"]);
-    }catch(PDOException $e){
-        $loggable["group_id"] = $data_request["group_id"];
-        $loggable["user_id"] = $data_request["user_id"];
-        $loggable["exception"]["PDOMessage"] = $e->getMessage();
-        $ret["message"] = "Reference not Deleted";
-        $loggable["status"] = "Error";
-        throw new Exception("Server_Error_DUGR0001");
+    if(validate_user_group_references_with_equipment($data_request , $pdo) !== 1){
+        if(isset($data_request["response"])){
+            switch($data_request["response"]){
+            case 'yes':
+                $deletion_guard = 0;
+                break;
+            case 'no':
+                $ret["server_message"] = "Canceled Operation";
+                $ret["message"] = "the operation has been canceled";
+                return $ret;
+            default:
+                $ret["server_message"] = "Multiple References Assigned To Object";
+                $ret["message"]["title"] = "Please Confirm The Deletion of the Reference";
+                $ret["message"]["content"] = "There are multiple people groups and equipment linked to the reference being deleted";
+                return $ret;
+            }
+        }else{
+            $ret["server_message"] = "Multiple References Assigned To Object";
+            $ret["message"]["title"] = "Please Confirm The Deletion of the Reference";
+            $ret["message"]["content"] = "There are multiple people groups and equipment linked to the reference being deleted";
+            return $ret;
+        }
+    }else{
+        $deletion_guard = 1;
     }
+    $loggable["message"]["userInput"] = $data_request;
+    if($deletion_guard == 1){
+        $loggable["message"]["previousInfo"] = unaltered_reference_information_full($data_request , $pdo);
+        try{
+            $request = array("table" => " users_inside_groups_equipments "
+                            ,"specific" => " user_id=" . $data_request["user_id"]
+                                         . " AND group_id=" . $data_request["group_id"]
+            );
+            $delete = delete_query($request , $pdo);
+            if(isset($delete["PDOException"]))
+                throw new PDOException($delete["PDOException"]);
+        }catch(PDOException $e){
+            $loggable["group_id"] = $data_request["group_id"];
+            $loggable["user_id"] = $data_request["user_id"];
+            $loggable["exception"]["PDOMessage"] = $e->getMessage();
+            $ret["message"] = "Reference not Fully Deleted";
+            $loggable["status"] = "Error";
+            throw new Exception("Server_Error_DUGR0001");
+        }
+        try{
+            $request = array("table" => " users_inside_groups "
+                            ,"specific" => " user_id=" . $data_request["user_id"]
+                                         . " AND group_id=" . $data_request["group_id"]
+            );
+            $delete = delete_query($request , $pdo);
+            if(isset($delete["PDOException"]))
+                throw new PDOException($delete["PDOException"]);
+        }catch(PDOException $e){
+            $loggable["group_id"] = $data_request["group_id"];
+            $loggable["user_id"] = $data_request["user_id"];
+            $loggable["exception"]["PDOMessage"] = $e->getMessage();
+            $ret["message"] = "Reference not Fully Deleted";
+            $loggable["status"] = "Error";
+            throw new Exception("Server_Error_DUGR0002");
+        }
         $loggable["type"] = "Reference_Deleted";
         $ret["message"] = "Successfully Deleted Referenece group:" . $data_request["group_id"] . " and user:" . $data_request["user_id"];
         throw new Exception("Deleted");
+    }
+    if($deletion_guard = 0){
+        try{
+            $loggable["message"]["previousInfo"] = unaltered_reference_information_full($data_request , $pdo);
+            $request = array("table" => " users_inside_groups "
+                            ,"specific" => " user_id=" . $data_request["user_id"]
+                                         . " AND group_id=" . $data_request["group_id"]
+            );
+            $delete = delete_query($request , $pdo);
+            if(isset($delete["PDOException"]))
+                throw new PDOException($delete["PDOException"]);
+        }catch(PDOException $e){
+            $loggable["group_id"] = $data_request["group_id"];
+            $loggable["user_id"] = $data_request["user_id"];
+            $loggable["exception"]["PDOMessage"] = $e->getMessage();
+            $ret["message"] = "Reference not Deleted";
+            $loggable["status"] = "Error";
+            throw new Exception("Server_Error_DUGR0003");
+        }
+        $loggable["type"] = "Reference_Deleted";
+        $ret["message"] = "Successfully Deleted Referenece group:" . $data_request["group_id"] . " and user:" . $data_request["user_id"];
+        throw new Exception("Deleted");
+    }
 }catch(Exception $e){
     $loggable["group_id"] = $data_request["group_id"];
     $loggable["user_id"] = $data_request["user_id"];
@@ -102,6 +200,7 @@ try{
     }
     $loggable["message"]["userInput"] = $data_request;
     try{
+        $loggable["message"]["previousInfo"] = unaltered_user_group_equipment_reference_information($data_request , $pdo);
         $request = array("table" => " users_inside_groups_equipments "
                         ,"specific" => "equipment_id=" . $data_request["equipment_id"]
                                      . " AND user_id=" . $data_request["user_id"]

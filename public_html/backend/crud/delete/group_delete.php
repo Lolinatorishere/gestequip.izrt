@@ -59,9 +59,7 @@ try{
         throw new Exception("Validation");
     $ids["group_id"] = $data_request["group_id"];
     $reference_guard = validate_group_users_references_in_db($ids , $pdo);
-    printLog($reference_guard);
     if($reference_guard >= 1){
-        printLog($data_request);
         if(isset($data_request["response"])){
             switch($data_request["response"]){
             case 'yes':
@@ -146,9 +144,9 @@ try{
 }catch(Exception $e){
     switch($e->getMessage()){
         case "Question":
-            $ret["server_message"] = "Multiple Users/Groups Assigned To Equipment";
-            $ret["message"]["title"] = "There are multiple people or groups assigned to the equipment being deleted";
-            $ret["message"]["content"] = "Please Choose between removing the equipment and all the references or just the specific reference";
+            $ret["server_message"] = "Multiple References Assigned To Object";
+            $ret["message"]["title"] = "Please Confirm The Deletion of the Group";
+            $ret["message"]["content"] = "There are multiple people or groups assigned to the group being deleted";
             return $ret;
         case "Deleted":
             $loggable["type"] = "Deleted_Equipment";

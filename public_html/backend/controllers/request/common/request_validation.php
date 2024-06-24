@@ -196,6 +196,19 @@ function validate_equipment_references($data_request , $pdo){
     return 1;
 }
 
+function validate_user_group_references_with_equipment($data_request , $pdo){
+    $request = array("fetch" => " * " 
+                    ,"table" => " users_inside_groups_equipments "
+                    ,"specific" => " group_id=" . $data_request["group_id"]
+                                 . " and user_id=" . $data_request["user_id"]
+                    );
+    $equipment = get_queries($request , $pdo);
+    if($equipment["total_items"] < 1){
+        return 0;
+    }
+    return 1;
+}
+
 function validate_group_users_references_in_db($ids , $pdo){
     $request = array("fetch" => " * " 
                 ,"table" => " users_inside_groups"
