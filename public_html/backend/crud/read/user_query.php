@@ -45,13 +45,13 @@ function get_all_auth_users($request , $pdo){
     foreach ($users_id as $key => $value) {
         $user_ids[$key] = $value["user_id"];
     }
-    $request_user = array("fetch" => " id , users_name "
+    $request_user = array("fetch" => " id , username , users_name , email , phone_number , regional_indicator , date_created , account_status"
                           ,"table" => " users "
                           ,"counted" => 1
                           ,"specific" => "id IN(" . sql_array_query_metacode($user_ids) . ") "
                           );
     $users = get_queries($request_user , $pdo);
-    $ret["items"] = $users;
+    $ret["items"] = $users["items"];
     $ret["pages"] = $pages;
     $ret["current_page"] = $page;
     $ret["paging"] = 1; 
@@ -108,14 +108,14 @@ function get_users($request , $pdo){
                 $sudo_request = array("fetch" => " admin_status "
                                      ,"table" => " sudo_group "
                                      ,"counted" => 1
-                                     ,"specific" => "id_user=" . $user_id["id"]
+                                     ,"specific" => "id_user=" . $user_id["user_id"]
                                      );
                 $sudo_info = get_query($sudo_request , $pdo);
             }
         }
         $request = array("fetch" => $user_fetch
                         ,"table" => " users "
-                        ,"specific" => " id = " . $user_id["id"]
+                        ,"specific" => " id = " . $user_id["user_id"]
                         ,"counted" => 1
                         );
         $user = get_query($request , $pdo);

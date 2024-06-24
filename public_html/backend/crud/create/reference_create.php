@@ -139,7 +139,6 @@ try{
     $ret["message"] = "Successfully linked equipment:" . $data_request["equipment_id"] ." to group:" . $data_request["group_id"] . " and user:" . $data_request["user_id"];
     throw new Exception("Created_Reference");
 }catch(Exception $e){
-    printLog($data_request);
     $loggable["group_id"] = $data_request["group_id"];
     $loggable["user_id"] = $data_request["user_id"];
     log_create($ret , $success , $e , $loggable , $error_message , $pdo , $pdo_previd);

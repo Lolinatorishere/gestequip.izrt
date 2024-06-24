@@ -127,6 +127,11 @@ function equipment_search_query_default($queries , &$db_responses , $pdo , $page
         $info_from_server = "No Queries";
         return;
     }
+    $equipments = array();
+    foreach($db_responses["default_query"]["items"] as $key => $value){
+        array_push($equipments , get_equipment(" * " , $value["id"] , $pdo)["items"][0]);
+    }
+    $db_responses["default_query"]["items"] = $equipments;
     $info_from_server = "Found Queries";
 }
 
@@ -160,7 +165,7 @@ function equipment_search_query_equipment_type($queries , &$db_responses , $pdo 
     );
     $equipment_types = get_queries($request , $pdo);
     foreach($equipment_types["items"] as $item){
-        if($queries["equipment_type"] === $item["equipment_type"]){
+        if($queries["equipment_type"]["equipment_type"] === $item["equipment_type"]){
             $specific_item = $item["id"];
             $db_responses_eq_type = $item;
         }
@@ -247,13 +252,14 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
     $info_from_server = "Found Queries";
 }
 
-// todo create logging for search queries
+// nottodo create logging for search queries
+// future me: nuh uh
 function equipment_search_query($queries , $pdo , $page_check){
     $info_from_server = "unset";
     $loggable = array();
     $ret = array("message" => "Server Error"); 
     $db_responses = array();
-    $parsed_search;
+    $parsed_search = array();
     equipment_search_query_user_group_id($queries , $db_responses ,  $pdo , $page_check , $info_from_server);
     equipment_search_query_default($queries , $db_responses , $pdo , $page_check , $info_from_server);
     equipment_search_query_equipment_type($queries , $db_responses , $pdo , $page_check , $info_from_server);
@@ -272,6 +278,18 @@ function equipment_search_query($queries , $pdo , $page_check){
                 $parsed_search = $response;
             }
             $i++;
+        }
+        $items_parsed = array();
+        if(isset($db_responses["specific_query"])){
+            foreach ($db_responses["specific_query"]["items"] as $specific_id => $s_value) {
+                foreach ($db_responses["equipment_type"]["items"] as $type_id => $t_value) {
+                    if($s_value["equipment_id"] !== $t_value["id"]){
+                        continue;
+                    }
+                    array_push($items_parsed , get_equipment(" * " , $t_value["id"] , $pdo)["items"][0]);
+                }
+            }
+            $parsed_search["items"] = $items_parsed;
         }
         $ret["message"] = "Found " . $parsed_search["total_items"];
         if($parsed_search["total_items"] !== 1){

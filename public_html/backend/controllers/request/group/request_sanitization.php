@@ -3,7 +3,6 @@
 function tab_create_information_sanitize($tab , $user_id , $pdo){
     $data_request = array();
     $data_request = sanitize_query($_POST);
-    printLog($data_request);
     if(isset($_GET["rgin"])){// origin of refresh
         $origin = preg_replace('/[^a-zA-Z0-9]/s' , '' , $_GET["rgin"]);
     }else{

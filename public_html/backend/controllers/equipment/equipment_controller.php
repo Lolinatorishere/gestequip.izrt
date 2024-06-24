@@ -40,7 +40,7 @@ require_once common_crud . "/read/equipment_query.php";
 require_once common_crud . "/read/group_query.php";
 require_once common_crud . "/read/logs_query.php";
 require_once common_crud . "/read/user_query.php";
-require_once common_crud . "/read/search_query.php";
+require_once common_crud . "/read/equipment_search.php";
 require_once common_crud . "/update/common_update.php";
 require_once common_crud . "/update/equipment_update.php";
 require_once common_crud . "/delete/common_delete.php";

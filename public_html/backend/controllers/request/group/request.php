@@ -74,7 +74,6 @@ function update_request($data_request , $tab , $user_id , $pdo ){
 }
 
 function delete_request($data_request , $tab , $user_id , $pdo , $origin){
-    printLog($origin);
     switch($origin) {
         case 'group':
             return delete_group($data_request , $pdo);

@@ -58,10 +58,14 @@ function refresh_get_users_groups($data_request , $pdo){
 }
 
 function refresh_get_groups_users($auth_groups , $data_request , $pdo){
+
     foreach ($auth_groups as $auth) {
         if($auth == $data_request["origin"]){
             $guard = 0;
         }
+    }
+    if($_SESSION["user_type"] === "Admin"){
+        $guard = 0;
     }
     if(!isset($guard))
         return "none";

@@ -106,7 +106,6 @@ try{
     return $ret;
 }
 }
-
 function get_equipment($fetch , $equipment_id , $pdo){
 try{
     if(!isset($equipment_id))

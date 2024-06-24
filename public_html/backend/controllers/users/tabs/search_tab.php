@@ -5,43 +5,46 @@ function on_request_sch_load($auth_groups , $data_request , $pdo , $user_id){
     $i = 0;
     $ret = array("users" => ""
                 ,"groups" => ""
-                ,"equipment_types" => ""
-                ,"equipment_defaults" => ""
+                ,"search_table" => ""
                 );
     $users = array();
     $groups = array("items" => array());
     if(!isset($data_request["limit"])){
         $data_request["limit"] = $limit;
     }
-    $users = get_all_auth_users($data_request , $pdo);
-    foreach($auth_groups as $auth_group){
-        if($i > $limit-1)
-            break;
-        $request = array("fetch" => " id , group_name "
+    if($_SESSION["user_type"] !== "Admin"){
+        $users = get_all_auth_users($data_request , $pdo);
+    }else{
+        $request = array("fetch" => " id , username , users_name , email , phone_number , regional_indicator , date_created , account_status"
+                        ,"table" => " users "
+                        ,"counted" => 1
+                        ,"specific" => " id > 1 " 
+                        );
+        $users = get_queries($request , $pdo);
+    }
+    $ret["users"] = $users;
+    if($_SESSION["user_type"] !== "Admin"){
+        $ret["groups"] = $auth_groups;
+    }else{
+        $request = array("fetch" => " * "
                         ,"table" => " user_groups "
                         ,"counted" => 1
-                        ,"specific" => "id=" . $auth_group
+                        ,"specific" => " id > 1 " 
                         );
-        array_push($groups["items"] , get_query($request , $pdo)["items"]);
+        $ret["groups"] = get_queries($request , $pdo);
     }
-    $groups["pages"] = ceil(count($auth_groups)/$limit);
-    $groups["curent_page"] = 1;
-    $groups["paging"] = 1;
-    $groups["total_items"] = count($auth_groups);
-    $request = array("fetch" => " * " 
-                    ,"table" => " equipment_types "
-                    ,"counted" => 1
-                    );
-    $equipment_types = get_queries($request , $pdo);
-    $filter = array();
-    $equipment_types["items"] = clean_query($filter , $equipment_types["items"]);
-    $request = array("table" => "equipment");
-    $default_columns = describe_table($request , $pdo);
-    $default_columns["items"] = parse_equipment_type_columns($default_columns["items"]);
-    $ret["users"] = $users;
-    $ret["groups"] = $groups;
-    $ret["equipment_defaults"] = $default_columns["items"];
-    $ret["equipment_types"] = $equipment_types["items"];
+    $request = array("table" => " users ");
+    $user_table = describe_table($request , $pdo);
+    $return_table = array();
+    foreach ($user_table["items"] as $key => $value) {
+        if($value["Field"] === "id"||
+           $value["Field"] === "pass"||
+           $value["Field"] === "date_created"){
+            continue;
+        }
+        array_push($return_table , $value);
+    }
+    $ret["search_table"] = $return_table;
     return $ret;
 }
 
@@ -57,19 +60,25 @@ function refresh_get_users_groups($data_request , $pdo){
                     ,"specific" => " user_id=\"" . $request_id . "\""
                     );
     $groups = get_queries($group_request , $pdo);
-    $auth_groups = check_against_auth_groups($groups["items"]);
+    if($_SESSION["user_type"] !== "Admin"){
+        $auth_groups = check_against_auth_groups($groups["items"]);
+    }else{
+        $auth_groups = $groups["items"];
+    }
     $total_items = count($auth_groups);
-    for($i = 0 ; $i + $offset < $total_items ; $i++){
-        $ioff = $i + $offset;
-        $group_id = $auth_groups[$ioff]["group_id"];
+    for($i = 0 ; $i < $total_items ; $i++){
+        $group_id = $auth_groups[$i]["group_id"];
         $request = array("fetch" => " id , group_name "
             ,"table" => " user_groups "
             ,"counted" => 1
-            ,"specific" => " id=\"" . $group_id . "\" "
+            ,"specific" => " id=\"" . $group_id . "\" and id > 1"
         );
-        if($i > $limit + $offset)
+        if($i >= $limit )
             break;
-        array_push($accepted_groups , get_query($request , $pdo)["items"]);
+        $group_info = get_query($request , $pdo)["items"];
+        if(empty($group_info))
+            continue;
+        array_push($accepted_groups , $group_info);
     }
     $ret["items"] = $accepted_groups;
     $ret["total_items"] = $total_items;
@@ -85,12 +94,14 @@ function refresh_get_groups_users($auth_groups , $data_request , $pdo){
             $guard = 0;
         }
     }
+    if($_SESSION["user_type"] === "Admin"){
+        $guard = 0;
+    }
     if(!isset($guard))
         return "none";
-    $data_specific = array("users" => array());
     $request = array("fetch" => " * "
                     ,"table" => " users_inside_groups "
-                    ,"specific" => " group_id = " . $data_request["origin"]
+                    ,"specific" => " group_id = " . $data_request["origin"] . " AND group_id > 1"
                     ,"limit" => 8
                     ,"user_fetch" => " id , users_name "
                 );
@@ -101,27 +112,11 @@ function on_request_sch_refresh($auth_groups , $data_request , $pdo , $user_id){
     $ret = array();
     switch($data_request["refresh"]){
         case 'user': // loads the specific users groups 
-            return refresh_get_users_groups($data_request , $pdo);
-        case 'group': // loads the specific groups users
             return refresh_get_groups_users($auth_groups , $data_request , $pdo);
-        case 'type_specific':
-            if(!isset($_SESSION["equipment_types"]))
-                break;
-            foreach($_SESSION["equipment_types"] as $type) {
-                if($data_request["origin"] === $type["equipment_type"]){
-                    $guard = 0;
-                    break;
-                }
-            }
-            if(!isset($guard))
-                break;
-            $data_specific = array("types_specific" => array());
-            $request = array("table" => $data_request["origin"]);
-            $columns = describe_table($request , $pdo);
-            $columns["items"] = parse_equipment_type_columns($columns["items"]);
-            return $columns;
+        case 'group': // loads the specific groups users
+            return refresh_get_users_groups($data_request , $pdo);
         case 'query':
-            return equipment_search($data_request , $pdo);
+            return user_search($data_request , $pdo);
         case 'clear':
             return on_request_sch_load($auth_groups , $data_request , $pdo , $user_id);
         default: 

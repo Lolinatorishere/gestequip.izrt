@@ -2,7 +2,6 @@
 
 function create_group($data_request , $pdo){
 try{
-    printLog($data_request);
     $ret = array("server_message" => ""
                 ,"message" => "default"
                 );
