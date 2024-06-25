@@ -46,10 +46,14 @@ function read_request($tab , &$data_request , $user_id , $pdo){
             return read_all_user($data_request , $pdo);
         case "grpusr":
             return read_group_users($data_request , $pdo);
-        case "schusr":
-            return read_request_search($data_request , $pdo);
         case 'getlog':
             return read_request_log($data_request , $pdo);
+        case "tbdesc":
+            return read_table_description($data_request , $pdo);
+        case "schusr":
+            return read_request_search($data_request , $pdo);
+        case "yurusr":
+            return read_your_user($pdo);
         }
     $data_request["error"] = "error";
     return $data_request;

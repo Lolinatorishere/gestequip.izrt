@@ -1,7 +1,6 @@
 <?php
 include_once __DIR__ . "/../frontend/html/html_head.php";
 include_once __DIR__ . "/../frontend/html/navbar/html_nav.php";
-include_once __DIR__ . "/../backend/crud/read/user_query.php";
 
 $language = "en";
 $page_name = "Profile";
@@ -25,9 +24,7 @@ make_head($language, $page_name, $css_path, $js_path);
                 <div class="main-content-corner">
                     <div class="main-content">
                         <div class="profile-content">
-    
                         <div class="content-first">
-    
                             <div class="profile-align-vertical">
                                 <div class="profile-align-horizontal">
                                     <div class="top-profile">

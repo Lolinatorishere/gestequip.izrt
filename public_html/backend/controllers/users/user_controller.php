@@ -46,10 +46,11 @@ require_once common_crud . "/delete/common_delete.php";
 require_once common_crud . "/delete/user_delete.php";
 
 // read tab modules
-require_once user_read . "/get_group_users.php";
 require_once user_read . "/get_all_users.php";
+require_once user_read . "/get_group_users.php";
 require_once user_read . "/get_logs.php";
 require_once user_read . "/get_table_description.php";
+require_once user_read . "/get_your_user.php";
 require_once user_read . "/search_users.php";
 
 // Base get requests 
