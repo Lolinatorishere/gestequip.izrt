@@ -16,8 +16,8 @@ if(!defined('query_generator_dir'))
 if(!defined('common_crud'))
     define('common_crud' , '/var/www/html/gestequip.izrt/public_html/backend/crud');
 
-if(!defined('equipment_tabs'))
-    define('equipment_tabs' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/equipment/tabs');
+if(!defined('equipment_read'))
+    define('equipment_read' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/equipment/read');
 
 //random modules
 require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 
@@ -47,14 +47,11 @@ require_once common_crud . "/delete/common_delete.php";
 require_once common_crud . "/delete/equipment_delete.php";
 
 // read tab modules
-require_once equipment_tabs . "/add_equipment_tab.php";
-require_once equipment_tabs . "/all_equipment_tab.php";
-require_once equipment_tabs . "/equipment_type_tab.php";
-require_once equipment_tabs . "/group_equipment_tab.php";
-require_once equipment_tabs . "/logs_tab.php";
-require_once equipment_tabs . "/remove_equipment_tab.php";
-require_once equipment_tabs . "/search_tab.php";
-require_once equipment_tabs . "/your_equipment_tab.php";
+require_once equipment_read . "/get_equipment.php";
+require_once equipment_read . "/get_equipment_types.php";
+require_once equipment_read . "/get_table_description.php";
+require_once equipment_read . "/get_logs.php";
+require_once equipment_read . "/search_equipment.php";
 
 // Base get requests 
 if(isset($_GET["tab"])){

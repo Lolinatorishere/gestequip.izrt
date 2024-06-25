@@ -1,5 +1,5 @@
 <?php
-
+ 
 function validate_external_create_inputs($request , $pdo , &$error_message){
     $error_message = array();
     if(!isset($request["default"]) || !isset($request["specific"])){
@@ -12,6 +12,27 @@ function validate_external_create_inputs($request , $pdo , &$error_message){
     }
     if(validate_user_group_in_db($request["user_id"] , $request["group_id"] , $pdo) !== 1){
         $error_message["invalid_ids"] = "Invalid Selected User or Group";
+        return 0;
+    }
+    if(validate_external_inputs($request , "default" , " equipment " , $pdo , $error_message) !== 1)
+        return 0;
+    if(validate_external_inputs($request , "specific" , " " . $request["equipment_type"] , $pdo , $error_message) !== 1)
+        return 0;
+    if(validate_full_input($request , "default" , " equipment " , $pdo , $error_message) !== 1)
+        return 0;
+    if(validate_full_input($request , "specific" , " " . $request["equipment_type"] , $pdo , $error_message) !== 1)
+        return 0;
+    return 1;
+}
+
+function validate_external_request_inputs($request , $pdo , &$error_message){
+    $error_message = array();
+    if(!isset($request["user_id"]) || !isset($request["group_id"]) || !isset($request["equipment_id"])){
+        $error_message["unset_id"] = "unset ids";
+        return 0;
+    }
+    if(validate_user_group_in_db($request["user_id"] , $request["group_id"] , $pdo) !== 1){
+        $error_message["invalid_ids"] = "invalid selected user or group";
         return 0;
     }
     if(validate_external_inputs($request , "default" , " equipment " , $pdo , $error_message) !== 1)
@@ -105,8 +126,6 @@ function equipment_request_validation($tab){
     }
     switch ($trim_req){
         case "yur_eq":
-            return 1;
-        case "grp_eq":
             return 1;
         case "sch_eq":
             return 1;

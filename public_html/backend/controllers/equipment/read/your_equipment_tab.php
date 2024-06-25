@@ -1,5 +1,7 @@
 <?php
 
+//Todo migrate this to get request;
+
 function on_request_yur_load($auth_groups , $data_request , $pdo , $user_id){
     $all_equipment = array();
     //$data_request["fetch"] = " * ";

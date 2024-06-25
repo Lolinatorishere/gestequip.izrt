@@ -2,7 +2,7 @@
 
 // Validate table inputs
 // uses the requests and checks against the db table to see if its a valid search
-function equipment_validate_external_search_inputs($request , $check , $db_table , $pdo){
+function validate_external_search_inputs($request , $check , $db_table , $pdo){
     $table_check = 0;
     $table_request = array("table" => $db_table);
     $table = describe_table($table_request , $pdo);
@@ -154,6 +154,10 @@ function validate_full_input($request , $check , $db_table , $pdo , &$error_mess
 
 
 function validate_reference_existence($data_request , $pdo){
+    if(!isset($data_request["user_id"])||
+        !isset($data_request["group_id"])){
+        return 0;
+    }
     if(isset($data_request["equipment_id"])){
         if(validate_equipment_references($data_request , $pdo) === 1){
             return 1;
@@ -163,6 +167,7 @@ function validate_reference_existence($data_request , $pdo){
             return 1;
         }
     }
+    return 0;
 }
 
 

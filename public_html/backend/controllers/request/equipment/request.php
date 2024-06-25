@@ -6,16 +6,14 @@ function read_request($tab , &$data_request , $user_id , $pdo){
     $equipment_ids ='';
     $data = array();
     switch($tab){
-        case "yur_eq":
-            return read_request_yur($data_request , $pdo , $user_id);
-        case "grp_eq":
-            return read_request_grp($data_request , $pdo , $user_id);
+        case "speceq":
+            return read_equipment($data_request , $pdo);
+        case "eqtype":
+            return read_equipment_types($pdo);
+        case "tbdesc":
+            return read_table_description($data_request , $pdo);
         case "sch_eq":
-            return read_request_sch($data_request , $pdo , $user_id);
-        case 'add_eq':
-            return read_request_add($data_request , $pdo , $user_id);
-        case 'log_eq':
-            return read_request_log($data_request , $pdo , $user_id);
+            return read_searched_query($data_request , $pdo);
         }
     $data_request["error"] = "error";
     return $data_request;
@@ -50,13 +48,13 @@ function data_request($tab , $pdo , $user_id){
         case 0:
             return $ret;
         case 1: //Create request
-            return tab_create_information_sanitize($tab , $user_id , $pdo);
+            return create_information_sanitize($tab , $user_id , $pdo);
         case 2: //Reat request
-            return tab_read_information_sanitize($tab , $user_id , $pdo);
+            return read_information_sanitize($tab , $user_id , $pdo);
         case 3: //Update request
-            return tab_update_information_sanitize($tab , $user_id , $pdo);
+            return update_information_sanitize($tab , $user_id , $pdo);
         case 4: //Delete request
-            return tab_delete_information_sanitize($tab , $user_id , $pdo);
+            return delete_information_sanitize($tab , $user_id , $pdo);
         default:
             return $ret;
     }

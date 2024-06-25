@@ -1,8 +1,5 @@
 <?php
 
-if($_SESSION["user_type"] !== "Admin")
-    die;
-
 include_once query_generator_dir;
 
 function create_user($data_request , $pdo){

@@ -1,5 +1,6 @@
 <?php
-function on_request_equipment_logs_load($data_request , $pdo){
+
+function default_equipment_logs($data_request , $pdo){
     $ret = array();
     $logs = get_logs("equipment_logs" , $pdo);
     if($logs["total_items"] === 0)
@@ -7,7 +8,7 @@ function on_request_equipment_logs_load($data_request , $pdo){
     return $logs;
 }
 
-function on_request_equipment_refresh($data_request , $pdo){
+function specific_equipment_logs($data_request , $pdo){
     $log_status;
     $origin = trim($data_request["origin"]);
     switch($origin){
@@ -33,9 +34,9 @@ function read_request_log($data_request , $pdo){
     // what queries can data specific have:
     //$data_specific = array("user" => array() ,"group_id" = "");
     if(!isset($data_request["refresh"])){
-        return on_request_equipment_logs_load($data_request , $pdo);
+        return default_equipment_logs($data_request , $pdo);
     }else{
-        return on_request_equipment_refresh($data_request , $pdo);
+        return specific_equipment_logs($data_request , $pdo);
     }
 }
 

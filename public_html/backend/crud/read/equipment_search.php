@@ -93,7 +93,7 @@ function equipment_search_query_default($queries , &$db_responses , $pdo , $page
     if($page_check["paged_query"] === "default_query"){
         $page = $page_check["page"];
     }
-    if(equipment_validate_external_search_inputs($queries , "default_query" , " equipment " , $pdo) !== 1){
+    if(validate_external_search_inputs($queries , "default_query" , " equipment " , $pdo) !== 1){
         $info_from_server = "No Queries";
         return;
     }
@@ -218,7 +218,7 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
         return;
     // todo Please for the love of god fix this buffalo buffalobuffalobuffalobuffalobuffalobuffalobuffalobuffalobuffalo
     // situation
-    if(equipment_validate_external_search_inputs($queries , "specific_query" , $db_responses["equipment_type"]["equipment_type"]["equipment_type"] , $pdo) !== 1){
+    if(validate_external_search_inputs($queries , "specific_query" , $db_responses["equipment_type"]["equipment_type"]["equipment_type"] , $pdo) !== 1){
         $info_from_server = "No Queries";
         return;
     }
@@ -255,6 +255,7 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
 // nottodo create logging for search queries
 // future me: nuh uh
 function equipment_search_query($queries , $pdo , $page_check){
+    $auth = search_authentication($pdo)["items"];
     $info_from_server = "unset";
     $loggable = array();
     $ret = array("message" => "Server Error"); 
@@ -279,8 +280,8 @@ function equipment_search_query($queries , $pdo , $page_check){
             }
             $i++;
         }
-        $items_parsed = array();
         if(isset($db_responses["specific_query"])){
+            $items_parsed = array();
             foreach ($db_responses["specific_query"]["items"] as $specific_id => $s_value) {
                 foreach ($db_responses["equipment_type"]["items"] as $type_id => $t_value) {
                     if($s_value["equipment_id"] !== $t_value["id"]){
@@ -289,6 +290,22 @@ function equipment_search_query($queries , $pdo , $page_check){
                     array_push($items_parsed , get_equipment(" * " , $t_value["id"] , $pdo)["items"][0]);
                 }
             }
+            $parsed_search["items"] = $items_parsed;
+        }
+        if($_SESSION["user_type"] !== "Admin"){
+            $items_parsed = array();
+            $auth_total_items = 0;
+            foreach($parsed_search["items"] as $key => $parsed){
+                foreach($auth as $authorised){
+                    if($parsed["equipment_id"] === $authorised["equipment_id"]){
+                        $parsed["user_permission_level"] = $authorised["user_permission_level"];
+                        array_push($items_parsed , $parsed);
+                        $auth_total_items++;
+                    }
+                }
+            }
+            $parsed_search["total_items"] = $auth_total_items;
+            $parsed_search["pages"] = ceil($auth_total_items / 20);
             $parsed_search["items"] = $items_parsed;
         }
         $ret["message"] = "Found " . $parsed_search["total_items"];

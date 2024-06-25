@@ -36,6 +36,13 @@ try{
         $loggable["message"]["sql"] = $sql;
         throw new Exception("Server_Error_CG0001");
     }
+        $request["reference"] = array("user_id" => "1"
+                        ,"group_id" => $group_id
+                        ,"user_permission_level" => "0"
+                        );
+        $sql = create_insertion_generator($request , " users_inside_groups " , "reference" , 0);
+        $statement = $pdo->prepare($sql);
+        $statement->execute();
     $request = array("fetch" => " * "
                     ,"table" => " user_groups "
                     ,"counted" => 1

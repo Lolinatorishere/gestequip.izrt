@@ -16,8 +16,8 @@ if(!defined('query_generator_dir'))
 if(!defined('common_crud'))
     define('common_crud' , '/var/www/html/gestequip.izrt/public_html/backend/crud');
 
-if(!defined('user_tabs'))
-    define('user_tabs' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/users/tabs');
+if(!defined('group_tabs'))
+    define('group_read' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/groups/read');
 
 //random modules
 require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 
@@ -49,11 +49,9 @@ require_once common_crud . "/delete/group_delete.php";
 require_once common_crud . "/delete/reference_delete.php";
 
 // read tab modules
-require_once user_tabs . "/add_user_tab.php";
-require_once user_tabs . "/all_user_tab.php";
-require_once user_tabs . "/logs_tab.php";
-require_once user_tabs . "/remove_user_tab.php";
-require_once user_tabs . "/search_tab.php";
+require_once group_read . "/get_groups.php";
+require_once group_read . "/controll_groups.php";
+require_once group_read . "/search_tab.php";
 
 // Base get requests 
 if(isset($_GET["tab"])){

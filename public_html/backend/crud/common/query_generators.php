@@ -5,7 +5,7 @@ function search_query_parse_inputs($queries){
     $i = 1;
     $total_parameters = count($queries);
     foreach($queries as $key => $value){
-        $sql .= "`". $key ."`" . " LIKE '" . $value . "%' ";
+        $sql .= "`". $key ."`" . " LIKE '%" . $value . "%' ";
         if($i < $total_parameters){
             $sql .= " AND ";
         }

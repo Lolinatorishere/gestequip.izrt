@@ -24,7 +24,7 @@ function sanitize_query($query){
 }
 
 // gets the correct requests for each tab
-function tab_read_information_sanitize($tab , $user_id , $pdo){
+function read_information_sanitize($tab , $user_id , $pdo){
     $data_request = array();
     if(isset($_GET["page"])){
         $data_request["page"] = preg_replace('/[^0-9]/s' , '' , $_GET["page"]); 

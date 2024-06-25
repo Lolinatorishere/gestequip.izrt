@@ -15,12 +15,8 @@ function validate_external_create_inputs($request , $pdo , &$error_message){
 }
 
 function validate_external_update_inputs($request , $pdo , &$error_message){
-    if(!isset($request["user_id"])){
-        $error_message = "User was not selected";
-        return 0;
-    }
-    if(validate_user_in_db($request["user_id"] , $pdo) !== 1){
-        $error_message = "User does not Exist";
+    if(!isset($request["group_id"])){
+        $error_message = "Group was not selected";
         return 0;
     }
     if(isset($request["group_id"])){
@@ -29,7 +25,7 @@ function validate_external_update_inputs($request , $pdo , &$error_message){
             return 0;
         }
     }
-    if(!isset($data_request["group"])){
+    if(!isset($request["group"])){
         $error_message = "User didnt request any changes";
         return 0;
     }
@@ -69,15 +65,11 @@ function user_request_validation($tab){
         return 0;
     }
     switch ($trim_req){
-        case "addusr":
+        case "ctlgrp":
             return 1;
-        case "allusr":
+        case "yurgrp":
             return 1;
-        case "remusr":
-            return 1;
-        case "logusr":
-            return 1;
-        case "schusr":
+        case "schgrp":
             return 1;
         default:
             return 0;

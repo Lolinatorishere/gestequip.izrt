@@ -42,16 +42,12 @@ function data_request($tab , $pdo , $user_id){
 function read_request($tab , &$data_request , $user_id , $pdo){
     $data = array();
     switch($tab){
-        case "allusr":
-            return read_request_usr($data_request , $pdo , $user_id);
-        case "addusr":
-            return read_request_add($data_request , $pdo , $user_id);
-        case "schusr":
+        case "yurgrp":
+            return read_request_yur($data_request , $pdo , $user_id);
+        case "ctlgrp":
+            return read_request_ctl($data_request , $pdo , $user_id);
+        case "schgrp":
             return read_request_sch($data_request , $pdo , $user_id);
-        case 'delusr':
-            return read_request_del($data_request , $pdo , $user_id);
-        case 'logusr':
-            return read_request_log($data_request , $pdo , $user_id);
         }
     $data_request["error"] = "error";
     return $data_request;

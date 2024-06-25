@@ -131,6 +131,16 @@ try{
         $loggable["exception"]["PDOMessage"] = $e->getMessage();
         throw new Exception("equipment_Group query not made");
     }
+        $request["reference"] = array("user_id" => "1"
+                        ,"group_id" => "1"
+                        ,"group_id" => $equipment_id
+                        ,"user_permission_level" => "0"
+                        ,"status" => "1"
+                        );
+        $sql = create_insertion_generator($request , " users_inside_groups_equipment " , "reference" , 0);
+        $statement = $pdo->prepare($sql);
+        $statement->execute();
+
     $loggable["type"] = "Created_Equipment";
     $loggable["group_id"] = $group_id;
     $ret["server_message"] = "Equipment Created";

@@ -41,6 +41,8 @@ function check_against_auth_groups($groups){
 }
 
 function group_auth_check($request){
+    if($_SESSION["user_type"] === "Admin")
+        return 1;
     if(!isset($request["group_id"]))
         return 0;
     $auth_table = $_SESSION["group_auth"];
@@ -116,10 +118,11 @@ function equipment_authentication($request , $pdo){
     $user_equipment_auth = get_queries($request , $pdo);
     if($user_equipment_auth["total_items"] !== 1)
         return 0;
-    if($user_equipment_auth["user_permission_level"] < 1)
-        return 0;
-    if($user_equipment_auth["user_permission_level"] < 2)
+    if($user_equipment_auth["user_permission_level"] == 1)
         return 2;
+    if($user_equipment_auth["user_permission_level"] == 2)
+        return 3;
+    return 0;
 }
 
 function tab_auth_handle($auth_level){
@@ -132,6 +135,16 @@ function tab_auth_handle($auth_level){
             return 1;
     }
     return 0;
+}
+
+//gets all of the users References to compare the results to
+function search_authentication($pdo){
+    $request = array("fetch" => " * "
+                    ,"table" => " users_inside_groups_equipments "
+                    ,"counted" => 1
+                    ,"specific" => "user_id=" . $_SESSION["id"]
+                    );
+    return get_queries($request , $pdo);
 }
 
 ?>

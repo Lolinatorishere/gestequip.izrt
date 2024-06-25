@@ -4,7 +4,7 @@ session_start();
 // to avoid other files from working without the controller
 
 // verifies if the user sending information is legit
-if($_SESSION["user_type"] !== "Admin"){
+if($_SESSION["user_type"] !== "Admin" || $_SESSION["user_type"] !== "Manager"){
     error_log(print_r($_SESSION , true));
     die;
 }

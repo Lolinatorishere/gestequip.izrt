@@ -15,6 +15,8 @@ function get_equipment_type($equipment_type , $pdo , $type){
                     ,"specific" => " equipment_type='" . $equipment_type . "' OR id = '" . $equipment_type . "'"
                     );
     $query = get_query($request , $pdo);
+    if(empty($query["items"]))
+        return "error";
     switch($type){
         case "both":
             return $query["items"];
@@ -106,6 +108,7 @@ try{
     return $ret;
 }
 }
+
 function get_equipment($fetch , $equipment_id , $pdo){
 try{
     if(!isset($equipment_id))
