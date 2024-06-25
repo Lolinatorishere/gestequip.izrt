@@ -1,7 +1,5 @@
 <?php
 
-//Todo migrate this to get request;
-
 function read_your_equipment($data_request , $pdo){
     // what queries can data specific have:
     if(empty($_SESSION["id"]))
@@ -9,7 +7,7 @@ function read_your_equipment($data_request , $pdo){
     if(!isset($_SESSION["group_auth"]))
         return;
     $data_request["requests"] = array();
-    $request = array("fetch" => " * "
+    $request = array("fetch" => " DISTINCT * "
                     ,"table" => " users_inside_groups_equipments "
                     ,"specific" => " user_id=" . $_SESSION["id"]
                     );
@@ -30,6 +28,7 @@ function read_your_equipment($data_request , $pdo){
         array_push($parsed_items , read_equipment($request , $pdo));
     }
     $all_references["items"] = $parsed_items;
+    printLog($all_references);
     if(isset($all_references["total_items"])){
         if($all_references["total_items"] === 0)
             return "No Equipments Assigned";

@@ -17,7 +17,7 @@ if(!defined('common_crud'))
     define('common_crud' , '/var/www/html/gestequip.izrt/public_html/backend/crud');
 
 if(!defined('group_tabs'))
-    define('group_read' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/groups/read');
+    define('group_read' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/group/read');
 
 //random modules
 require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 

@@ -8,9 +8,12 @@ $css_path = array(
     "../frontend/css/common.css",
     "../frontend/css/pages/profile.css",
     "../frontend/css/sidebar/sidebar.css",
-);
+    );
 
-$js_path = "";
+$js_path = array("../frontend/js/common/backendUrlRequest.js"
+                ,"../frontend/js/pages/profile/user_info.js"
+                ,"../frontend/js/pages/profile/printProfile.js"
+                );
 
 $navbar = "default";
 
@@ -27,15 +30,42 @@ make_head($language, $page_name, $css_path, $js_path);
                         <div class="content-first">
                             <div class="profile-align-vertical">
                                 <div class="profile-align-horizontal">
-                                    <div class="top-profile">
-                                        <?php $user_info = user_info();?>
-                                        <div class="profile-vertical-align">
-                                            <div class="profile-horizontal-align">
-                                                <div class="profile-tab">
-                                                  <iframe src="/frontend/iframes/profile/profile_info.php" frameborder="0"></iframe> 
+                                    <div class="top-profile" id="profile-info">
+                                        <div class="users-name">
+                                            <div class="users-name-title">
+                                                Name:
+                                            </div>
+                                            <div id="users_name">
+                                            </div>
+                                        </div>
+                                        <div class="user-username">
+                                            <div class="username-title">
+                                                Username:
+                                            </div>
+                                            <div id="username">
+                                            </div>
+                                        </div>
+                                        <div class="user-email">
+                                            <div class="email-title">
+                                                Email:
+                                            </div>
+                                            <div id="email">
+                                            </div>
+                                        </div>
+                                        <div class="phone_number">
+                                            <div class="phone_number-title">
+                                                Phone Number:
+                                            </div>
+                                            <div class="number-concat">
+                                                <div id="phone_number">
+                                                </div>
+                                                <div id="regional_indicator">
                                                 </div>
                                             </div>
                                         </div>
+                                        <script>
+                                            printUser()
+                                        </script>
                                     </div>
                                 </div>
                             </div>
@@ -46,9 +76,28 @@ make_head($language, $page_name, $css_path, $js_path);
                             <div class="groups-align-vertical">
                                 <div class="groups-align-horizontal">
                                     <div class="groups-profile">
-                                        <div class="groups-iframe">
-                                            <iframe src="/frontend/iframes/profile/group_info.php" frameborder="0"></iframe>
-                                        </div>
+                                            <div id="your-groups" class="group-your">
+                                                <div class="your-groups">
+                                                    <div class="group-controlls" id="group-controlls">
+                                                        page ctrl
+                                                    </div>
+                                                    <div class="groups-content" id="groups-content">
+                                                        <div class="group-content-title" id="group-content-title">
+                                                            <div class="group-title-name">
+                                                                Name
+                                                            </div>
+                                                            <div class="group-title-status">
+                                                                Status
+                                                            </div>
+                                                        </div>
+                                                        <div class="group-content-items" id="group-content-items">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                 printUserGroups();
+                                            </script>
                                     </div>
                                 </div>
                             </div>
@@ -57,7 +106,37 @@ make_head($language, $page_name, $css_path, $js_path);
                             <div class="equipment-align-vertical">
                                 <div class="equipment-align-horizontal">
                                     <div class="equipment-profile">
-                                        <iframe src="/frontend/iframes/profile/equipment_info.php" frameborder="0"></iframe>
+                                            <div id="your-equipment" class="equipment-your">
+                                                <div class="your-groups">
+                                                    <div class="group-controlls" id="group-controlls">
+                                                        page ctrl
+                                                    </div>
+                                                    <div class="groups-content" id="groups-content">
+                                                        <div class="group-content-title" id="group-content-title">
+                                                            <div class="group-assigned-title-name">
+                                                                group
+                                                            </div>
+                                                            <div class="equipment-type-title">
+                                                                type
+                                                            </div>
+                                                            <div class="equipment-brand-title">
+                                                                brand
+                                                            </div>
+                                                            <div class="equipment-purchase-date-title">
+                                                                purchase date
+                                                            </div>
+                                                            <div class="status">
+                                                                status
+                                                            </div>
+                                                        </div>
+                                                        <div class="equipment-content-items" id="equipment-content-items">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <script>
+                                             printUserEquipments();
+                                        </script>
                                     </div>
                                 </div>
                             </div>

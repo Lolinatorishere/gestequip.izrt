@@ -27,7 +27,7 @@
                         ,"specific" => " id=" . $reference["group_id"]
                         );
         $full_info["group"] = get_query($request , $pdo)["items"];
-        $full_info["equipment"] = get_equipment(" * " , $reference["equipment_id"] , $pdo)["items"];
+        $full_info["equipment"] = get_equipment(" * " , $reference["equipment_id"] , $pdo)["items"][0];
         return $full_info;
     }
 ?>
