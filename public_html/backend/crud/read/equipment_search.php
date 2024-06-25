@@ -320,6 +320,10 @@ function equipment_search_query($queries , $pdo , $page_check){
 }
 
 function equipment_search($data_request , $pdo){
+    if(!isset($data_request["query"])){
+        $server_message["server_message"] = "No Query Requested";
+        return $server_message;
+    }
     $search_queries = $data_request["query"];
     $user_group_query_check = 0;
     $server_message = array("server_message" => "Error"

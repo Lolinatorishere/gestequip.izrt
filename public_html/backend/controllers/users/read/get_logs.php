@@ -2,7 +2,7 @@
 
 function default_equipment_logs($data_request , $pdo){
     $ret = array();
-    $logs = get_logs($data_request , "equipment_logs" , $pdo);
+    $logs = get_logs($data_request , "user_logs" , $pdo);
     if($logs["total_items"] === 0)
         return array("Error" => "Error", "Server_Error" => "No Logs In the Database");
     return $logs;
@@ -24,7 +24,7 @@ function specific_equipment_logs($data_request , $pdo){
         default:
             return "invalid log type requested";
     }
-    return get_logs_by_status($data_request , $log_status , "equipment_logs" , $pdo);
+    return get_logs_by_status($data_request , $log_status , "user_logs" , $pdo);
 }
 
 function read_request_log($data_request , $pdo){

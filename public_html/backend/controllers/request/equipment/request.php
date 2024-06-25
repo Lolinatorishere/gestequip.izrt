@@ -1,9 +1,6 @@
 <?php
 
 function read_request($tab , &$data_request , $user_id , $pdo){
-    $group_ids = '';
-    $user_ids = '';
-    $equipment_ids ='';
     $data = array();
     switch($tab){
         case "speceq":
@@ -20,6 +17,8 @@ function read_request($tab , &$data_request , $user_id , $pdo){
             return read_all_equipment($data_request , $pdo);
         case "sch_eq":
             return read_searched_query($data_request , $pdo);
+        case "getlog":
+            return read_request_log($data_request , $pdo);
         }
     $data_request["error"] = "error";
     return $data_request;

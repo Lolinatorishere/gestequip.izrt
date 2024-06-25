@@ -22,7 +22,7 @@ function get_all_auth_users($request , $pdo){
     $multi = multi_query_request_generator($fetch , $table , $what_in , $specific);
     $union = union_generator($multi);
     if(!isset($request["total_items"])){
-        $sql = "SELECT count(*) FROM (" . $union . ") AS result_table";
+        $sql = "SELECT count(*) FROM (" . $union . ") AS result_table ";
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $union_total = $statement->fetch()[0];
@@ -36,13 +36,12 @@ function get_all_auth_users($request , $pdo){
     $pages = $request["pages"];
     $sql = "SELECT * FROM
            (" . $union . ")
-           AS result_table";
+           AS result_table ";
     if(isset($request["limit"]) && isset($request["page"])){
         $sql .= "LIMIT ". $limit . 
                 " OFFSET " . ($page-1) * $limit;
     }
     $statement = $pdo->prepare($sql);
-    printLog($sql);
     $statement->execute();
     $users_id = $statement->fetchAll(PDO::FETCH_ASSOC);
     foreach ($users_id as $key => $value) {
@@ -76,7 +75,12 @@ function get_users($request , $pdo){
     // the reason this table exists is because it simplifies the querying 
     // of the equipments of a group or its users
     page_check($request);
-    $sql = common_select_query($request);
+    if(!isset($request["counted"])){
+        $request["countingthis"] = 1;
+        $sql = common_select_query($request);
+    }else {
+        $sql = common_select_query($request);
+    }
     // request is unavailable
     if($sql == "")
         return $sql_error;
@@ -84,11 +88,11 @@ function get_users($request , $pdo){
     $statement->execute();
     if(!$statement)
         return $sql_error;
-    if(!isset($request["total_items"])){
+    if(!isset($request["total_items"]) || !isset($request["counted"])){
         $rows_in_query = $statement->fetch();
         $request["total_items"] = $rows_in_query[0];
         $request["counted"] = 1;
-        $request["page"] = 1;
+        unset($request["countingthis"]);
         $request["pages"] = ceil($request["total_items"] / $request["limit"]);
         $sql = common_select_query($request);
         $statement = $pdo->prepare($sql);
@@ -121,13 +125,14 @@ function get_users($request , $pdo){
                         ,"specific" => " id = " . $user_id["user_id"]
                         ,"counted" => 1
                         );
-        $user = get_query($request , $pdo);
+        $user = get_query($request , $pdo)["items"];
         if($sudo_guard === 1){
             if(isset($sudo_info["items"])){
                 $user["items"]["admin_status"] = $sudo_info["items"]["admin_status"];
                 $sudo_guard = 0;
             }
         }
+        $user["user_permission_level"] = $user_id["user_permission_level"];
         array_push($users , merge_arrays($user));
     }
     $ret["items"] = $users;

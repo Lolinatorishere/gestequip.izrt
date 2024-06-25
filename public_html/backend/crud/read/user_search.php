@@ -44,6 +44,8 @@ function user_search_query($data_request , $pdo , $page){
 }
 
 function user_search($data_request , $pdo){
+    if(!isset($data_request["query"]))
+        return "Unset Search Query";
     $user_group_query_check = 0;
     $server_message = array("server_message" => "Error"
         ,"message" => "No Parameters Were Inserted"

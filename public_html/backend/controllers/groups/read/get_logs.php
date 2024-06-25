@@ -1,16 +1,16 @@
 <?php
 
-function on_request_user_logs_load($data_request , $pdo){
+function default_equipment_logs($data_request , $pdo){
     $ret = array();
-    $logs = get_logs("user_logs" , $pdo);
+    $logs = get_logs($data_request , "group_logs" , $pdo);
     if($logs["total_items"] === 0)
         return array("Error" => "Error", "Server_Error" => "No Logs In the Database");
     return $logs;
 }
 
-function on_request_logs_refresh($data_request , $pdo){
+function specific_equipment_logs($data_request , $pdo){
     $log_status;
-    $origin = trim($data_request["origin"]);
+    $origin = trim($data_request["refresh"]);
     switch($origin){
         case 'Error':
             $log_status = "Error";
@@ -24,7 +24,7 @@ function on_request_logs_refresh($data_request , $pdo){
         default:
             return "invalid log type requested";
     }
-    return get_logs_by_status($log_status , "user_logs" , $pdo);
+    return get_logs_by_status($data_request , $log_status , "group_logs" , $pdo);
 }
 
 function read_request_log($data_request , $pdo){
@@ -34,12 +34,10 @@ function read_request_log($data_request , $pdo){
     // what queries can data specific have:
     //$data_specific = array("user" => array() ,"group_id" = "");
     if(!isset($data_request["refresh"])){
-        return on_request_user_logs_load($data_request , $pdo);
+        return default_equipment_logs($data_request , $pdo);
     }else{
-        return on_request_logs_refresh($data_request , $pdo);
+        return specific_equipment_logs($data_request , $pdo);
     }
-    
 }
-
 
 ?>

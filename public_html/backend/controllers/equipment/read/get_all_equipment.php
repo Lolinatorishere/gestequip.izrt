@@ -14,7 +14,6 @@ function read_all_equipment($data_request , $pdo){
         $request["current_page"] = $data_request["page"];
     }
     $all_references = get_queries($request , $pdo);
-    printLog($all_references);
     $parsed_items = array();
     foreach($all_references["items"]  as $key => $value){
         $query = array("user_id" => $value["user_id"]

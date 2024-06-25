@@ -3,12 +3,6 @@ session_start();
 // defines section 
 // to avoid other files from working without the controller
 
-// verifies if the user sending information is legit
-if($_SESSION["user_type"] !== "Admin" || $_SESSION["user_type"] !== "Manager"){
-    error_log(print_r($_SESSION , true));
-    die;
-}
-
 //Inner Module Definitions
 if(!defined('common_funcs'))
     define('common_funcs' , '/var/www/html/gestequip.izrt/public_html/backend/crud/common/common_functions.php');
@@ -22,8 +16,8 @@ if(!defined('query_generator_dir'))
 if(!defined('common_crud'))
     define('common_crud' , '/var/www/html/gestequip.izrt/public_html/backend/crud');
 
-if(!defined('user_tabs'))
-    define('user_tabs' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/users/tabs');
+if(!defined('user_read'))
+    define('user_read' , '/var/www/html/gestequip.izrt/public_html/backend/controllers/users/read');
 
 //random modules
 require_once "/var/www/html/gestequip.izrt/public_html/backend/common/merge_arrays.php"; 
@@ -52,11 +46,11 @@ require_once common_crud . "/delete/common_delete.php";
 require_once common_crud . "/delete/user_delete.php";
 
 // read tab modules
-require_once user_tabs . "/add_user_tab.php";
-require_once user_tabs . "/all_user_tab.php";
-require_once user_tabs . "/logs_tab.php";
-require_once user_tabs . "/remove_user_tab.php";
-require_once user_tabs . "/search_tab.php";
+require_once user_read . "/get_group_users.php";
+require_once user_read . "/get_all_users.php";
+require_once user_read . "/get_logs.php";
+require_once user_read . "/get_table_description.php";
+require_once user_read . "/search_users.php";
 
 // Base get requests 
 if(isset($_GET["tab"])){

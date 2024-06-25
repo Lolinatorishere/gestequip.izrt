@@ -2,18 +2,31 @@
 if($_SESSION["user_type"] !== "Admin")
     die();
 
-function get_logs_by_status($log_status , $log_table ,  $pdo){
+function get_logs_by_status($data_request , $log_status , $log_table ,  $pdo){
     $request = array("fetch" => " * "
                     ,"table" => $log_table
                     ,"specific" => "log_status='" . $log_status . "'"
                     );
+    if(isset($data_request["paging"])){
+        $request["paging"] = $data_request["paging"];
+    }
+    if(isset($data_request["page"])){
+        $request["page"] = $data_request["page"];
+    }
     return get_queries($request , $pdo);
 }
 
-function get_logs($log_table , $pdo){
+function get_logs($data_request , $log_table , $pdo){
     $request = array("fetch" => " * "
                     ,"table" => $log_table
+                    ,"specific" => " id > 0 "
                     );
+    if(isset($data_request["paging"])){
+        $request["paging"] = $data_request["paging"];
+    }
+    if(isset($data_request["page"])){
+        $request["page"] = $data_request["page"];
+    }
     return get_queries($request , $pdo);
 }
 

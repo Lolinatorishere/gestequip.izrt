@@ -27,13 +27,13 @@ function data_request($tab , $pdo , $user_id){
         case 0:
             return $ret;
         case 1: //Create request
-            return tab_create_information_sanitize($tab , $user_id , $pdo);
+            return create_information_sanitize($tab , $user_id , $pdo);
         case 2: //Read request
-            return tab_read_information_sanitize($tab , $user_id , $pdo);
+            return read_information_sanitize($tab , $user_id , $pdo);
         case 3: //Update request
-            return tab_update_information_sanitize($tab , $user_id , $pdo);
+            return update_information_sanitize($tab , $user_id , $pdo);
         case 4: //Delete request
-            return tab_delete_information_sanitize($tab , $user_id , $pdo);
+            return delete_information_sanitize($tab , $user_id , $pdo);
         default:
             return $ret;
     }
@@ -43,15 +43,13 @@ function read_request($tab , &$data_request , $user_id , $pdo){
     $data = array();
     switch($tab){
         case "allusr":
-            return read_request_usr($data_request , $pdo , $user_id);
-        case "addusr":
-            return read_request_add($data_request , $pdo , $user_id);
+            return read_all_user($data_request , $pdo);
+        case "grpusr":
+            return read_group_users($data_request , $pdo);
         case "schusr":
-            return read_request_sch($data_request , $pdo , $user_id);
-        case 'delusr':
-            return read_request_rem($data_request , $pdo , $user_id);
-        case 'logusr':
-            return read_request_log($data_request , $pdo , $user_id);
+            return read_request_search($data_request , $pdo);
+        case 'getlog':
+            return read_request_log($data_request , $pdo);
         }
     $data_request["error"] = "error";
     return $data_request;

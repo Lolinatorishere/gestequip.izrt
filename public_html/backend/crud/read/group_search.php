@@ -3,15 +3,20 @@
 function group_search_query($data_request , $pdo , $page){
     $guard = 0;
     $error_message = array();
+    if(!isset($data_request["query"])){
+        $ret["message"] = "No Query was Requested";
+        return $ret;
+    }
     if(validate_external_search_inputs($data_request , "query" , " user_groups " , $pdo ) !== 1){
         $ret["message"] = "Invalid Input in Query";
         return $ret;
     }
     $auth_ids = array();
+    $auth_groups = get_auth_groups($pdo)["all_groups"];
     $string_query = search_query_parse_inputs($data_request["query"]);
     $request = array("fetch" => " * "
                     ,"table" => " user_groups "
-                    ,"specific" => " id IN(" .  sql_array_query_metacode($_SESSION["group_auth"]["auth"]) . ") AND (" . $string_query . ") AND id > 1"
+                    ,"specific" => " id IN(" .  sql_array_query_metacode($auth_groups) . ") AND (" . $string_query . ") AND id > 1"
                     );
     if($_SESSION["user_type"] === "Admin"){
         $request["specific"] = $string_query . "AND id > 1";

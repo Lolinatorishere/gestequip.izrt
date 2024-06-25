@@ -49,9 +49,11 @@ require_once common_crud . "/delete/group_delete.php";
 require_once common_crud . "/delete/reference_delete.php";
 
 // read tab modules
-require_once group_read . "/get_groups.php";
-require_once group_read . "/controll_groups.php";
-require_once group_read . "/search_tab.php";
+require_once group_read . "/get_your_groups.php";
+require_once group_read . "/get_table_description.php";
+require_once group_read . "/get_all_groups.php";
+require_once group_read . "/get_logs.php";
+require_once group_read . "/search_group.php";
 
 // Base get requests 
 if(isset($_GET["tab"])){
