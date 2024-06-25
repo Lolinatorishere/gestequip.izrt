@@ -11,7 +11,7 @@ function get_user_group_auth($request , $pdo){
     $statement->execute();
     if(!$statement)
         return $sql_error;
-    $groups =  $statement->fetchAll();
+    $groups =  $statement->fetchAll(PDO::FETCH_ASSOC);
     $user_groups = array("auth" => array()
                         ,"own_auth" => array()
                         ,"de_auth" => array()

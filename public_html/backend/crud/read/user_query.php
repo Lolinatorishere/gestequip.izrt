@@ -6,9 +6,9 @@ include_once query_generator_dir;
 include_once common_funcs;
 
 function get_all_auth_users($request , $pdo){
+    $groups = get_auth_groups($pdo)["auth"];
     $ret = array();
-    $groups = $_SESSION["group_auth"]["auth"];
-    $limit = $request["limit"];
+    $limit = 20;
     $users = array();
     $fetch = array();
     $table = array();
@@ -36,10 +36,13 @@ function get_all_auth_users($request , $pdo){
     $pages = $request["pages"];
     $sql = "SELECT * FROM
            (" . $union . ")
-           AS result_table
-           LIMIT ". $limit . 
-           " OFFSET " . ($page-1) * $limit;
+           AS result_table";
+    if(isset($request["limit"]) && isset($request["page"])){
+        $sql .= "LIMIT ". $limit . 
+                " OFFSET " . ($page-1) * $limit;
+    }
     $statement = $pdo->prepare($sql);
+    printLog($sql);
     $statement->execute();
     $users_id = $statement->fetchAll(PDO::FETCH_ASSOC);
     foreach ($users_id as $key => $value) {

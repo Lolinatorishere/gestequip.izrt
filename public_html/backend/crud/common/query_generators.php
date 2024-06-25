@@ -292,7 +292,7 @@ try{
         $sql .= " WHERE "
             . $request["specific"];
     }
-    if(isset($request["paging"])){
+    if(isset($request["paging"]) && !isset($request["countingthis"])){
         $limit = $request["limit"];
         $page = $request["current_page"];
         $sql .= " LIMIT " . $limit

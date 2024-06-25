@@ -1,6 +1,6 @@
 <?php
     function read_equipment($data_request , $pdo){
-        $full_info = array("user" => array() , "group" => array() , "equipment" => array() , "auth_level" => "0");
+        $full_info = array("user" => "" , "group" => "" , "equipment" => "" , "auth_level" => "0" , "status" => "0");
         if(validate_reference_existence($data_request["query"] , $pdo) !== 1)
             return "Equipment Reference does Not Exist";
         if(user_group_request_authentication($data_request["query"] , $pdo) !== 1)
@@ -14,6 +14,7 @@
                         );
         $reference = get_query($request , $pdo)["items"];
         $full_info["auth_level"] = $reference["user_permission_level"];
+        $full_info["status"] = $reference["status"];
         $request = array("fetch" => " id , users_name , username , email , phone_number , regional_indicator "
                         ,"table" => " users "
                         ,"counted" => 1

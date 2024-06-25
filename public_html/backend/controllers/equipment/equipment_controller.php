@@ -49,6 +49,9 @@ require_once common_crud . "/delete/equipment_delete.php";
 // read tab modules
 require_once equipment_read . "/get_equipment.php";
 require_once equipment_read . "/get_equipment_types.php";
+require_once equipment_read . "/get_your_equipment.php";
+require_once equipment_read . "/get_authorised_equipment.php";
+require_once equipment_read . "/get_all_equipment.php";
 require_once equipment_read . "/get_table_description.php";
 require_once equipment_read . "/get_logs.php";
 require_once equipment_read . "/search_equipment.php";
