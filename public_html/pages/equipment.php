@@ -16,6 +16,7 @@ $js_path = array("../frontend/js/pages/equipment/tabbar_functionality.js"
                 ,"../frontend/js/common/backend_requests.js"
                 ,"../frontend/js/pages/common/equipment_requests.js"
                 ,"../frontend/js/pages/common/user_requests.js"
+                ,"../frontend/js/pages/common/html_creators.js"
                 ,"../frontend/js/pages/equipment/tabs/group_tab.js"
                 ,"../frontend/js/pages/equipment/tabs/search_tab.js"
                 );

@@ -25,15 +25,20 @@ async function getEquipmentTypes(){
     return user_info;
 }
 
-async function getAuthEquipments(){
+async function getAuthEquipments(page){
     let request = {
              type: 'equipment'
             ,custom: {
                  tab: 'autheq'
                 ,type: 'data' 
                 ,crud: 'read'
+                ,pgng: 1
+                ,page: 1
                 }
             }
+    if(page){
+        request.custom.page = page;
+    }
     let user_request = await fetch(await urlCreateBackendRequest(request));
     let user_info = await user_request.json();
     return user_info;
@@ -53,29 +58,58 @@ async function getUser(){
     return user_info;
 }
 
-async function getUserGroups(){
+async function getUserGroups(page){
     let request = {
              type: 'group'
             ,custom: {
                  tab: 'yurgrp'
                 ,type: 'data' 
                 ,crud: 'read'
+                ,pgng: 1
+                ,page: 1
                 }
             }
+    if(page){
+        request.custom.page = page;
+    }
     let user_request = await fetch(await urlCreateBackendRequest(request));
     let user_info = await user_request.json();
     return user_info;
 }
 
-async function getUserEquipments(){
+async function getEquipmentLogs(page){
+    let request = {
+             type: 'equipment'
+            ,custom: {
+                 tab: 'getlog'
+                ,type: 'data' 
+                ,crud: 'read'
+                ,pgng: 1
+                ,page: 1
+                }
+            }
+    if(page){
+        request.custom.page = page;
+    }
+    let user_request = await fetch(await urlCreateBackendRequest(request));
+    let user_info = await user_request.json();
+    return user_info;
+}
+
+async function getUserEquipments(page){
     let request = {
              type: 'equipment'
             ,custom: {
                  tab: 'youreq'
                 ,type: 'data' 
                 ,crud: 'read'
+                ,pgng: 1
+                ,page: 1
                 }
             }
+    if(page){
+        request.custom.page = page;
+    }
     let user_request = await fetch(await urlCreateBackendRequest(request));
     let user_info = await user_request.json();
     return user_info;

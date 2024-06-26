@@ -1,105 +1,36 @@
 
-
-function itemsHtml(data , appends){
-    let itemsDiv = document.createElement('div')
-       ,info = data.information;
-    if(data.data !== "success"){
-        itemsDiv.className = 'info-message';
-        itemsDiv.innerHTML = `
-            no information is available
-        `;
-        return itemsDiv;
+function setControls(data , append_to , refresh , loadingFunction){
+    let totalDiv = document.createElement('div')
+       ,controlDiv = document.createElement('div')
+       ,controls = document.createElement('div')
+       ,info = data.information
+       ,control_location = '';
+    if(data.control_location !== undefined && data.control_page !== ""){
+        control_location = data.control_location;
     }else{
-        if(data.title !== undefined){
-            let title = document.createElement('div')
-               ,title_div = document.createElement('div');
-            data.title.forEach(element => {
-                let HTMLinner = '';
-                HTMLinner += `
-                            <div id="title-${element}">
-                                ${element}
-                            <div>
-                             `
-                title.innerHTML += HTMLinner;
-            });
-            title.classname = appends[0] + "-title";
-            title_div.classname = "title-bar";
-            title_div.id = "title-bar";
-            title_div.appendChild(title);
-            itemsDiv.appendChild(title_div);
-        }
-        //equipment type, brand, model, purchase_date, equipment state
-        for(let i = 0 ; i < info.items.length ; i++){
-            let item = info.items[i];
-            let items = document.createElement('div');
-            let HTMLinner = '';
-            items.className = 'item-' + appends[0];
-            if(i%2 !== 0){
-                items.className = 'item-' + appends[0] + ' highlight';
-            }
-            items.id = 'item-' + appends[0] + "-" + i;
-            appends[1].forEach(element => {
-                if(item !== undefined){
-                    HTMLinner += `
-                                <div class="${element}">
-                                    ${item[element]}
-                                </div>
-                                `
-                }
-            })
-            items.innerHTML = HTMLinner
-            itemsDiv.appendChild(items);
-        }
+        data.control_location = undefined;
     }
-    return itemsDiv;
+    info.control_location = control_location;
+    totalDiv.className = 'total';
+    totalDiv.innerHTML = `
+                            Total: ${info.total_items}
+                         `
+    controlDiv.className = 'controls';
+    controlDiv.innerHTML = controlsHtml(info);
+    controls.appendChild(totalDiv);
+    controls.appendChild(controlDiv);
+    append_to.innerHTML = controls.innerHTML;
+    controlsFunctionality(data , refresh , loadingFunction);
 }
 
-
-function createItemHTML(data , appends , highlight , iteration){
-    console.log(data);
-    let item = data;
-    let item_div = document.createElement('div');
-    let HTMLinner = '';
-    item_div.className = 'item-' + appends[0];
-    if(highlight === "true"){
-        item_div.className = 'item-' + appends[0] + ' highlight';
-    }
-    item_div.id = 'item-' + appends[0] + "-" + iteration;
-    appends[1].forEach(element => {
-        if(item !== undefined){
-            HTMLinner += `
-                        <div class="item-${appends[0]}-div">
-                            ${item[element]}
-                        </div>
-                        `
-        }
-    })
-    item_div.innerHTML = HTMLinner
-    return item_div;
-}
-
-async function setInventoryItems(data , append_items){
+async function setInventoryHtml(data , append_items){
     let itemsDiv = document.createElement('div')
     let group_items = data.group_equipments.items;
     let equipment_type = ""
     let highlight = "";
-    if(data.title !== undefined){
-        let title = document.createElement('div')
-           ,title_div = document.createElement('div');
-        data.title.forEach(element => {
-            let HTMLinner = '';
-            HTMLinner += `
-                        <div id="title-${element}" class="${data.appends[0]}-title-div">
-                            ${element}
-                        <div>
-                         `
-            title.innerHTML += HTMLinner;
-        });
-        title.className = data.appends[0] + "-title";
-        title_div.className = "title-bar";
-        title_div.id = "title-bar";
-        title_div.appendChild(title);
-        itemsDiv.appendChild(title_div);
+    title = createTitleHTML(data);
+    if(title !== undefined){
+        itemsDiv.appendChild(title);
     }
     for(i = 0 ; i < group_items.length ; i++){
         for(j = 0 ; j < data.equipment_types.items.length ; j++){
@@ -131,6 +62,8 @@ async function setInventoryItems(data , append_items){
         itemsDiv.appendChild(item);
     }
     append_items.innerHTML = itemsDiv.innerHTML;
+    custom_data.control_location = "group";
+    controlsHtml(custom_data);
 }
 
 async function groupTabFunctionality(){
@@ -142,10 +75,10 @@ async function groupTabFunctionality(){
     appends = [["grp"],["users_name","group_name","equipment_type","brand","model","purchase_date","equipment_status"]];
     custom_data = {
             group_equipments: group_equipments.information
-           ,control_location: undefined
+           ,control_location: "group"
            ,appends: appends
            ,title: ["group" , "user" , "type" , "brand" , "model" , "purchase date" , "status"]
            ,equipment_types: equipment_types.information
     };
-    setInventoryItems(custom_data , append_items);
+    setInventoryHtml(custom_data , append_items);
 }

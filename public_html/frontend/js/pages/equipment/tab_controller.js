@@ -323,50 +323,51 @@ function controlsHtml(data){
 }
 
 // TODO fix this not working as intended
+    let totalDiv = document.createElement('div')
 function controlsFunctionality(data , refresh , loadingFunction){
     let current_page = parseInt(data.information.current_page)
-       ,total_items = parseInt(data.information.total_items)
-       ,page_max = parseInt(data.information.pages)
-       ,page_controls = []
-       ,arrow_backward
-       ,arrow_forward
-       ,control_location = '';
+    ,total_items = parseInt(data.information.total_items)
+    ,page_max = parseInt(data.information.pages)
+    ,page_controls = []
+    ,arrow_backward
+    ,arrow_forward
+    ,control_location = '';
 
     if(data.control_location !== undefined){
         control_location = "-" + data.control_location;
     }
     let request = {
-            page: 'equipment'
-           ,custom: undefined
-        }
+        page: 'equipment'
+        ,custom: undefined
+    }
     if(current_page !== 1){
         element_arrow = 'control-arrow-backward' + control_location;
         document.getElementById(element_arrow)
-        .addEventListener('click' , async function(){
-            // fetch first time tab info
-            let tab_information = undefined;
-            request.custom = {
-                tab: data.tab
-               ,type: 'data' 
-               ,crud: 'read'
-               ,pgng: 1
-               ,page: current_page-1
-               ,t_i: total_items
-            }
-            if(refresh !== undefined){
-                request.custom.rfsh = refresh[0];
-                request.custom.rgin = refresh[1];
-            }
-            response = await fetch(await urlCreateBackendRequest(request));
-            if(response !== undefined){
-                tab_information = await response.json();
-            }
-            if(tab_information !== undefined){
-                tab_information.control_location = control_location;
-                await loadingFunction(tab_information);
-            }
+            .addEventListener('click' , async function(){
+                // fetch first time tab info
+                let tab_information = undefined;
+                request.custom = {
+                    tab: data.tab
+                    ,type: 'data' 
+                    ,crud: 'read'
+                    ,pgng: 1
+                    ,page: current_page-1
+                    ,t_i: total_items
+                }
+                if(refresh !== undefined){
+                    request.custom.rfsh = refresh[0];
+                    request.custom.rgin = refresh[1];
+                }
+                response = await fetch(await urlCreateBackendRequest(request));
+                if(response !== undefined){
+                    tab_information = await response.json();
+                }
+                if(tab_information !== undefined){
+                    tab_information.control_location = control_location;
+                    await loadingFunction(tab_information);
+                }
                 // TODO: got to create the loading of an error response
-        });
+            });
         for(let i = 1 ; i <= 6 ; i++){
             page_control = 'control-page-' + i + control_location;
             if(current_page - i >= 1){
@@ -383,31 +384,31 @@ function controlsFunctionality(data , refresh , loadingFunction){
     if(current_page !== page_max){
         element_arrow = 'control-arrow-forward' + control_location;
         document.getElementById(element_arrow)
-        .addEventListener('click' , async function(){
-            // fetch first time tab info
-            let tab_information = undefined;
-            request.custom = {
-                tab: data.tab
-               ,type: 'data' 
-               ,crud: 'read'
-               ,pgng: 1
-               ,page: current_page+1
-               ,t_i: total_items
-            }   
-            if(refresh !== undefined){
-                request.custom.rfsh = refresh[0];
-                request.custom.rgin = refresh[1];
-            }
-            response = await fetch(await urlCreateBackendRequest(request));
-            if(response !== undefined){
-                tab_information = await response.json();
-            }
-            if(tab_information !== undefined){
-                tab_information.control_location = control_location;
-                await loadingFunction(tab_information);
-            }
+            .addEventListener('click' , async function(){
+                // fetch first time tab info
+                let tab_information = undefined;
+                request.custom = {
+                    tab: data.tab
+                    ,type: 'data' 
+                    ,crud: 'read'
+                    ,pgng: 1
+                    ,page: current_page+1
+                    ,t_i: total_items
+                }   
+                if(refresh !== undefined){
+                    request.custom.rfsh = refresh[0];
+                    request.custom.rgin = refresh[1];
+                }
+                response = await fetch(await urlCreateBackendRequest(request));
+                if(response !== undefined){
+                    tab_information = await response.json();
+                }
+                if(tab_information !== undefined){
+                    tab_information.control_location = control_location;
+                    await loadingFunction(tab_information);
+                }
                 // TODO: got to create the loading of an error response
-        });
+            });
         for(let i = 1 ; i <= 6 ; i++){
             control_page = 'control-page-' + i + control_location;
             if(current_page + i <= page_max){
@@ -425,11 +426,11 @@ function controlsFunctionality(data , refresh , loadingFunction){
             let tab_information = undefined;
             request.custom = {
                 tab: data.tab
-               ,type: 'data' 
-               ,crud: 'read'
-               ,pgng: 1
-               ,page: page.innerHTML.trim()
-               ,t_i: total_items
+                ,type: 'data' 
+                ,crud: 'read'
+                ,pgng: 1
+                ,page: page.innerHTML.trim()
+                ,t_i: total_items
             }   
             if(refresh !== undefined){
                 request.custom.rfsh = refresh[0];
@@ -443,13 +444,12 @@ function controlsFunctionality(data , refresh , loadingFunction){
                 tab_information.control_location = control_location;
                 await loadingFunction(tab_information);
             }
-                // TODO: got to create the loading of an error response
+            // TODO: got to create the loading of an error response
         });
     });
 }
 
 function setControls(data , append_to , refresh , loadingFunction){
-    let totalDiv = document.createElement('div')
        ,controlDiv = document.createElement('div')
        ,controls = document.createElement('div')
        ,info = data.information
