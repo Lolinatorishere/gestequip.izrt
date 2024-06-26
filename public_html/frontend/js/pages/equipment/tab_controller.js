@@ -323,7 +323,6 @@ function controlsHtml(data){
 }
 
 // TODO fix this not working as intended
-    let totalDiv = document.createElement('div')
 function controlsFunctionality(data , refresh , loadingFunction){
     let current_page = parseInt(data.information.current_page)
     ,total_items = parseInt(data.information.total_items)

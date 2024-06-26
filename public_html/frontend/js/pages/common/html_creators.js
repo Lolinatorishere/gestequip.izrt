@@ -1,10 +1,16 @@
-function controlsHtml(data){
-    console.log(data);
+function controlPagesHtml(data){
     let html = ''; 
     control_location = '';
     if(data.control_location !== ""){
         control_location = "-" + data.control_location;
     }
+    html += `<div class="control-current-page-title${control_location}">
+                <div class="control-current${control_location}-page">
+                    Page: ${data.page}
+                </div>
+            </div>
+            `
+    html += `<div class="page-controls${control_location}" id="page-controls${control_location}">`
     if(parseInt(data.page) > 1){
         //render reversing pages
         let page_render = 0;
@@ -14,19 +20,19 @@ function controlsHtml(data){
             }
         }
         html += `
-               <div class="control-arrow" id="control-arrow-backward${control_location}">
+               <div class="control${control_location}-arrow" id="control-arrow-backward${control_location}" page="${parseInt(data.page)-parseInt(1)}">
                    <
                </div>  
                `
         if(parseInt(data.page) > 5){
         html += `
-               <div id="first-page${control_location}">
+               <div id="first-page${control_location}" class="page-controls${control_location}-content" page="1">
                     1
                </div> 
                `
             if(parseInt(data.page) > 5){
                 html += `
-                <div id="dots">
+                <div id="dots" class="page-controls${control_location}-content">
                     ...
                 </div>
                 `
@@ -34,22 +40,22 @@ function controlsHtml(data){
         }
         for(let i = parseInt(data.page)+parseInt(page_render) ; parseInt(i) < parseInt(data.page) ; i++){
             html += `
-                   <div id="control-page-${i}-${control_location}">
+                   <div id="control-page-${i}${control_location}" page="${i}" class="page-controls${control_location}-content">
                        ${i}
                    </div>
                    `
         }
     }
     html += `
-            <div id="control-page-${data.page}${control_location}">
+            <div id="control-page-${data.page}${control_location}" page="${data.page}" class="page-controls${control_location}-content current${control_location}-page">
                 ${data.page}
             </div>
             `;
-    if(data.page !== data.pages){
+    if(parseInt(data.page) < parseInt(data.pages)){
         //dont render forwarding pages controls
         for(let i = parseInt(data.page) + parseInt(1) ; parseInt(i) <= parseInt(data.pages) && parseInt(i) <= parseInt(data.page) + parseInt(4) ; i++){
             html += `
-            <div id="control-page-${i}${control_location}">
+            <div id="control-page-${i}${control_location}" page="${i}" class="page-controls${control_location}-content">
                 ${i}
             </div>
             `    
@@ -57,30 +63,45 @@ function controlsHtml(data){
         if(parseInt(data.page) + parseInt(4) < parseInt(data.pages)){
             if(parseInt(data.page)+parseInt(4) < parseInt(data.pages)){
                 html += `
-                <div id="dots">
+                <div id="dots" class="page-controls${control_location}-content">
                     ...
                 </div>
                 `
             }
             html += `
-            <div id="last-page${control_location}">
+            <div id="last-page${control_location}" class="page-controls${control_location}-content" page="${data.pages}">
                 ${data.pages}
             </div>
             `
         }
         html += `
-            <div class="control-arrow" id="control-arrow-forward${control_location}">
+            <div class="control${control_location}-arrow" id="control-arrow-forward${control_location}" class="page-controls${control_location}-content" page="${parseInt(data.page)+parseInt(1)}">
                 >
             </div>  
             `
     }
-    console.log(html);
+    html += `</div>`;
     return html;
+}
+
+function totalItemsHtml(data){
+    html = `
+           <div class="total${control_location}-div-content">
+                Total: ${data.total_items}
+           </div>
+           `
+    return html;
+}
+
+function controlsHtml(data){
+    ret = {};
+    ret.pageControl = controlPagesHtml(data);
+    ret.totalItems = totalItemsHtml(data);
+    return ret;
 }
 
 
 function createItemHTML(data , appends , highlight , iteration){
-    console.log(data);
     let item = data;
     let item_div = document.createElement('div');
     let HTMLinner = '';

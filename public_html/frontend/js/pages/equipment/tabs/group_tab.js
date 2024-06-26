@@ -1,33 +1,30 @@
 
-function setControls(data , append_to , refresh , loadingFunction){
-    let totalDiv = document.createElement('div')
-       ,controlDiv = document.createElement('div')
-       ,controls = document.createElement('div')
-       ,info = data.information
-       ,control_location = '';
-    if(data.control_location !== undefined && data.control_page !== ""){
-        control_location = data.control_location;
-    }else{
-        data.control_location = undefined;
+
+function pageControlsFunctionality(control_location , loadingFunction){
+    control_div = document.querySelectorAll(control_location);
+    total_controls = control_div[0].children
+    for(i = 0 ; i < total_controls.length ; i++){
+        if(total_controls[i].attributes.page === undefined)
+            continue;
+        console.log(total_controls[i].attributes.id.nodeValue);
+        controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
+        controls.addEventListener('click' , async function(){
+            loadingFunction(getAuthEquipments , controls.attributes.page.nodeValue);
+        });
+        controls.style.cursor = "pointer";
     }
-    info.control_location = control_location;
-    totalDiv.className = 'total';
-    totalDiv.innerHTML = `
-                            Total: ${info.total_items}
-                         `
-    controlDiv.className = 'controls';
-    controlDiv.innerHTML = controlsHtml(info);
-    controls.appendChild(totalDiv);
-    controls.appendChild(controlDiv);
-    append_to.innerHTML = controls.innerHTML;
-    controlsFunctionality(data , refresh , loadingFunction);
 }
 
-async function setInventoryHtml(data , append_items){
+function itemReadDetails(content_location , append_to ,){
+    //todo make this
+}
+
+async function genertateInventoryHtml(data){
     let itemsDiv = document.createElement('div')
     let group_items = data.group_equipments.items;
     let equipment_type = ""
     let highlight = "";
+    let ret = {};
     title = createTitleHTML(data);
     if(title !== undefined){
         itemsDiv.appendChild(title);
@@ -61,24 +58,36 @@ async function setInventoryHtml(data , append_items){
         item = createItemHTML(htmlData , data.appends , highlight , i);
         itemsDiv.appendChild(item);
     }
-    append_items.innerHTML = itemsDiv.innerHTML;
-    custom_data.control_location = "group";
-    controlsHtml(custom_data);
+    ret.items = itemsDiv.innerHTML;
+    controls_data = data.group_equipments;
+    controls_data.control_location = "group";
+    ret.controls = controlsHtml(controls_data);
+    return ret;
 }
 
-async function groupTabFunctionality(){
-    group_equipments = await getAuthEquipments();
+async function inventoryControler(datarequest , page){
+    group_equipments = await datarequest(page);
     equipment_types = await getEquipmentTypes();
-    append_controls = document.getElementById("items-controls");
+    append_page_totals = document.getElementById("group-items-total");
+    append_page_controls = document.getElementById("group-page-controls");
     append_items = document.getElementById("items-content");
     append_details = document.getElementById("info-selected");
-    appends = [["grp"],["users_name","group_name","equipment_type","brand","model","purchase_date","equipment_status"]];
+    appends = [["grp"],["group_name","users_name","equipment_type","brand","model","purchase_date"]];
     custom_data = {
             group_equipments: group_equipments.information
            ,control_location: "group"
            ,appends: appends
-           ,title: ["group" , "user" , "type" , "brand" , "model" , "purchase date" , "status"]
+           ,title: ["group" , "user" , "type" , "brand" , "model" , "purchase date" ]
            ,equipment_types: equipment_types.information
     };
-    setInventoryHtml(custom_data , append_items);
+    htmlData = await genertateInventoryHtml(custom_data);
+    append_items.innerHTML = htmlData.items;
+    append_page_controls.innerHTML = htmlData.controls.pageControl;
+    append_page_totals.innerHTML = htmlData.controls.totalItems;
+    await setFetchedItemsUI("items-content" , 20 , custom_data.equipment_types.items , 5);
+    pageControlsFunctionality("#page-controls-group" , inventoryControler);
+}
+
+async function groupTabFunctionality(){
+     inventoryControler(getAuthEquipments , 1);
 }
