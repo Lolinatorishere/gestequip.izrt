@@ -16,7 +16,7 @@ async function setTabHighlight(tab_node , tab_id){
 
 async function setTabUI(tab_html_content){
     div = document.getElementById('tab-content');
-    div.innerHTML = tab_html_content.html;
+    div.innerHTML = tab_html_content;
 }
 
 async function unsetPreviousHighlight(previous_tab , tab_node){
@@ -1084,9 +1084,8 @@ async function setTab(request , button , tab){
     tab_css = document.getElementById("tab-css");
     tab_css.href = '/frontend/css/iframes/equipment/tabs/' + tab +'.css';
     // fetches the correct tab ui on click
-    userInterface = '/frontend/iframes/equipment/tabs/' + tab +'.';
-    let response = await fetch(await urlCreateBackendRequest(request));
-    let userInterface = await response.json();
+    userInterface = await fetch('/frontend/iframes/equipment/tabs/' + tab +'.html');
+    console.log(userInterface);
     await setTabUI(userInterface);
     // fetch first time tab info
     request.custom = {

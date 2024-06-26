@@ -11,6 +11,7 @@ $css_path = array(
     );
 
 $js_path = array("../frontend/js/common/backendUrlRequest.js"
+                ,"../frontend/js/pages/profile/generateHtml.js"
                 ,"../frontend/js/pages/profile/user_info.js"
                 ,"../frontend/js/pages/profile/printProfile.js"
                 );
@@ -31,41 +32,57 @@ make_head($language, $page_name, $css_path, $js_path);
                             <div class="profile-align-vertical">
                                 <div class="profile-align-horizontal">
                                     <div class="top-profile" id="profile-info">
-                                        <div class="users-name">
-                                            <div class="users-name-title">
-                                                Name:
-                                            </div>
-                                            <div id="users_name">
-                                            </div>
+                                        <div class="user-info-title">
+                                            User Information:
                                         </div>
-                                        <div class="user-username">
-                                            <div class="username-title">
-                                                Username:
-                                            </div>
-                                            <div id="username">
-                                            </div>
-                                        </div>
-                                        <div class="user-email">
-                                            <div class="email-title">
-                                                Email:
-                                            </div>
-                                            <div id="email">
-                                            </div>
-                                        </div>
-                                        <div class="phone_number">
-                                            <div class="phone_number-title">
-                                                Phone Number:
-                                            </div>
-                                            <div class="number-concat">
-                                                <div id="phone_number">
+                                        <div class = "user-info">
+                                            <div class="users-name">
+                                                <div class="users-name-title">
+                                                    Name:
                                                 </div>
-                                                <div id="regional_indicator">
+                                                <div id="users_name">
                                                 </div>
                                             </div>
-                                        </div>
-                                        <script>
-                                            printUser()
-                                        </script>
+                                            <div class="user-username">
+                                                <div class="username-title">
+                                                    Username:
+                                                </div>
+                                                <div id="username">
+                                                </div>
+                                            </div>
+                                            <div class="user-email">
+                                                <div class="email-title">
+                                                    Email:
+                                                </div>
+                                                <div id="email">
+                                                </div>
+                                            </div>
+                                            <div class="phone_number">
+                                                <div class="phone_number-title">
+                                                    Phone Number:
+                                                </div>
+                                                <div class="number-concat">
+                                                    <div id="phone_number">
+                                                    </div>
+                                                    <div id="regional_indicator">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                                printUser()
+                                            </script>
+                                        <?php 
+                                        if($_SESSION["user_type"] === "Manager" || $_SESSION["user_type"] === "Admin"){
+                                            echo('
+                                                </div>
+                                                <div class="user-controlls" id="user-controlls">
+                                                <script>
+                                                    loadUserControls();
+                                                </script>
+                                            </div>
+                                            ');
+                                        }
+                                        ?>
                                     </div>
                                 </div>
                             </div>

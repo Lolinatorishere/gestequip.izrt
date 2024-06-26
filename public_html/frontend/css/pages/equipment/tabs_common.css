@@ -1,3 +1,8 @@
+* {
+    margin: 0px;
+    text-decoration: none;
+    text-wrap: nowrap;
+}
 
 .equipment-tabbar{
     height: 4%;

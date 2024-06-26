@@ -1,0 +1,139 @@
+.content-position-top{
+    height: 30%;
+    display: flex;
+}
+
+.content-position-bottom{
+    height: 70%;
+}
+
+.center-horizontal{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 0%;
+    width: 100%;
+}
+
+.center-vertical{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+#current-tab{
+    background-color: rgb(201, 201, 201);
+    border-color: rgb(201, 201, 201);
+}
+
+#first-tab  {
+    border-color: rgb(239, 239, 239);
+     
+}
+
+.equipment-your {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+}
+
+.your-items {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 70%;
+    border-style: none solid solid none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
+.group-items {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 70%;
+    border-style: none solid solid none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
+.items-controls{
+    display: flex;
+    flex-direction: column;
+    height: 5%;
+    width: 100%;
+    justify-content: center;
+}
+
+.title-bar{
+    border-style: none none dotted none;
+    border-width: 2px;
+    height: 3%;
+    border-color: rgb(170, 170, 170);
+}
+.grp-title{
+    display:flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.items-content{
+    display: flex;
+    flex-direction: column;
+    height: 95%;
+    width: 100%;
+    justify-content: start;
+    border-style: solid none none none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
+.item-grp{
+    display: flex;
+    height: 5%;
+    flex-direction: row;
+}
+
+.item-grp-div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.grp-title-div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.highlight{
+    background-color: rgb(239, 239, 239);
+}
+
+.your-details {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    height: 100%;
+    border-style: none solid solid none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
+.details-info{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 70%;
+}
+
+.details-notification{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 30%;   
+}
+
