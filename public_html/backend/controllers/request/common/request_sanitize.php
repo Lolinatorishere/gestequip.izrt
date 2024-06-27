@@ -27,7 +27,7 @@ function sanitize_query($query){
 function read_information_sanitize($tab , $user_id , $pdo){
     $data_request = array();
     if(isset($_GET["page"])){
-        $data_request["page"] = preg_replace('/[^0-9]/s' , '' , $_GET["page"]); 
+        $data_request["page"] = intval(preg_replace('/[^0-9]/s' , '' , $_GET["page"])); 
     } 
     if(isset($_GET["t_i"])){
         $data_request["total_items"] = preg_replace('/[^0-9]/s' , '' , $_GET["t_i"]);
@@ -40,6 +40,12 @@ function read_information_sanitize($tab , $user_id , $pdo){
     }
     if(isset($_GET["rgin"])){// origin of refresh
         $data_request["origin"] = preg_replace('/[^a-zA-Z0-9]/s' , '' , $_GET["rgin"]);
+    }
+    if(isset($_GET["lmit"])){
+        $data_request["limit"] = intval(preg_replace('/[^0-9]/s' , '' , $_GET["lmit"]));
+        if($data_request["limit"] <= 0){
+            $data_request["limit"] = 1;
+        }
     }
     if(isset($_POST["query"])){// origin of query not 
         $data_request["query"] = sanitize_query($_POST["query"]);

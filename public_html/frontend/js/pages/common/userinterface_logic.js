@@ -1,4 +1,19 @@
 
+function internalTabSetter(tab_id , functionality){
+    tab_row = document.querySelector(tab_id).children;
+    console.log(tab_row);
+    for(let i = 0 ; i < tab_row.length ; i++){
+        if(tab_row[i].children.length === 0)
+            continue;
+        if(tab_row[i].children === undefined)
+            continue;
+        tab_row[i].children[0].style.paddingleft = 1 + 'rem';
+        tab_row[i].children[0].style.paddingright = 1 + 'rem';
+        functionality(tab_row[i].children[0]);
+    }
+}
+
+
 function calculateUiWidthPercentages(widths , parent_width , padding){
     let total_width = 0
        ,ret = {
@@ -169,4 +184,158 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type , padding)
     }
 }
 
+async function encapsulateAndFilter(encapsulation_location , filter , conditionals){
+    content = encapsulation_location.children;
+    let content_width = [];
+    let parent_height = encapsulation_location.clientHeight;
+    let content_height = [];
+    let total_height = 0;
+    for(let i = 0 ; i < content.length ; i++){
+        
+        total_height += content[i].clientHeight;
+        let width = content[i].clientWidth;
+        let height = content[i].clientHeight;
+        content[i].style.height = height + "px";
+        content[i].style.marginTop = 16 + "px";
+        content[i].style.paggingBottom = -32 + "px";
+        content[i].style.marginBottom = 16 + "px";
+        content[i].style.marginLeft = 16 + "px";
+        content[i].style.marginRight = 16 + "px";
+        content[i].style.paggingRight = -32 + "px";
+        content[i].style.borderWidth = "2px";
+        content[i].style.borderStyle = "solid";
+        content[i].style.borderColor = "rgb(170, 170, 170)";
+        content[i].style.display = "flex";
+        content[i].style.flexDirection = "column";
+        content[i].style.justifyContent = "center";
+        content[i].style.backgroundColor = "rgb(239, 239, 239)";
+        let children_width = [[],[]];
+        let children_height = 0;
+        let displaying_children = 0;
+        let title_width = 0;
+        let value_width = 0;
+        for(let j = 0 ; j < content[i].children.length ; j++){
+            let continue_guard = 0;
+            item_content = content[i].children[j]
+            for(let k = 0 ; k < filter[i].length ; k++){
+                if(item_content.children[1].attributes.id.nodeValue === filter[i][k]){
+                    item_content.style.display = "none";
+                    continue_guard = 1;
+                    break;
+                }
+            }
+            if(continue_guard === 1){
+                continue;
+            }
+            //checking conditionals
+            if(conditionals[i][0].length !== 0){
+                let string_check = item_content.children[1].attributes.id.nodeValue;
+                let string_value = item_content.children[1].innerText;
+                conditions_length = conditionals[i][0].length
+                condition_check = conditionals[i][0];
+                conditions = conditionals[i][1];
+                for(let k = 0 ; k < conditions_length ; k++){
+                    if(string_check !== condition_check[k])
+                        continue;
+                    if(typeof conditions[k][0][0] === "object" || typeof conditions[k][0][0] === "array"){
+                        let object_length = conditions[k][0][0].length;
+                        let equal = conditions[k][1][0]
+                        let replace = conditions[k][1][1]
+                        console.log(object_length);
+                        for(let l = 0 ; l < object_length ; l++){
+                            if(string_value == conditions[k][0][0][l][equal]){
+                                item_content.children[1].innerText = conditions[k][0][0][l][replace];
+                            }
+                            console.log(conditions[k][0][0][l][equal]);
+                        }
+                    }else{
+                        if(string_value == conditions[k][0]){
+                            item_content.children[1].innerText = conditions[k][1][0]
+                        }else{
+                            item_content.children[1].innerText = conditions[k][1][1]
+                        }
+                    }
+                }
+            }
+            children_height += parseInt(item_content.clientHeight);
+            children_width[0][displaying_children] = item_content.children[0].clientWidth;
+            children_width[1][displaying_children] = item_content.children[1].clientWidth;
+            displaying_children++;
+        }
+        if(displaying_children !== 0){
+            child_height_multiplier = ((parseFloat(children_height/height)-1)*-1);
+            child_height_px = (parseFloat(children_height/displaying_children*(1+child_height_multiplier)));
+            title_width = findMinMaxAttributeFromList(children_width[0] , "max");
+            value_width = findMinMaxAttributeFromList(children_width[1] , "max");
+            combo_width = (title_width+value_width);
+            title_width = parseFloat(title_width/combo_width)*100;
+            value_width = parseFloat(value_width/combo_width)*100;
+        }
+        for(let j = 0 ; j < content[i].children.length ; j++){
+            item_content = content[i].children[j]
+            item_content.style.height = child_height_px + "px";
+            item_content.children[0].style.width = title_width+"%";
+            item_content.children[0].style.fontSize = "0.9rem";
+            item_content.children[0].style.display = "flex";
+            item_content.children[0].style.flexDirection = "column";
+            item_content.children[0].style.justifyContent = "center";
+            item_content.children[0].style.marginLeft = "6px";
+            item_content.children[0].style.paddingRight = "-6px";
+            item_content.children[0].style.borderWidth = "2px";
+            item_content.children[0].style.borderStyle = "none dotted none none";
+            item_content.children[0].style.borderColor = "rgb(170, 170, 170)";
+            item_content.children[1].style.width = value_width+"%";
+            item_content.children[1].style.fontSize = "0.9rem";
+            item_content.children[1].style.marginLeft = "6px";
+            item_content.children[1].style.paddingRight = "-6px";
+            item_content.children[1].style.display = "flex";
+            item_content.children[1].style.flexDirection = "column";
+            item_content.children[1].style.justifyContent = "center";
+        }
+    }
+    encapsulation_location.style.height = total_height + "px";
+}
+
+function itemReadDetails(content_location , append_to , information , information_types , encapsulate){
+    let control_div = document.querySelectorAll(content_location);
+    let append_details = document.getElementById(append_to);
+    let total_controls = control_div[0].children
+    let htmlInformation = [];
+    let html = [];
+    let title = 0;
+    for(let i = 0 ; i < total_controls.length ; i++){
+        controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
+        if(total_controls[i].attributes.id.nodeValue === "title-bar"){
+            title = 1;
+            continue;
+        }
+        html[i-title] = "";
+        for(let j = 0 ; j < information_types.length ; j++){
+            htmlInformation[j] = createDetailsHtml(information.items[i-title][information_types[j]] , information_types[j]);
+            html[i-title] += htmlInformation[j].innerHTML;
+        }
+        controls.addEventListener('click' , async function(){
+            append_details.innerHTML = html[i-title];
+            if(typeof encapsulate.function === "function"){
+                await encapsulate.function(append_details , encapsulate.filter , encapsulate.conditionals);
+            }
+        });
+        controls.style.cursor = "pointer";
+    }
+}
+
+function pageControlsFunctionality(control_location , controlerFunction , loadingFunction){
+    control_div = document.querySelectorAll(control_location);
+    total_controls = control_div[0].children
+    for(let i = 0 ; i < total_controls.length ; i++){
+        if(total_controls[i].attributes.page === undefined)
+            continue;
+        controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
+        controls.addEventListener('click' , async function(){
+            controlerFunction(loadingFunction , controls.attributes.page.nodeValue);
+        });
+        controls.style.cursor = "pointer";
+        controls.style.userSelect = "none";
+    }
+}
 

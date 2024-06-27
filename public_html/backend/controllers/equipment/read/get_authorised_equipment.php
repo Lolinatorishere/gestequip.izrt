@@ -21,6 +21,9 @@ function read_authorised_equipment($data_request , $pdo){
     if(isset($data_request["page"])){
         $request["current_page"] = $data_request["page"];
     }
+    if(isset($data_request["limit"])){
+        $request["limit"] = $data_request["limit"];
+    }
     $all_references = get_queries($request , $pdo);
     $parsed_items = array();
     foreach($all_references["items"]  as $key => $value){

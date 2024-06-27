@@ -1,43 +1,4 @@
 
-function pageControlsFunctionality(control_location , loadingFunction){
-    control_div = document.querySelectorAll(control_location);
-    total_controls = control_div[0].children
-    for(i = 0 ; i < total_controls.length ; i++){
-        if(total_controls[i].attributes.page === undefined)
-            continue;
-        controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
-        controls.addEventListener('click' , async function(){
-            loadingFunction(getAuthEquipments , controls.attributes.page.nodeValue);
-        });
-        controls.style.cursor = "pointer";
-    }
-}
-
-function itemReadDetails(content_location , append_to , information , information_types){
-    let control_div = document.querySelectorAll(content_location);
-    let append_details = document.getElementById(append_to);
-    let total_controls = control_div[0].children
-    let htmlInformation = [];
-    let html = [];
-    let title = 0;
-    for(let i = 0 ; i < total_controls.length ; i++){
-        controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
-        if(total_controls[i].attributes.id.nodeValue === "title-bar"){
-            title = 1;
-            continue;
-        }
-        for(let j = 0 ; j < information_types.length ; j++){
-            htmlInformation[j] = createDetailsHtml(information.items[i-title][information_types[j]] , information_types[j]);
-            html[i-title] += htmlInformation[j].innerHTML;
-            console.log(html[i-title]);
-        }
-        controls.addEventListener('click' , async function(){
-            append_details.innerHTML = html[i-title];
-        });
-        controls.style.cursor = "pointer";
-    }
-}
-
 async function genertateInventoryHtml(data){
     let itemsDiv = document.createElement('div')
     let group_items = data.group_equipments.items;
@@ -85,12 +46,36 @@ async function genertateInventoryHtml(data){
 }
 
 async function inventoryControler(datarequest , page){
-    group_equipments = await datarequest(page);
-    equipment_types = await getEquipmentTypes();
-    append_page_totals = document.getElementById("group-items-total");
-    append_page_controls = document.getElementById("group-page-controls");
-    append_items = document.getElementById("items-content");
-    append_details = document.getElementById("info-selected");
+    let group_equipments = await datarequest(page);
+    let equipment_types = await getEquipmentTypes();
+    let append_page_totals = document.getElementById("group-items-total");
+    let append_page_controls = document.getElementById("group-page-controls");
+    let append_items = document.getElementById("items-content");
+    let append_details = document.getElementById("info-selected");
+    let encapsulate = {
+        function: encapsulateAndFilter,
+        filter: [["id","username","regional_indicator"]
+                ,["id","group_status","group_type"]
+                ,["id","equipment_id","has_battery","registration_lock","serial_brand_md5","registration_date","equipment_type", "IMEI"]
+                ],
+        conditionals:[
+            [[],[]],
+            [[],[]],
+            [
+                //[what text] , [[conditional] , [results]] 
+                /// if conditional = array creates for loop with the array 
+                // [array content] then you specify whats in the array more arays or an object
+                // ["compare array with component " , "replace  with array component"]
+                ["equipment_status","roaming","delivery_getAuthEquipmentsstatus","computer_type"],
+                [
+                    [["1"],["Active","Inactive"]],
+                    [["1"],["Active","Inactive"]],
+                    [["1"],["Active","Inactive"]],
+                    [[equipment_types.information.items] , ["id" , "equipment_type"]]
+                ]
+            ]
+        ]
+    }
     appends = [["grp"],["group_name","users_name","equipment_type","brand","model","purchase_date"]];
     custom_data = {
             group_equipments: group_equipments.information
@@ -104,10 +89,11 @@ async function inventoryControler(datarequest , page){
     append_page_controls.innerHTML = htmlData.controls.pageControl;
     append_page_totals.innerHTML = htmlData.controls.totalItems;
     await setFetchedItemsUI("items-content" , 20 , custom_data.equipment_types.items , 5);
-    pageControlsFunctionality("#page-controls-group" , inventoryControler);
-    itemReadDetails("#items-content" , "info-selected" , group_equipments.information , ["user" , "group" , "equipment"])
+    itemReadDetails("#items-content" , "info-selected" , group_equipments.information , ["user" , "group" , "equipment"] , encapsulate)
+    //equipmentUpdate("#equipment");
+    pageControlsFunctionality("#page-controls-group" , inventoryControler , getAuthEquipments);
 }
 
 async function groupTabFunctionality(){
-     inventoryControler(getAuthEquipments , 1);
+    inventoryControler(getAuthEquipments , 1);
 }

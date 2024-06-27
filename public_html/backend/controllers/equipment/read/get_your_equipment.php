@@ -17,6 +17,9 @@ function read_your_equipment($data_request , $pdo){
     if(isset($data_request["page"])){
         $request["current_page"] = $data_request["page"];
     }
+    if(isset($data_request["limit"])){
+        $request["limit"] = $data_request["limit"];
+    }
     $all_references = get_queries($request , $pdo);
     $parsed_items = array();
     foreach($all_references["items"]  as $key => $value){
@@ -28,7 +31,6 @@ function read_your_equipment($data_request , $pdo){
         array_push($parsed_items , read_equipment($request , $pdo));
     }
     $all_references["items"] = $parsed_items;
-    printLog($all_references);
     if(isset($all_references["total_items"])){
         if($all_references["total_items"] === 0)
             return "No Equipments Assigned";

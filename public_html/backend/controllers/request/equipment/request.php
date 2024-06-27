@@ -25,12 +25,7 @@ function read_request($tab , &$data_request , $user_id , $pdo){
 }
 
 function create_request($data_request , $tab , $user_id , $pdo){
-    switch($tab){
-        case "add_eq":
-            return create_equipment($data_request , $pdo);
-    }
-    $data_request["error"] = "error";
-    return $data_request;
+    return create_equipment($data_request , $pdo);
 }
 
 function update_request($data_request , $tab , $user_id , $pdo){

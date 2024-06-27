@@ -106,17 +106,20 @@ function createDetailsHtml(data , div_name){
     let HTMLinner;
     html_div.className = div_name;
     html_div.id = div_name;
+    let i = 0;
     for(let [key , value] of Object.entries(data)){
+        let key_parse = key.replace("_" , " ");
         html = `
-        <div id="${div_name}-content" class="${div_name}-content-details">
+        <div id="${div_name}-content-${i}" class="${div_name}-content-details">
             <div id="title-${key}" class="title-${key}">
-                ${key}
+                ${key_parse}
             </div>
             <div id="${key}" class="${key}">
                 ${value}
             </div>
         </div>
                  `
+        i++;
         html_div.innerHTML += html;
         item_div.appendChild(html_div);
     }

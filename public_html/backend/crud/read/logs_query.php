@@ -13,6 +13,9 @@ function get_logs_by_status($data_request , $log_status , $log_table ,  $pdo){
     if(isset($data_request["page"])){
         $request["page"] = $data_request["page"];
     }
+    if(isset($data_request["limit"])){
+        $request["limit"] = $data_request["limit"];
+    }
     return get_queries($request , $pdo);
 }
 
@@ -26,6 +29,9 @@ function get_logs($data_request , $log_table , $pdo){
     }
     if(isset($data_request["page"])){
         $request["page"] = $data_request["page"];
+    }
+    if(isset($data_request["limit"])){
+        $request["limit"] = $data_request["limit"];
     }
     return get_queries($request , $pdo);
 }

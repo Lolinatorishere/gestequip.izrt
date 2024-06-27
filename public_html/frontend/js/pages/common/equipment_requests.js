@@ -8,7 +8,56 @@ async function getSpecificEquipment(user_id , group_id , equipment_id){
                 ,crud: 'read'
                 }
             }
-    return fetchPOST();
+    let post ={
+        data:{
+            query:{
+                user_id:user_id,
+                group_id:group_id,
+                equipment_id:equipment_id,
+            }
+        }
+    }
+    return await fetchPOST(request , post);
+}
+
+async function getSearchEquipment(user_id , group_id , equipment_type , eq_default , eq_specific , page , limit){
+
+    let request = {
+             type: 'equipment'
+            ,custom: {
+                 tab: 'sch_eq'
+                ,type: 'data' 
+                ,crud: 'read'
+                }
+            }
+    let post ={
+        data:{
+            query:{
+            }
+        }
+    }
+    if(typeof page !== 'undefined' && page !== null){
+        request.custom.page = page;
+    }
+    if(typeof limit !== 'undefined' && limit !== null){
+        request.custom.lmit = limit;
+    }
+    if(typeof user_id !== 'undefined' && user_id !== null){
+        post.data.query["user_id"] = user_id;
+    }
+    if(typeof group_id !== 'undefined' && group_id !== null){
+        post.data.query["group_id"] = group_id;
+    }
+    if(typeof equipment_type  !== 'undefined' && equipment_type !== null){
+        post.data.query["equipment_type"] = equipment_type;
+    }
+    if(typeof eq_default  !== 'undefined' && eq_default !== null){
+        post.data.query["default"] = eq_default;
+    }
+    if(typeof eq_specific  !== 'undefined' && eq_specific !== null){
+        post.data.query["specific"] = eq_specific;
+    }
+    return fetchPOST(request , post);
 }
 
 async function getEquipmentTypes(){
@@ -25,20 +74,20 @@ async function getEquipmentTypes(){
     return user_info;
 }
 
-async function getAuthEquipments(page){
-    let request = {
+async function getAuthEquipments(page , limit){
+        let request = {
              type: 'equipment'
             ,custom: {
                  tab: 'autheq'
                 ,type: 'data' 
                 ,crud: 'read'
                 ,pgng: 1
-                ,page: 1
                 }
             }
-    if(page){
+    if(typeof page !== 'undefined' && page !== null) 
         request.custom.page = page;
-    }
+    if(typeof limit !== 'undefined' && limit !== null) 
+        request.custom.lmit = limit;
     let user_request = await fetch(await urlCreateBackendRequest(request));
     let user_info = await user_request.json();
     return user_info;
@@ -72,12 +121,16 @@ async function getUserGroups(page){
     if(page){
         request.custom.page = page;
     }
+    if(typeof page !== 'undefined' && page !== null) 
+        request.custom.page = page;
+    if(typeof limit !== 'undefined' && limit !== null) 
+        request.custom.lmit = limit;
     let user_request = await fetch(await urlCreateBackendRequest(request));
     let user_info = await user_request.json();
     return user_info;
 }
 
-async function getEquipmentLogs(page){
+async function getEquipmentLogs(page , limit){
     let request = {
              type: 'equipment'
             ,custom: {
@@ -85,12 +138,12 @@ async function getEquipmentLogs(page){
                 ,type: 'data' 
                 ,crud: 'read'
                 ,pgng: 1
-                ,page: 1
                 }
             }
-    if(page){
+    if(typeof page !== 'undefined' && page !== null) 
         request.custom.page = page;
-    }
+    if(typeof limit !== 'undefined' && limit !== null) 
+        request.custom.lmit = limit;
     let user_request = await fetch(await urlCreateBackendRequest(request));
     let user_info = await user_request.json();
     return user_info;
@@ -104,12 +157,12 @@ async function getUserEquipments(page){
                 ,type: 'data' 
                 ,crud: 'read'
                 ,pgng: 1
-                ,page: 1
                 }
             }
-    if(page){
+    if(typeof page !== 'undefined' && page !== null) 
         request.custom.page = page;
-    }
+    if(typeof limit !== 'undefined' && limit !== null) 
+        request.custom.lmit = limit;
     let user_request = await fetch(await urlCreateBackendRequest(request));
     let user_info = await user_request.json();
     return user_info;

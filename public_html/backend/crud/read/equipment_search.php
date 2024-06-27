@@ -36,7 +36,7 @@ function equipment_search_query_get_previous_equipment_ids($db_responses , $pdo)
     return $previous_request["message"] = "error";
 }
 
-function equipment_search_query_user_group_id($queries , &$db_responses , $pdo , $page_check , &$info_from_server){
+function equipment_search_query_user_group_id($queries , &$db_responses , $pdo , $page_check , &$info_from_server , $limit){
     if($page_check["paged_query"] === "both_id"){
         $page = $page_check["page"];
     }
@@ -46,7 +46,9 @@ function equipment_search_query_user_group_id($queries , &$db_responses , $pdo ,
                         ,"specific" => " user_id = \"" . $queries["user_id"] . "\" and group_id =\"". $queries["group_id"] . "\""
                         );
         if(isset($page)){
-            $request["current_page"] = $page;
+            $request["paging"] = 1;
+            $request["page"] = $page;
+            $request["limit"] = $limit;
         }
         $db_responses["from_id"] = get_queries($request , $pdo);
     }else{
@@ -56,7 +58,9 @@ function equipment_search_query_user_group_id($queries , &$db_responses , $pdo ,
                            ,"specific" => " user_id = \"" . $queries["user_id"] . "\""
                            );
             if(isset($page)){
-                $request["current_page"] = $page;
+                $request["paging"] = 1;
+                $request["page"] = $page;
+                $request["limit"] = $limit;
             }
             $db_responses["from_id"] = get_queries($request , $pdo);
         }
@@ -66,7 +70,9 @@ function equipment_search_query_user_group_id($queries , &$db_responses , $pdo ,
                            ,"specific" => " group_id =\"". $queries["group_id"] . "\""
                            );
             if(isset($page)){
-                $request["current_page"] = $page;
+                $request["paging"] = 1;
+                $request["page"] = $page;
+                $request["limit"] = $limit;
             }
             $db_responses["from_id"] = get_queries($request , $pdo);
         }
@@ -84,7 +90,7 @@ function equipment_search_query_user_group_id($queries , &$db_responses , $pdo ,
     return;
 }
 
-function equipment_search_query_default($queries , &$db_responses , $pdo , $page_check , &$info_from_server){
+function equipment_search_query_default($queries , &$db_responses , $pdo , $page_check , &$info_from_server , $limit){
     $guard = 0;
     if(!isset($queries["default_query"])){
         $info_from_server = $info_from_server;
@@ -120,7 +126,9 @@ function equipment_search_query_default($queries , &$db_responses , $pdo , $page
                     ,"specific" => $specific_string
                     );
     if(isset($page)){
-        $request["current_page"] = $page_check["page"];
+        $request["paging"] = 1;
+        $request["page"] = $page_check["page"];
+        $request["limit"] = $limit;
     }
     $db_responses["default_query"] = get_queries($request , $pdo);
     if($db_responses["default_query"]["total_items"] === 0){
@@ -135,7 +143,7 @@ function equipment_search_query_default($queries , &$db_responses , $pdo , $page
     $info_from_server = "Found Queries";
 }
 
-function equipment_search_query_equipment_type($queries , &$db_responses , $pdo , $page_check , &$info_from_server){
+function equipment_search_query_equipment_type($queries , &$db_responses , $pdo , $page_check , &$info_from_server , $limit){
     $guard = 0;
     if(!isset($queries["equipment_type"])){
         $info_from_server = $info_from_server;
@@ -165,7 +173,7 @@ function equipment_search_query_equipment_type($queries , &$db_responses , $pdo 
     );
     $equipment_types = get_queries($request , $pdo);
     foreach($equipment_types["items"] as $item){
-        if($queries["equipment_type"]["equipment_type"] === $item["equipment_type"]){
+        if($queries["equipment_type"] === $item["equipment_type"]){
             $specific_item = $item["id"];
             $db_responses_eq_type = $item;
         }
@@ -180,7 +188,9 @@ function equipment_search_query_equipment_type($queries , &$db_responses , $pdo 
                         ,"specific" => "equipment_type=\"" . $specific_item ."\""
                         );
         if(isset($page)){
-            $request["current_page"] = $page;
+            $request["paging"] = 1;
+            $request["page"] = $page;
+            $request["limit"] = $limit;
         }
         $db_responses["equipment_type"] = get_queries($request , $pdo);
         if($db_responses["equipment_type"]["total_items"] === 0){
@@ -198,7 +208,9 @@ function equipment_search_query_equipment_type($queries , &$db_responses , $pdo 
                         ,"specific" => "id IN (" . $equipment_ids_string . ") AND equipment_type=\"" . $specific_item ."\""
                         );
         if(isset($page)){
-            $request["current_page"] = $page;
+            $request["paging"] = 1;
+            $request["page"] = $page;
+            $request["limit"] = $limit;
         }
         $db_responses["equipment_type"] = get_queries($request , $pdo);
         if($db_responses["equipment_type"]["total_items"] === 0){
@@ -210,7 +222,7 @@ function equipment_search_query_equipment_type($queries , &$db_responses , $pdo 
     $db_responses["equipment_type"]["equipment_type"] = $db_responses_eq_type;
 }
 
-function equipment_search_query_specific($queries , &$db_responses , $pdo , $page_check , &$info_from_server){
+function equipment_search_query_specific($queries , &$db_responses , $pdo , $page_check , &$info_from_server , $limit){
     $guard = 0;
     if(!isset($queries["equipment_type"]) || !isset($queries["specific_query"]))
         return;
@@ -228,7 +240,7 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
     }
     if($guard === 0)
         return;
-     if($page_check["paged_query"] === "equipment_type"){
+    if($page_check["paged_query"] === "specific_query"){
         $page = $page_check["page"];
     }
     $equipment_ids = array();
@@ -242,7 +254,9 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
                     ,"specific" => " equipment_id IN (" . $equipment_ids_string . ") AND (" . $string_query . ") "
                     );
     if(isset($page)){
-        $request["current_page"] = $page;
+        $request["paging"] = 1;
+        $request["page"] = $page;
+        $request["limit"] = $limit;
     }
     $db_responses["specific_query"] = get_queries($request , $pdo);
     if($db_responses["specific_query"]["total_items"] === 0){
@@ -254,17 +268,17 @@ function equipment_search_query_specific($queries , &$db_responses , $pdo , $pag
 
 // nottodo create logging for search queries
 // future me: nuh uh
-function equipment_search_query($queries , $pdo , $page_check){
+function equipment_search_query($queries , $pdo , $page_check , $limit){
     $auth = search_authentication($pdo)["items"];
     $info_from_server = "unset";
     $loggable = array();
     $ret = array("message" => "Server Error"); 
     $db_responses = array();
     $parsed_search = array();
-    equipment_search_query_user_group_id($queries , $db_responses ,  $pdo , $page_check , $info_from_server);
-    equipment_search_query_default($queries , $db_responses , $pdo , $page_check , $info_from_server);
-    equipment_search_query_equipment_type($queries , $db_responses , $pdo , $page_check , $info_from_server);
-    equipment_search_query_specific($queries , $db_responses , $pdo , $page_check , $info_from_server);
+    equipment_search_query_user_group_id($queries , $db_responses ,  $pdo , $page_check , $info_from_server , $limit);
+    equipment_search_query_default($queries , $db_responses , $pdo , $page_check , $info_from_server , $limit);
+    equipment_search_query_equipment_type($queries , $db_responses , $pdo , $page_check , $info_from_server , $limit);
+    equipment_search_query_specific($queries , $db_responses , $pdo , $page_check , $info_from_server , $limit);
     if($info_from_server === "No Queries"){
         $ret["message"] = $info_from_server;
     }
@@ -324,6 +338,7 @@ function equipment_search($data_request , $pdo){
         $server_message["server_message"] = "No Query Requested";
         return $server_message;
     }
+    $limit = $data_request["limit"];
     $search_queries = $data_request["query"];
     $user_group_query_check = 0;
     $server_message = array("server_message" => "Error"
@@ -360,10 +375,7 @@ function equipment_search($data_request , $pdo){
             }
         }
     }
-    if(!isset($data_request["total_items"])){
-        $page["paged_query"] = "unset";
-    }
-    $response = equipment_search_query($query , $pdo , $page);
+    $response = equipment_search_query($query , $pdo , $page , $limit);
     $server_message["message"] = $response["message"];
     if(isset($response["result"])){
         $server_message["server_message"] = $response["message"];

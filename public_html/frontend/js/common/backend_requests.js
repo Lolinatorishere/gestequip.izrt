@@ -15,7 +15,7 @@ async function urlCreateBackendRequest(request){
 
 async function fetchPOST(endpoint, POST_request) {
     try {
-        const response = await fetch(endpoint, {
+        const response = await fetch(await urlCreateBackendRequest(endpoint), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

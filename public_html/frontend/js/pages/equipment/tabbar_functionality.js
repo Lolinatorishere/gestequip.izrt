@@ -42,6 +42,13 @@ function onTabLoad(tab){
             }
             break;
         case "sch_eq":
+            if(typeof searchTabFunctionality === "function"){
+                searchTabFunctionality();
+            }else{
+                console.log("nuh uh Tab");
+            }
+            break;
+
             break;
         case "all_eq":
             break;
