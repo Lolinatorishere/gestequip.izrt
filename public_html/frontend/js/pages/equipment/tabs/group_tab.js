@@ -1,12 +1,10 @@
 
-
 function pageControlsFunctionality(control_location , loadingFunction){
     control_div = document.querySelectorAll(control_location);
     total_controls = control_div[0].children
     for(i = 0 ; i < total_controls.length ; i++){
         if(total_controls[i].attributes.page === undefined)
             continue;
-        console.log(total_controls[i].attributes.id.nodeValue);
         controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
         controls.addEventListener('click' , async function(){
             loadingFunction(getAuthEquipments , controls.attributes.page.nodeValue);
@@ -15,8 +13,29 @@ function pageControlsFunctionality(control_location , loadingFunction){
     }
 }
 
-function itemReadDetails(content_location , append_to ,){
-    //todo make this
+function itemReadDetails(content_location , append_to , information , information_types){
+    let control_div = document.querySelectorAll(content_location);
+    let append_details = document.getElementById(append_to);
+    let total_controls = control_div[0].children
+    let htmlInformation = [];
+    let html = [];
+    let title = 0;
+    for(let i = 0 ; i < total_controls.length ; i++){
+        controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
+        if(total_controls[i].attributes.id.nodeValue === "title-bar"){
+            title = 1;
+            continue;
+        }
+        for(let j = 0 ; j < information_types.length ; j++){
+            htmlInformation[j] = createDetailsHtml(information.items[i-title][information_types[j]] , information_types[j]);
+            html[i-title] += htmlInformation[j].innerHTML;
+            console.log(html[i-title]);
+        }
+        controls.addEventListener('click' , async function(){
+            append_details.innerHTML = html[i-title];
+        });
+        controls.style.cursor = "pointer";
+    }
 }
 
 async function genertateInventoryHtml(data){
@@ -86,6 +105,7 @@ async function inventoryControler(datarequest , page){
     append_page_totals.innerHTML = htmlData.controls.totalItems;
     await setFetchedItemsUI("items-content" , 20 , custom_data.equipment_types.items , 5);
     pageControlsFunctionality("#page-controls-group" , inventoryControler);
+    itemReadDetails("#items-content" , "info-selected" , group_equipments.information , ["user" , "group" , "equipment"])
 }
 
 async function groupTabFunctionality(){

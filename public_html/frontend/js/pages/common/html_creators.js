@@ -100,6 +100,28 @@ function controlsHtml(data){
     return ret;
 }
 
+function createDetailsHtml(data , div_name){
+    let item_div = document.createElement('div');
+    let html_div = document.createElement('div');
+    let HTMLinner;
+    html_div.className = div_name;
+    html_div.id = div_name;
+    for(let [key , value] of Object.entries(data)){
+        html = `
+        <div id="${div_name}-content" class="${div_name}-content-details">
+            <div id="title-${key}" class="title-${key}">
+                ${key}
+            </div>
+            <div id="${key}" class="${key}">
+                ${value}
+            </div>
+        </div>
+                 `
+        html_div.innerHTML += html;
+        item_div.appendChild(html_div);
+    }
+    return item_div;
+}
 
 function createItemHTML(data , appends , highlight , iteration){
     let item = data;
