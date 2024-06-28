@@ -46,9 +46,8 @@ async function genertateInventoryHtml(data){
 }
 
 async function equipment_controls(information){
-    console.log(information);
     controls_location = document.getElementById(information.append_to);
-    user_auth = await getUserGroupAuth(4);
+    user_auth = await getUserGroupAuth(information.details.group.id);
     control_location = document.getElementById("group-details-info");
     switch(user_auth.information.items.user_permission_level){
         case 0:
@@ -65,8 +64,8 @@ async function equipment_controls(information){
             break
         case 2:
             alter_button = {
-                className:"update-button",
-                id:"update-button",
+                className:"alter-button",
+                id:"alter-button",
                 message:"Alter Equipment",
             }
             delete_button = {
@@ -74,14 +73,26 @@ async function equipment_controls(information){
                 id:"delete-button",
                 message:"Delete Reference",
             }
+            update_button = {
+                className: "update-button",
+                id:"update-button",
+                message:"Update Equipment"
+            }
             alter_button_internal = {
                 description_data: getTableDescription,
-                update_info: information.details.equipment.equipment_type
+                update_info: information.details.equipment.equipment_type, 
             }
             buttons = {
-                html: [alter_button , delete_button],
-                functions: [setUpdateableInfo , ""],
-                internal: [alter_button_internal , ""]
+                html: [alter_button , delete_button ,update_button],
+                functions: [setUpdateableInfo , "" , ""],
+                internal: [alter_button_internal , "" , ""],
+                callback: [{
+                    function:updateButtonControler,
+                    internal:{
+                        request: postEquipmentUpdate,
+                        information: information.details
+                    }
+                }]
             }
             control_location.innerHTML = "";
             control_location.appendChild(createButtonsFunctionality(buttons));

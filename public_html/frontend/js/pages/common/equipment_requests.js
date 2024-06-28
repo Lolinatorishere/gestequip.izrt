@@ -190,3 +190,20 @@ async function getUserEquipments(page){
     return user_info;
 }
 
+async function postEquipmentUpdate(data){
+    if(typeof data !== "object")
+        return;
+    
+    let request = {
+        type: 'equipment'
+        ,custom: {
+            type: 'data' 
+            ,crud: 'update'
+            }
+        }
+    let post = {
+        data:data
+    }
+    return await fetchPOST(request , post);
+}
+

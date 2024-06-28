@@ -17,7 +17,17 @@ function createInputHtml(input){
     input_div.className = input.className;
     input_div.id = input.id;
     input_div.type = input.type
-    input_div.placeholder = input.placeholder;
+    if(input.type === "checkbox"){
+        if(input.placeholder === "Active"){
+            input_div.value = "on"; 
+            input_div.checked = true; 
+        }else{
+            input_div.value = "off"; 
+            input_div.checked = false; 
+        }
+    }else{
+        input_div.placeholder = input.placeholder;
+    }
     return input_div;
 }
 

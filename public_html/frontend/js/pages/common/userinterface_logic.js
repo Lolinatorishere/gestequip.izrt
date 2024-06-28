@@ -318,11 +318,12 @@ async function setUpdateableInfo(functions){
     }else{
         edit_tables = await functions.description_data();
     }
-    console.log(edit_tables);
     for(let [key , value] of Object.entries(edit_tables.information.default)){
         if(document.getElementById(value.Field) === undefined)
             continue;
         inputdiv = document.getElementById(value.Field);
+        console.log(inputdiv);
+        console.log(inputdiv.tagName);
         input = {
             className: value.Type + "-input",
             id: value.Field,
@@ -349,18 +350,42 @@ async function setUpdateableInfo(functions){
     }
 }
 
+function updateButtonControler(functions){
+    if(document.getElementById("update-button") === undefined){
+        return;
+    }
+    button = document.getElementById("update-button");
+    button.addEventListener("click" , async function(){
+        let inputs = document.getElementsByTagName('input');
+        for(let i = 0 ; i < inputs.length ; i++){
+            //console.log(inputs[i].value);
+            //console.log(inputs[i]);
+        }
+    });
+    //for()
+}
+
 function createButtonsFunctionality(buttons){
+    if(document.getElementById("update-button") !== undefined){
+        delete(document.getElementById("update-button"));
+    }
     let functional_buttons = document.createElement('div');
     for(let i = 0 ; i < buttons.html.length ; i++){
         button = createButtonHtml(buttons.html[i]);
         button.addEventListener("click" , async function(){
-            if(typeof buttons.functions[i] !== "function"){
+            if(typeof buttons.functions[i] !== "function")
                 return;
-            }
             if(typeof buttons.internal === "object"){
                 buttons.functions[i](buttons.internal[i]);
             }else{
                 buttons.functions[i]();
+            }
+            if(typeof buttons.callback[i].function !== "function")
+                return;
+            if(typeof buttons.callback[i].internal === "object"){
+                buttons.callback[i].function(buttons.callback[i].internal);
+            }else{
+                buttons.callback[i].function();
             }
         });
         functional_buttons.appendChild(button);
