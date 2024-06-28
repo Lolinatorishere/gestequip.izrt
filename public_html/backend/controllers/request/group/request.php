@@ -1,8 +1,6 @@
 <?php
 
-if($_SESSION["user_type"] !== "Admin"){
-    die;
-}
+session_start();
 
 function ui_request($ui){
     $dir = '/var/www/html/gestequip.izrt/public_html/frontend/iframes/user/tabs/';
@@ -52,6 +50,8 @@ function read_request($tab , &$data_request , $user_id , $pdo){
             return read_request_log($data_request , $pdo);
         case "tbdesc":
             return read_table_description($data_request , $pdo);
+        case "yurath":
+            return read_your_auth_level($data_request , $pdo);
         }
     $data_request["error"] = "error";
     return $data_request;

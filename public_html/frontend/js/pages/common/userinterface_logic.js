@@ -296,7 +296,79 @@ async function encapsulateAndFilter(encapsulation_location , filter , conditiona
     encapsulation_location.style.height = total_height + "px";
 }
 
-function itemReadDetails(content_location , append_to , information , information_types , encapsulate){
+function parseTableType(type){
+    ret = "";
+    switch(type){
+        case "tinyint(1)":
+            ret = "checkbox";
+            break;
+        case "date":
+            ret = "date";
+            break;
+        default:
+            ret = "text";
+            break;
+    }
+    return ret;
+}
+
+async function setUpdateableInfo(functions){
+    if(functions.update_info !== undefined){
+        edit_tables = await functions.description_data(functions.update_info);
+    }else{
+        edit_tables = await functions.description_data();
+    }
+    console.log(edit_tables);
+    for(let [key , value] of Object.entries(edit_tables.information.default)){
+        if(document.getElementById(value.Field) === undefined)
+            continue;
+        inputdiv = document.getElementById(value.Field);
+        input = {
+            className: value.Type + "-input",
+            id: value.Field,
+            type: parseTableType(value.Type),
+            placeholder: inputdiv.innerText
+        }
+        inputdiv.innerText = ""
+        inputdiv.appendChild(createInputHtml(input));
+    }
+    if(edit_tables.information.specific !== undefined){
+        for(let [key , value] of Object.entries(edit_tables.information.specific)){
+            if(document.getElementById(value.Field) === undefined)
+                continue;
+            inputdiv = document.getElementById(value.Field);
+            input = {
+                className: value.Type + "-input",
+                id: value.Field,
+                type: parseTableType(value.Type),
+                placeholder: inputdiv.innerText
+            }
+            inputdiv.innerText = ""
+            inputdiv.appendChild(createInputHtml(input));
+        }
+    }
+}
+
+function createButtonsFunctionality(buttons){
+    let functional_buttons = document.createElement('div');
+    for(let i = 0 ; i < buttons.html.length ; i++){
+        button = createButtonHtml(buttons.html[i]);
+        button.addEventListener("click" , async function(){
+            if(typeof buttons.functions[i] !== "function"){
+                return;
+            }
+            if(typeof buttons.internal === "object"){
+                buttons.functions[i](buttons.internal[i]);
+            }else{
+                buttons.functions[i]();
+            }
+        });
+        functional_buttons.appendChild(button);
+    }
+    return functional_buttons;
+}
+
+function itemReadDetails(content_location , append_to , information , information_types , encapsulate , callback){
     let control_div = document.querySelectorAll(content_location);
     let append_details = document.getElementById(append_to);
     let total_controls = control_div[0].children
@@ -318,6 +390,10 @@ function itemReadDetails(content_location , append_to , information , informatio
             append_details.innerHTML = html[i-title];
             if(typeof encapsulate.function === "function"){
                 await encapsulate.function(append_details , encapsulate.filter , encapsulate.conditionals);
+            }
+            if(typeof callback.function === "function"){
+                callback.details = information.items[i-title]
+                await callback.function(callback);
             }
         });
         controls.style.cursor = "pointer";

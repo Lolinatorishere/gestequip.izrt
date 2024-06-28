@@ -32,8 +32,16 @@ function update_request($data_request , $tab , $user_id , $pdo){
     return update_equipment($data_request , $pdo);
 }
 
-function delete_request($data_request , $tab , $user_id , $pdo){
-    return delete_equipment($data_request , $pdo);
+function delete_request($data_request , $tab , $user_id , $pdo , $origin){
+    switch($origin) {
+        case 'group':
+            return delete_equipment($data_request , $pdo);
+        case 'reference':
+            $data_request["reference"] = "user_group";
+            return delete_reference($data_request , $pdo);
+        default:
+            return "Invalid Origin";
+    }
 }
 
 // function to handle crud requests from tabs

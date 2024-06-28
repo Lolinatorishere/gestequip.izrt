@@ -1,5 +1,7 @@
 <?php
+
 session_start();
+
 // defines section 
 // to avoid other files from working without the controller
 
@@ -51,6 +53,7 @@ require_once common_crud . "/delete/reference_delete.php";
 // read tab modules
 require_once group_read . "/get_your_groups.php";
 require_once group_read . "/get_table_description.php";
+require_once group_read . "/get_your_auth_level.php";
 require_once group_read . "/get_all_groups.php";
 require_once group_read . "/get_logs.php";
 require_once group_read . "/search_group.php";
@@ -82,6 +85,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 $req_tab = user_request_validation($tab_request);
 $req_type = request_type_validation($request_type);
 $ret = request_handle($req_tab , $tab_request , $req_type);
+
 if($req_type === 1){
     echo json_encode(array('ui' => $ret[0]
                           ,'html' => $ret[1]));

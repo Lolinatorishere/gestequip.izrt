@@ -1,3 +1,26 @@
+
+function createButtonHtml(button){
+    let button_div = document.createElement('div');
+    button_div.className = button.className;
+    button_div.id = button.id;
+    html = `
+        <div  class="title-${button.className}-content">
+            ${button.message}
+        </div>
+             `
+    button_div.innerHTML += html;
+    return button_div;
+}
+
+function createInputHtml(input){
+    let input_div = document.createElement('input');
+    input_div.className = input.className;
+    input_div.id = input.id;
+    input_div.type = input.type
+    input_div.placeholder = input.placeholder;
+    return input_div;
+}
+
 function controlPagesHtml(data){
     let html = ''; 
     control_location = '';

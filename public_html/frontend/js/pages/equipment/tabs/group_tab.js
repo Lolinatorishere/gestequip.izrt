@@ -45,6 +45,50 @@ async function genertateInventoryHtml(data){
     return ret;
 }
 
+async function equipment_controls(information){
+    console.log(information);
+    controls_location = document.getElementById(information.append_to);
+    user_auth = await getUserGroupAuth(4);
+    control_location = document.getElementById("group-details-info");
+    switch(user_auth.information.items.user_permission_level){
+        case 0:
+            //no buttons for you deadass
+            break
+        case 1:
+            button = {
+                className:"update-button",
+                id:"update-button",
+                message:"Alter Equipment",
+                function:"update-button"
+            }
+            control_location.appendChild(createButtonHtml(button)); 
+            break
+        case 2:
+            alter_button = {
+                className:"update-button",
+                id:"update-button",
+                message:"Alter Equipment",
+            }
+            delete_button = {
+                className:"delete-button",
+                id:"delete-button",
+                message:"Delete Reference",
+            }
+            alter_button_internal = {
+                description_data: getTableDescription,
+                update_info: information.details.equipment.equipment_type
+            }
+            buttons = {
+                html: [alter_button , delete_button],
+                functions: [setUpdateableInfo , ""],
+                internal: [alter_button_internal , ""]
+            }
+            control_location.innerHTML = "";
+            control_location.appendChild(createButtonsFunctionality(buttons));
+            break
+    }
+}
+
 async function inventoryControler(datarequest , page){
     let group_equipments = await datarequest(page);
     let equipment_types = await getEquipmentTypes();
@@ -52,6 +96,11 @@ async function inventoryControler(datarequest , page){
     let append_page_controls = document.getElementById("group-page-controls");
     let append_items = document.getElementById("items-content");
     let append_details = document.getElementById("info-selected");
+    for(let i = 0 ; i < group_equipments.information.items.length ; i++){
+        item = group_equipments.information.items[i];
+        group_equipments.information.items[i].user.phone = item.user.phone_number;
+        delete(group_equipments.information.items[i].user.phone_number);
+    }
     let encapsulate = {
         function: encapsulateAndFilter,
         filter: [["id","username","regional_indicator"]
@@ -66,7 +115,7 @@ async function inventoryControler(datarequest , page){
                 /// if conditional = array creates for loop with the array 
                 // [array content] then you specify whats in the array more arays or an object
                 // ["compare array with component " , "replace  with array component"]
-                ["equipment_status","roaming","delivery_getAuthEquipmentsstatus","computer_type"],
+                ["equipment_status","roaming","delivery_status","computer_type"],
                 [
                     [["1"],["Active","Inactive"]],
                     [["1"],["Active","Inactive"]],
@@ -89,8 +138,11 @@ async function inventoryControler(datarequest , page){
     append_page_controls.innerHTML = htmlData.controls.pageControl;
     append_page_totals.innerHTML = htmlData.controls.totalItems;
     await setFetchedItemsUI("items-content" , 20 , custom_data.equipment_types.items , 5);
-    itemReadDetails("#items-content" , "info-selected" , group_equipments.information , ["user" , "group" , "equipment"] , encapsulate)
-    //equipmentUpdate("#equipment");
+    information = {
+        function: equipment_controls,
+        append_to: "group-details-controls"
+    }
+    itemReadDetails("#items-content" , "info-selected" , group_equipments.information , ["user" , "group" , "equipment"] , encapsulate , information)
     pageControlsFunctionality("#page-controls-group" , inventoryControler , getAuthEquipments);
 }
 

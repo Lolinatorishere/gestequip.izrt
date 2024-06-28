@@ -74,6 +74,27 @@ async function getEquipmentTypes(){
     return user_info;
 }
 
+async function getTableDescription(equipment_type){
+    let request = {
+             type: 'equipment'
+            ,custom: {
+                 tab: 'tbdesc'
+                ,type: 'data' 
+                ,crud: 'read'
+                }
+            }
+    let post ={
+        data:{
+            query:{
+            }
+        }
+    }
+    if(typeof equipment_type  !== 'undefined' && equipment_type !== null){
+        post.data.query["equipment_type"] = equipment_type;
+    }
+    return fetchPOST(request , post);
+}
+
 async function getAuthEquipments(page , limit){
         let request = {
              type: 'equipment'
@@ -157,6 +178,7 @@ async function getUserEquipments(page){
                 ,type: 'data' 
                 ,crud: 'read'
                 ,pgng: 1
+                ,page: 1
                 }
             }
     if(typeof page !== 'undefined' && page !== null) 

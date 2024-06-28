@@ -1,5 +1,7 @@
 <?php
+
 session_start();
+
 // defines section 
 // to avoid other files from working without the controller
 

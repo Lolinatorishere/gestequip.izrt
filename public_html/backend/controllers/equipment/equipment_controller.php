@@ -1,7 +1,8 @@
 <?php
-session_start();
 // defines section 
 // to avoid other files from working without the controller
+
+session_start();
 
 //Inner Module Definitions
 if(!defined('common_funcs'))

@@ -55,7 +55,6 @@ function validate_external_delete_inputs($request , $pdo , &$error_message){
             return 0;
         }
     }
-    
     return 1;
 }
 

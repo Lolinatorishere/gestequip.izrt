@@ -26,7 +26,7 @@ session_start();
   if($_SESSION["user_type"] === "Admin")
   echo '<div class="tabbar-item">
     <div class="tabbar-content">
-      <div id="add_equipment_type">Modify Types</div>
+      <div id="add_equipment_type">Modify types</div>
     </div>
   </div>
 
