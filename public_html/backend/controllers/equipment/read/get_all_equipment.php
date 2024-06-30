@@ -3,7 +3,7 @@
 function read_all_equipment($data_request , $pdo){
     if($_SESSION["user_type"] !== "Admin")
         return "Unauthorised Request";
-    $request = array("fetch" => " * "
+    $request = array("fetch" => " equipment_id DESTINCT"
                     ,"table" => " users_inside_groups_equipments "
                     ,"specific" => " user_id > 0 "
                     );

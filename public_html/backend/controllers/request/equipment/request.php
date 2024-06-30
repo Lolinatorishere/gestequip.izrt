@@ -38,7 +38,7 @@ function delete_request($data_request , $tab , $user_id , $pdo , $origin){
         case 'group':
             return delete_equipment($data_request , $pdo);
         case 'reference':
-            $data_request["reference"] = "user_group";
+            $data_request["reference"] = "user_group_equipment";
             return delete_reference($data_request , $pdo);
         default:
             return "Invalid Origin";

@@ -184,7 +184,6 @@ function createItemHTML(data , appends , highlight , iteration){
 function createTitleHTML(data){
     if(data.title !== undefined){
         let title = document.createElement('div')
-           ,title_div = document.createElement('div');
         data.title.forEach(element => {
             let HTMLinner = '';
             HTMLinner += `
@@ -194,11 +193,14 @@ function createTitleHTML(data){
                          `
             title.innerHTML += HTMLinner;
         });
-        title.className = data.appends[0] + "-title";
-        title_div.className = "title-bar";
-        title_div.id = "title-bar";
-        title_div.appendChild(title);
-        return title_div;
+        title.className = "title-bar-"+data.appends[0];
+        title.id = "title-bar-"+data.appends[0];
+        title.style.display = "flex";
+        title.style.flexDirection = "row";
+        title.style.borderStyle = "none dotted none none"
+        title.style.borderColor = "rgb(170, 170, 170)"
+        title.style.borderWidth = "2px"
+        return title;
     }else{
         return undefined;
     }

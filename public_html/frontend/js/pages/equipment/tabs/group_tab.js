@@ -1,5 +1,5 @@
 
-async function genertateInventoryHtml(data){
+async function generateInventoryHtml(data){
     let itemsDiv = document.createElement('div')
     let group_items = data.group_equipments.items;
     let equipment_type = ""
@@ -50,24 +50,18 @@ async function equipment_controls(information){
     controls_location = document.getElementById(information.append_to);
     user_auth = await getUserGroupAuth(information.details.group.id);
     control_location = document.getElementById("group-details-info");
+    let table_info = {
+        description_func: getEquipmentTableDescription,
+        update_info: information.details.equipment.equipment_type, 
+    }
     switch(user_auth.information.items.user_permission_level){
         case 0:
-            
+            document.getElementById("update-button").style.display = "none";
+            document.getElementById("delete-button").style.display = "none";
             break
         case 1:
-            button = {
-                className:"update-button",
-                id:"update-button",
-                message:"Alter Equipment",
-                function:"update-button"
-            }
             control_location.appendChild(createButtonHtml(button)); 
-            break
-        case 2:
-            let table_info = {
-                description_func: getEquipmentTableDescription,
-                update_info: information.details.equipment.equipment_type, 
-            }
+
             setUpdateableInfo(table_info);
             document.getElementById("update-button")
             .addEventListener("click" , async function(){
@@ -80,6 +74,24 @@ async function equipment_controls(information){
                 setServerResponse(server_response.information , "server-response");
                 inventoryControler(getAuthEquipments , 1);
             });
+            document.getElementById("update-button").style.display = "flex";
+            document.getElementById("delete-button").style.display = "none";
+            break
+        case 2:
+            setUpdateableInfo(table_info);
+            document.getElementById("update-button")
+            .addEventListener("click" , async function(){
+                user_id = information.details.user.id
+                group_id = information.details.group.id
+                equipment_id = information.details.equipment.equipment_id
+                user_input = await getInputInformation();
+                parsed_user_input = await prepareInputForEquipment(user_input , user_id , group_id , equipment_id , information.details.equipment.equipment_type);
+                server_response = await postEquipmentUpdate(parsed_user_input);
+                setServerResponse(server_response.information , "server-response");
+                inventoryControler(getAuthEquipments , 1);
+            });
+            document.getElementById("update-button").style.display = "flex";
+            document.getElementById("delete-button").style.display = "flex";
             break
     }
 }
@@ -129,7 +141,7 @@ async function inventoryControler(datarequest , page){
            ,title: ["group" , "user" , "type" , "brand" , "model" , "purchase date" ]
            ,equipment_types: equipment_types.information
     };
-    htmlData = await genertateInventoryHtml(custom_data);
+    htmlData = await generateInventoryHtml(custom_data);
     append_items.innerHTML = htmlData.items;
     append_page_controls.innerHTML = htmlData.controls.pageControl;
     append_page_totals.innerHTML = htmlData.controls.totalItems;
@@ -139,7 +151,8 @@ async function inventoryControler(datarequest , page){
         append_to: "group-details-controls",
         equipment_types: equipment_types
     }
-    itemReadDetails("#items-content" , "info-selected" , group_equipments.information , ["user" , "group" , "equipment"] , encapsulate , information)
+    appends_to = ["grp" , "info-selected"]
+    itemReadDetails("#items-content" , appends_to , group_equipments.information , ["user" , "group" , "equipment"] , encapsulate , information)
     pageControlsFunctionality("#page-controls-group" , inventoryControler , getAuthEquipments);
 }
 

@@ -114,43 +114,6 @@ async function getAuthEquipments(page , limit){
     return user_info;
 }
 
-async function getUser(){
-    let request = {
-             type: 'user'
-            ,custom: {
-                 tab: 'yurusr'
-                ,type: 'data' 
-                ,crud: 'read'
-                }
-            }
-    let user_request = await fetch(await urlCreateBackendRequest(request));
-    let user_info = await user_request.json();
-    return user_info;
-}
-
-async function getUserGroups(page){
-    let request = {
-             type: 'group'
-            ,custom: {
-                 tab: 'yurgrp'
-                ,type: 'data' 
-                ,crud: 'read'
-                ,pgng: 1
-                ,page: 1
-                }
-            }
-    if(page){
-        request.custom.page = page;
-    }
-    if(typeof page !== 'undefined' && page !== null) 
-        request.custom.page = page;
-    if(typeof limit !== 'undefined' && limit !== null) 
-        request.custom.lmit = limit;
-    let user_request = await fetch(await urlCreateBackendRequest(request));
-    let user_info = await user_request.json();
-    return user_info;
-}
-
 async function getEquipmentLogs(page , limit){
     let request = {
              type: 'equipment'
@@ -203,6 +166,25 @@ async function postEquipmentUpdate(data){
         }
     let post = {
         data:data
+    }
+    return await fetchPOST(request , post);
+}
+
+async function postEquipmentReferenceDelete( user_id , group_id , equipment_id){
+    let request = {
+        type: 'equipment'
+        ,custom: {
+            type: 'data' 
+            ,crud: 'delete'
+            ,rgin: 'reference'
+            }
+        }
+    let post = {
+        data:{
+            user_id:equipment_id,
+            group_id:equipment_id,
+            equipment_id:equipment_id
+        }
     }
 
     if(Object.keys(edit_tables.information.specific) !== 0){

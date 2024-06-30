@@ -11,6 +11,9 @@ $css_path = array(
     );
 
 $js_path = array("../frontend/js/common/backend_requests.js"
+                ,"../frontend/js/pages/common/equipment_requests.js"
+                ,"../frontend/js/pages/common/user_requests.js"
+                ,"../frontend/js/pages/common/group_requests.js"
                 ,"../frontend/js/pages/profile/generateHtml.js"
                 ,"../frontend/js/pages/profile/user_info.js"
                 ,"../frontend/js/pages/profile/printProfile.js"

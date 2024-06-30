@@ -1,7 +1,6 @@
 
 function internalTabSetter(tab_id , functionality){
     tab_row = document.querySelector(tab_id).children;
-    console.log(tab_row);
     for(let i = 0 ; i < tab_row.length ; i++){
         if(tab_row[i].children.length === 0)
             continue;
@@ -9,6 +8,7 @@ function internalTabSetter(tab_id , functionality){
             continue;
         tab_row[i].children[0].style.paddingleft = 1 + 'rem';
         tab_row[i].children[0].style.paddingright = 1 + 'rem';
+        console.log(tab_row[i].children[0]);
         functionality(tab_row[i].children[0]);
     }
 }
@@ -136,11 +136,11 @@ function itemsUIparseWidthRows(widths){
 
 async function setFetchedItemsUI(item_set_id , limit , equipment_type , padding){
     let item_location_height = document.getElementById(item_set_id).clientHeight
-       ,item_location_width = document.getElementById(item_set_id).clientWidth
-       ,individual_item_height = item_location_height/limit
-       ,set_items = document.getElementById(item_set_id).children
-       ,title_properties = set_items[0]
-       ,title = 0;
+    let item_location_width = document.getElementById(item_set_id).clientWidth
+    let individual_item_height = item_location_height/limit
+    let set_items = document.getElementById(item_set_id).children
+    let title_properties = set_items[0]
+    let title = 0;
     if(title_properties.id === "title-bar"){
         title_properties.style.paddingTop = 3
         title_properties.style.paddingBottom = 3
@@ -160,12 +160,15 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type , padding)
     for(let i = 0 ; i < set_items.length-title ; i++){
         for(let j = 0 ; j < total_children ; j++){
             item = set_items[i+title].children[j];
+            item.style.height = individual_item_height + "px";
             item.style.width = aligned_percentage[j]*100 + "%";
             item.style.textAlign = "";
             item.style.textWrap = wrap_text;
             item.style.marginLeft = "8px";
             item.style.paddingRight = "-8px";
-                item.style.fontSize = "0.8rem"
+            item.style.fontSize = "0.8rem"
+            item.style.flexDirection = "column";
+            item.style.justifyContent = "center";
             if(parseInt(j)+parseInt(1) < parseInt(total_children)){
                 item.style.borderStyle = "none dotted none none"
                 item.style.borderColor = "rgb(170, 170, 170)"
@@ -174,9 +177,13 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type , padding)
         }
     }
     if(title === 1){
+        document.getElementById("title-bar").style.height = individual_item_height + "px";
         let titles = title_properties.children[0].children
         for(let i = 0 ; i < titles.length ; i++){
+            titles[i].style.height = individual_item_height + "px";
             titles[i].style.width = aligned_percentage[i]*100 + "%";
+            titles[i].style.flexDirection = "column";
+            titles[i].style.justifyContent = "center";
             titles[i].style.fontSize = "0.9rem";
             titles[i].style.marginLeft = "8px";
             titles[i].style.paddingRight = "-8px";
@@ -241,12 +248,10 @@ async function encapsulateAndFilter(encapsulation_location , filter , conditiona
                         let object_length = conditions[k][0][0].length;
                         let equal = conditions[k][1][0]
                         let replace = conditions[k][1][1]
-                        console.log(object_length);
                         for(let l = 0 ; l < object_length ; l++){
                             if(string_value == conditions[k][0][0][l][equal]){
                                 item_content.children[1].innerText = conditions[k][0][0][l][replace];
                             }
-                            console.log(conditions[k][0][0][l][equal]);
                         }
                     }else{
                         if(string_value == conditions[k][0]){
@@ -413,7 +418,6 @@ async function getInputInformation(functions){
 }
 
 async function setServerResponse(information , append_to){
-    console.log(information);
     if(document.getElementById(append_to) === undefined){
         return;
     }else{
@@ -428,7 +432,7 @@ async function setServerResponse(information , append_to){
                 if(typeof message === "object")
                     break;
                 html = `
-                    <div class=${m_key}>
+                    <div class=${m_key} style="text-wrap:wrap">
                         ${message}
                     </div>
                    `
@@ -436,7 +440,7 @@ async function setServerResponse(information , append_to){
             }
         }else{
             html = `
-              <div class=${key}>
+              <div class=${key} style="text-wrap:wrap">
                   ${value}
               </div>
              `
@@ -476,14 +480,14 @@ function createButtonsFunctionality(buttons){
 
 function itemReadDetails(content_location , append_to , information , information_types , encapsulate , callback){
     let control_div = document.querySelectorAll(content_location);
-    let append_details = document.getElementById(append_to);
+    let append_details = document.getElementById(append_to[1]);
     let total_controls = control_div[0].children
     let htmlInformation = [];
     let html = [];
     let title = 0;
     for(let i = 0 ; i < total_controls.length ; i++){
         controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
-        if(total_controls[i].attributes.id.nodeValue === "title-bar"){
+        if(total_controls[i].attributes.id.nodeValue === "title-bar-"+append_to[0]){
             title = 1;
             continue;
         }
@@ -514,7 +518,11 @@ function pageControlsFunctionality(control_location , controlerFunction , loadin
             continue;
         controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
         controls.addEventListener('click' , async function(){
-            controlerFunction(loadingFunction , controls.attributes.page.nodeValue);
+            if(typeof loadingFunction === "function"){
+                controlerFunction(loadingFunction , controls.attributes.page.nodeValue);
+            }else{
+                controlerFunction(controls.attributes.page.nodeValue);
+            }
         });
         controls.style.cursor = "pointer";
         controls.style.userSelect = "none";

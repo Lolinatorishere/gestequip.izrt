@@ -14,6 +14,7 @@
     flex-direction: column;
     justify-content: start;
     width: 70%;
+
 }
 
 .search-parameters{
@@ -112,7 +113,6 @@
     border-style: none solid none none;
     border-width: 2px;
     border-color: rgb(170, 170, 170);
-
 }
 
 .sch-details-groups{
@@ -150,6 +150,75 @@
 #selected-search-tab{
     background-color: rgb(201, 201, 201);
     border-color: rgb(201, 201, 201);
+}
+
+.search-query{
+    flex-direction:column;
+    width: 33%;
+    border-style: none solid none none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+.search-query *{
+    flex-direction:column;
+}
+
+.sch-user-items{
+    flex-direction: column;
+    height: 100%;
+}
+
+.sch-users-controls{
+    height: 5%;
+    border-style: none none solid none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+.control-current-page-title-user{
+    width: 20%;
+    height: 100;
+}
+
+.page-controls-user{
+    width: 80%;
+    height 100%;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.item-usr-div{
+    text-wrap: wrap !important; 
+}
+
+
+.sch-groups-items{
+    flex-direction: column;
+    height: 100%;
+}
+
+.sch-groups-controls{
+    height: 5%;
+    border-style: none none solid none;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+}
+
+.control-current-page-title-group{
+    width: 20%;
+    height: 100;
+}
+
+.page-controls-user{
+    width: 80%;
+    height 100%;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.item-usr-div{
+    text-wrap: wrap !important; 
 }
 
 

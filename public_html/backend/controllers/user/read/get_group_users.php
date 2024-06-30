@@ -1,7 +1,7 @@
 <?php
 
 function read_group_users($data_request , $pdo){
-    if(empty($_SESSION["id"])
+    if(empty($_SESSION["id"]))
         return "Unauthorised Request";
     if(!isset($data_request["query"]["group_id"]))
         return "Invalid Group Request";
