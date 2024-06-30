@@ -186,7 +186,7 @@ try{
             $ret["message"] = $e->getMessage();
             break;
     }
-    create_log($loggable , "equipment_logs" , $pdo);
+    create_log($loggable , "user_logs" , $pdo);
     return $ret;
 }
 }
@@ -275,7 +275,7 @@ try{
             $ret["message"] = $e->getMessage();
             break;
     }
-    create_log($loggable , "equipment_logs" , $pdo);
+    create_log($loggable , "user_logs" , $pdo);
     return $ret;
 }
 }

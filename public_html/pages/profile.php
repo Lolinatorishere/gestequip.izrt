@@ -10,7 +10,7 @@ $css_path = array(
     "../frontend/css/sidebar/sidebar.css",
     );
 
-$js_path = array("../frontend/js/common/backendUrlRequest.js"
+$js_path = array("../frontend/js/common/backend_requests.js"
                 ,"../frontend/js/pages/profile/generateHtml.js"
                 ,"../frontend/js/pages/profile/user_info.js"
                 ,"../frontend/js/pages/profile/printProfile.js"

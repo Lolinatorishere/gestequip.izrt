@@ -1,6 +1,8 @@
 <?php
 
 function read_request_search($data_request , $pdo){
+    if(!isset($_SESSION["id"]))
+        return "Unauthorised Request";
     // what queries can data specific have:
     if(!isset($_SESSION["group_auth"]))
         return;

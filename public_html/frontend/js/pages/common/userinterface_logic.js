@@ -314,16 +314,14 @@ function parseTableType(type){
 
 async function setUpdateableInfo(functions){
     if(functions.update_info !== undefined){
-        edit_tables = await functions.description_data(functions.update_info);
+        edit_tables = await functions.description_func(functions.update_info);
     }else{
-        edit_tables = await functions.description_data();
+        return;
     }
     for(let [key , value] of Object.entries(edit_tables.information.default)){
         if(document.getElementById(value.Field) === undefined)
             continue;
         inputdiv = document.getElementById(value.Field);
-        console.log(inputdiv);
-        console.log(inputdiv.tagName);
         input = {
             className: value.Type + "-input",
             id: value.Field,
@@ -350,19 +348,102 @@ async function setUpdateableInfo(functions){
     }
 }
 
-function updateButtonControler(functions){
+
+
+async function prepareInputForEquipment(user_input , user_id , group_id , equipment_id , equipment_type){
+    information = {
+        default:{},
+        specific:{},
+        user_id:user_id,
+        group_id:group_id,
+        equipment_id:equipment_id,
+    }
+    desc_response = await getEquipmentTableDescription(equipment_type);
+    table_description = desc_response.information;
+    for(let [key , value] of Object.entries(table_description.default)){
+        for(let [input_id , input_value] of Object.entries(user_input)){
+            if(value.Field === input_id){
+                information.default[input_id] = input_value;
+                break;
+            }
+        }
+    }
+    for(let [key , value] of Object.entries(table_description.specific)){
+        for(let [input_id , input_value] of Object.entries(user_input)){
+            if(value.Field === input_id){
+                information.specific[input_id] = input_value;
+                break;
+            }
+        }
+    }
+    let equipment_types = await getEquipmentTypes();
+    for(let i = 0 ; i < equipment_types.information.items.length ; i++){
+        if(equipment_type === equipment_types.information.items[i].id){
+            equipment_table = equipment_types.information.items[i].equipment_type;
+            break;
+        }
+    }
+    information["equipment_type"] = equipment_table;
+    return information;
+}
+
+async function getInputInformation(functions){
     if(document.getElementById("update-button") === undefined){
         return;
     }
-    button = document.getElementById("update-button");
-    button.addEventListener("click" , async function(){
-        let inputs = document.getElementsByTagName('input');
-        for(let i = 0 ; i < inputs.length ; i++){
-            //console.log(inputs[i].value);
-            //console.log(inputs[i]);
+    let information = {};
+    let inputs = document.getElementsByTagName('input');
+    for(let i = 0 ; i < inputs.length ; i++){
+        if(inputs[i].attributes.type.nodeValue === "checkbox"){
+            let checkBoxValue = undefined;
+            if(inputs[i].value === "on"){
+                checkBoxValue = 1;
+            }else{
+                checkBoxValue = 0;
+            }
+            if(checkBoxValue === undefined){
+                continue;
+            }
+            information[inputs[i].attributes.id.nodeValue] = checkBoxValue;
+        }else if(inputs[i].value !== ""){
+            information[inputs[i].attributes.id.nodeValue] = inputs[i].value;
         }
-    });
-    //for()
+    }
+    return information;
+}
+
+async function setServerResponse(information , append_to){
+    console.log(information);
+    if(document.getElementById(append_to) === undefined){
+        return;
+    }else{
+        document.getElementById(append_to).innerHTML = "";
+    }
+    let response = document.getElementById(append_to);
+    response.innerHTML = "";
+    HTMLinner = "";
+    for(let [key , value] of Object.entries(information)){
+        if(typeof value === "object"){
+            for(let [m_key , message] of Object.entries(value)){
+                if(typeof message === "object")
+                    break;
+                html = `
+                    <div class=${m_key}>
+                        ${message}
+                    </div>
+                   `
+                HTMLinner += html;
+            }
+        }else{
+            html = `
+              <div class=${key}>
+                  ${value}
+              </div>
+             `
+            HTMLinner += html;
+        }
+    }
+    response.innerHTML = HTMLinner;
 }
 
 function createButtonsFunctionality(buttons){

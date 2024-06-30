@@ -1,9 +1,5 @@
 <?php
 
-if($_SESSION["user_type"] !== "Admin"){
-    header("location: /pages/profile.php");
-    exit;
-}
 include_once __DIR__."/../frontend/html/html_head.php";
 include_once __DIR__."/../frontend/html/navbar/html_nav.php";
 

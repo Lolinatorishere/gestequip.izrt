@@ -74,7 +74,7 @@ async function getEquipmentTypes(){
     return user_info;
 }
 
-async function getTableDescription(equipment_type){
+async function getEquipmentTableDescription(equipment_type){
     let request = {
              type: 'equipment'
             ,custom: {
@@ -203,6 +203,9 @@ async function postEquipmentUpdate(data){
         }
     let post = {
         data:data
+    }
+
+    if(Object.keys(edit_tables.information.specific) !== 0){
     }
     return await fetchPOST(request , post);
 }

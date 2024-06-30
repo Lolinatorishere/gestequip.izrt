@@ -61,6 +61,12 @@ function validate_external_inputs($request , $check , $db_table , $pdo , &$error
                     }
                 }
                 if($table["items"][$i]["Type"] === "tinyint(1)"){
+                    if($request[$check][$key] === "1"){
+                        $request[$check][$key] = true;
+                    }
+                    if($request[$check][$key] === "0"){
+                        $request[$check][$key] = false;
+                    }
                     if($request[$check][$key] !== false && $request[$check][$key] !== true){
                         $error_message[$key] =  $key . " invalid choice";
                         throw new Exception($error_message[$key] , 1);

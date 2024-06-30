@@ -29,6 +29,7 @@ function create_request($data_request , $tab , $user_id , $pdo){
 }
 
 function update_request($data_request , $tab , $user_id , $pdo){
+    printLog($data_request);
     return update_equipment($data_request , $pdo);
 }
 

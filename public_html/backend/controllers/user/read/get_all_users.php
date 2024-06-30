@@ -1,7 +1,7 @@
 <?php
 
 function read_all_user($data_request , $pdo){
-    if($_SESSION["user_type"] !== "Admin")
+    if(empty($_SESSION["id"]))
         return "Unauthorised Request";
     $ret = array();
     $request = array("fetch" => " id, users_name, username, email, phone_number, regional_indicator "

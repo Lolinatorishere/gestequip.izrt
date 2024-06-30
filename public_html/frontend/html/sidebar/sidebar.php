@@ -23,9 +23,7 @@ function create_profile_div(){
 
 
     $sidebar_link = array(
-         "../../../pages/dashboard.php",
          "../../../pages/profile.php",
-         "../../../pages/notifications.php",
          "../../../pages/groups.php",
     );
     if($_SESSION["user_type"] === "Admin"){
@@ -34,9 +32,7 @@ function create_profile_div(){
     array_push($sidebar_link , "../../../pages/equipment.php" , "../../../pages/reports.php");
 
     $sidebar_icon = array(
-         "dashboard",
          "account_circle",
-         "notifications",
          "event_list"
     );
     if($_SESSION["user_type"] === "Admin"){
@@ -45,26 +41,22 @@ function create_profile_div(){
     array_push($sidebar_icon , "computer" , "summarize");
 
     $sidebar_content = array(
-        "Dashboard",
         "Profile",
-        "Notifications",
         "Groups",
     );
     if($_SESSION["user_type"] === "Admin"){
         array_push($sidebar_content  , "Users");
     }
-    array_push($sidebar_content , "Equipment" , "Reports");
+    array_push($sidebar_content , "Equipment");
 
     $page_compare = array(
-        "dashboard",
         "profile",
-        "notifications",
         "groups",
     );
     if($_SESSION["user_type"] === "Admin"){
         array_push($page_compare , "users");
     }
-    array_push($page_compare , "equipment" , "reports");
+    array_push($page_compare , "equipment");
 // This is the sidebar that will be used in the dashboard page
 // The sidebar is a div that contains 7 sidebar-items
 // Each sidebar-item is a link to a different page
