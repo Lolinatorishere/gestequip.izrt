@@ -108,14 +108,12 @@ function onloadTabsFunctions(){
                     ,'search'
                     ,'all_equipment'
                     ,'add_equipment'
-                    ,'add_equipment_type'
                     ,'remove_equipment'
                     ,'logs'],
             tab:['grp_eq'
                 ,'sch_eq'
                 ,'all_eq'
                 ,'add_eq'
-                ,'adeqty'
                 ,'rem_eq'
                 ,'log_eq']
        }

@@ -119,7 +119,6 @@ try{
     }
     if(isset($data_request["user_permission_level"])){
     try{
-        printLog($data_request);
         $request = array("table" => " users_inside_groups_equipments "
                         ,"columns" => $columns = array(" user_permission_level ")
                         ,"values" => $values = array($data_request["user_permission_level"])

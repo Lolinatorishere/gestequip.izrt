@@ -519,7 +519,7 @@ function pageControlsFunctionality(control_location , controlerFunction , loadin
         controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
         controls.addEventListener('click' , async function(){
             if(typeof loadingFunction === "function"){
-                controlerFunction(loadingFunction , controls.attributes.page.nodeValue);
+                controlerFunction(loadingFunction , total_controls[i].attributes.page.nodeValue);
             }else{
                 controlerFunction(controls.attributes.page.nodeValue);
             }

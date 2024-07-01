@@ -28,6 +28,9 @@ function read_group_users($data_request , $pdo){
     if(isset($data_request["page"])){
         $request["page"] = $data_request["page"];
     }
+    if(isset($data_request["limit"])){
+        $request["limit"] = $data_request["limit"];
+    }
     $users = get_users($request , $pdo);
     return $users;
 }

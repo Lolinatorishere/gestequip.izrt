@@ -1,7 +1,6 @@
 <?php
     
 function read_your_auth_level($data_request , $pdo){
-    printLog($data_request);
     if(!isset($data_request["query"]))
         return "Unset Query";
 
@@ -13,7 +12,6 @@ function read_your_auth_level($data_request , $pdo){
     }
     $group_id = $data_request["query"]["group_id"];
     $reference = array("group_id" => $group_id , "user_id" => $_SESSION["id"]);
-    printLog($reference);
     if(validate_reference_existence($reference , $pdo) !== 1){
         return "User Not in Group";
     }

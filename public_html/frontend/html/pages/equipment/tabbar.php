@@ -24,12 +24,7 @@ session_start();
   </div>';
 
   if($_SESSION["user_type"] === "Admin")
-  echo '<div class="tabbar-item">
-    <div class="tabbar-content">
-      <div id="add_equipment_type">Modify types</div>
-    </div>
-  </div>
-
+  echo '
   <div class="tabbar-item">
     <div class="tabbar-content">
       <div id="all_equipment">Full Inventory</div>

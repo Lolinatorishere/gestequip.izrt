@@ -15,10 +15,13 @@ function read_your_equipment($data_request , $pdo){
         $request["paging"] = $data_request["paging"];
     }
     if(isset($data_request["page"])){
-        $request["current_page"] = $data_request["page"];
+        $request["page"] = $data_request["page"];
     }
     if(isset($data_request["limit"])){
         $request["limit"] = $data_request["limit"];
+    }
+    if(isset($data_request["total_items"])){
+        $request["total_items"] = $data_request["total_items"];
     }
     $all_references = get_queries($request , $pdo);
     $parsed_items = array();

@@ -58,7 +58,6 @@ async function tabLoadUi(tab , callback){
     }
 }
 
-
 function tabLoadUi(tab , request , content_id , highlight_id , tab_html){
     let tab_content = document.getElementById(content_id)
        ,tab_element = document.getElementById(tab.id);
@@ -126,17 +125,17 @@ async function generateUserItemsHTML(data){
 
 async function generateGroupItemsHTML(data){
     let itemsDiv = document.createElement('div')
-    let users = data.groups.information.items;
+    let group = data.groups.information.items;
     let highlight = "";
     let ret = {};
     title = createTitleHTML(data);
     if(title !== undefined){
         itemsDiv.appendChild(title);
     }
-    for(let i = 0 ; i < users.length ; i++){
+    for(let i = 0 ; i < group.length ; i++){
         htmlData = {
-            users_name: users[i].users_name,
-            email: users[i].email
+            group_name: group[i].group_name,
+            grp_status: group[i].grp_status
         }
         if(i%2 === 0){
             highlight = "true";
@@ -148,7 +147,7 @@ async function generateGroupItemsHTML(data){
     }
     ret.items = itemsDiv.innerHTML;
     controls_data = data.groups.information;
-    controls_data.control_location = "user";
+    controls_data.control_location = "group";
     ret.controls = controlsHtml(controls_data);
     return ret;
 }
@@ -166,10 +165,9 @@ async function searchItemsFetchedFunctionality(information , item_location , ite
 }
 
 async function searchTabUserControler(page){
-    let users = await getUsers(page , 10);
+    let users = await getUsers(page , 1);
     let append_page_controls = document.getElementById("users-controls");
     let append_items = document.getElementById("users-items");
-    console.log(append_items);
     append_items.innerHTML = "";
     append_page_controls.innerHTML = "";
     appends = [["usr"],["users_name","email"]];
@@ -179,10 +177,11 @@ async function searchTabUserControler(page){
            ,title: ["Name" , "Email"]
     };
     htmlData = await generateUserItemsHTML(custom_data);
-    console.log(htmlData);
     append_items.innerHTML = htmlData.items;
     append_page_controls.innerHTML = htmlData.controls.pageControl;
     document.getElementById("title-bar-usr").style.height = "";
+    let group_controls = document.getElementById("users-controls")
+    group_controls.children[0].style.fontSize = "0.8rem";
     await setFetchedItemsUI("users-items" , 10 , custom_data.users , 5);
     await searchItemsFetchedFunctionality(users.information.items , "users-items" , searchGroupFromUserControler , "callback");
     await pageControlsFunctionality("#page-controls-user" , searchTabUserControler);
@@ -206,30 +205,25 @@ async function searchTabGroupControler(page){
            ,title: ["Group" , "Status"]
     };
     for(let i = 0 ; i < groups.information.items.length ; i++){
-        console.log(i);
         if(groups.information.items[i].status === "1"){
             custom_data.groups.information.items[i]["grp_status"] = "Active";
         }else{
             custom_data.groups.information.items[i]["grp_status"] = "Inactive";
         }
     }
-    console.log(custom_data.groups);
     htmlData = await generateGroupItemsHTML(custom_data);
     append_items.innerHTML = htmlData.items;
     append_page_controls.innerHTML = htmlData.controls.pageControl;
-    document.getElementById("title-bar-grp").style.height = "";
-    console.log(document.getElementById("title-bar"));
-    await setFetchedItemsUI("groups-items" , 10 , custom_data.groups , 5);
+    let group_controls = document.getElementById("groups-controls")
+    group_controls.children[0].style.fontSize = "0.8rem";
+    ///console.log(document.getElementById("title-bar"));
+    await setFetchedItemsUI("groups-items" , 10 , groups , 5);
     await searchItemsFetchedFunctionality(groups.information.items , "groups-items" , searchUserFromGroupControler , "callback");
     await pageControlsFunctionality("#page-controls-user" , searchTabGroupControler);
 }
 
 async function searchUserFromGroupControler(page){
     console.log(information)
-}
-
-async function searchControler(datarequest , page){
-    
 }
 
 async function searchTabFunctionality(){

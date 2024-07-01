@@ -56,15 +56,14 @@ try{
     }
     page_check($request);
     $ret = array();
-    if(!isset($request["counted"])){
-        $request["countingthis"] = 1;
-        $sql = common_select_query($request);
-    }else {
-        $sql = common_select_query($request);
-    }
+    $request["countingthis"] = 1;
+    $sql = common_select_query($request);
+//  }else {
+//      $sql = common_select_query($request);
+//  }
     if($sql == "error")
         return $sql_error;
-    if(!isset($request["total_items"]) || !isset($request["counted"])){
+    //if(!isset($request["total_items"]) && !isset($request["counted"])){
         $statement = $pdo->prepare($sql);
         $statement->execute();
         $total = $statement->fetch();
@@ -76,7 +75,7 @@ try{
         }
         $request["pages"] = ceil($request["total_items"] / $request["limit"]);
         $sql = common_select_query($request);
-    }
+    //}
     $statement = $pdo->prepare($sql);
     $statement->execute();
     $ret["total_items"] = $request["total_items"];

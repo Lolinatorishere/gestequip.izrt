@@ -170,7 +170,7 @@ async function postEquipmentUpdate(data){
     return await fetchPOST(request , post);
 }
 
-async function postEquipmentReferenceDelete( user_id , group_id , equipment_id){
+async function postEquipmentReferenceDelete(user_id , group_id , equipment_id){
     let request = {
         type: 'equipment'
         ,custom: {
@@ -181,8 +181,8 @@ async function postEquipmentReferenceDelete( user_id , group_id , equipment_id){
         }
     let post = {
         data:{
-            user_id:equipment_id,
-            group_id:equipment_id,
+            user_id:user_id,
+            group_id:group_id,
             equipment_id:equipment_id
         }
     }

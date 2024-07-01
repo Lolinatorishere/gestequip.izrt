@@ -279,18 +279,20 @@ try{
     $sql = " SELECT ";
     // allows request paging 
     // this should ask the mysql server how many of the query exists
-    if(!isset($request["counted"]) && !isset($request["total_items"])){
+    if(isset($request["countingthis"])){
         $sql .= (" COUNT(*)");
     }else{
         $sql .= $request["fetch"];
     }
     $sql .= " FROM " 
          . $request["table"];
-    if(!isset($request["specific"]))
-        return $sql;
-    if(!is_array($request["specific"])){
-        $sql .= " WHERE "
-            . $request["specific"];
+    if(!isset($request["specific"])){
+        $sql;
+    }else{
+        if(!is_array($request["specific"])){
+            $sql .= " WHERE "
+                . $request["specific"];
+        }
     }
     if(isset($request["paging"]) && !isset($request["countingthis"])){
         $limit = $request["limit"];

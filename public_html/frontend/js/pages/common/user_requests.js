@@ -20,8 +20,9 @@ async function getUsers(page , limit){
                  tab: 'allusr'
                 ,type: 'data' 
                 ,crud: 'read'
+                ,pgng: "1"
                 ,page: page
-                ,limit: limit
+                ,lmit: limit
                 }
             }
     let user_request = await fetch(await urlCreateBackendRequest(request));
