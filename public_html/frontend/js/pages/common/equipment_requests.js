@@ -20,8 +20,7 @@ async function getSpecificEquipment(user_id , group_id , equipment_id){
     return await fetchPOST(request , post);
 }
 
-async function getSearchEquipment(user_id , group_id , equipment_type , eq_default , eq_specific , page , limit){
-
+async function getSearchEquipment(page , limit , data){
     let request = {
              type: 'equipment'
             ,custom: {
@@ -32,8 +31,7 @@ async function getSearchEquipment(user_id , group_id , equipment_type , eq_defau
             }
     let post ={
         data:{
-            query:{
-            }
+            query:data
         }
     }
     if(typeof page !== 'undefined' && page !== null){
@@ -41,21 +39,6 @@ async function getSearchEquipment(user_id , group_id , equipment_type , eq_defau
     }
     if(typeof limit !== 'undefined' && limit !== null){
         request.custom.lmit = limit;
-    }
-    if(typeof user_id !== 'undefined' && user_id !== null){
-        post.data.query["user_id"] = user_id;
-    }
-    if(typeof group_id !== 'undefined' && group_id !== null){
-        post.data.query["group_id"] = group_id;
-    }
-    if(typeof equipment_type  !== 'undefined' && equipment_type !== null){
-        post.data.query["equipment_type"] = equipment_type;
-    }
-    if(typeof eq_default  !== 'undefined' && eq_default !== null){
-        post.data.query["default"] = eq_default;
-    }
-    if(typeof eq_specific  !== 'undefined' && eq_specific !== null){
-        post.data.query["specific"] = eq_specific;
     }
     return fetchPOST(request , post);
 }

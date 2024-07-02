@@ -221,4 +221,122 @@
     text-wrap: wrap !important; 
 }
 
+.query-title{
+    height: 5%;
+    border-style: none none solid none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
+.sch-eq-selected-type{
+    width: 30%;
+    flex-direction: row;
+    height: 100%;
+}
+
+.selected-equipment-dropdown{
+    flex-direction: column;
+    height:100%;
+    border-style: none solid none none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
+.equipment-type-dropdown-title{
+    height: 5%;
+    border-style: none none solid none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
+.loaded-equipment-types{
+    height: 95%;
+    flex-direction: column;
+}
+
+.loaded-equipment-types *{
+    height: 7%;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.search-query-inputs{
+    flex-direction: column;
+}
+
+.search-query-inputs *{
+    width: 95%;
+}
+
+.loading-search-controls{
+    flex-direction: column;
+}
+
+.loaded-search-queries{
+    height: 90%;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.add-search-query-tab{
+    height: 10%;
+    display: none;
+}
+ 
+.title-input-search-tab{
+    width: 37%;
+}
+
+.search-details-info{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 90%;
+    border-style: none none solid none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
+.search-details-info .user-content-details{
+    display: flex;
+    flex-direction: row;
+}
+
+.search-details-info .group-content-details{
+    display: flex;
+    flex-direction: row;
+}
+
+.search-details-info .equipment-content-details{
+    display: flex;
+    flex-direction: row;
+}
+
+.search-details-info .equipment-content-details .serial_brand_md5{
+    flex-direction: column;
+    font-size: 0.8rem;
+}
+
+.search-detail-information{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 10%;   
+}
+
+.search-details-controls{
+    display: flex;
+    width: 40%;
+    flex-direction: column;
+    border-style: none solid none none;
+    border-color: rgb(170, 170, 170);
+    border-width: 2px;
+}
+
+.search-server-response{
+    display: flex;
+    width: 60%;
+    flex-direction: column;
+}
 

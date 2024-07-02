@@ -44,7 +44,7 @@ async function getGroups(page , limit){
 let request = {
              type: 'group'
             ,custom: {
-                 tab: 'yurgrp'
+                 tab: 'allgrp'
                 ,type: 'data' 
                 ,crud: 'read'
                 ,pgng: 1

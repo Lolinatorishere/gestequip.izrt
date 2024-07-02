@@ -353,8 +353,6 @@ async function setUpdateableInfo(functions){
     }
 }
 
-
-
 async function prepareInputForEquipment(user_input , user_id , group_id , equipment_id , equipment_type){
     information = {
         default:{},
