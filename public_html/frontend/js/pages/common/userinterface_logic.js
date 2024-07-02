@@ -198,7 +198,6 @@ async function encapsulateAndFilter(encapsulation_location , filter , conditiona
     let content_height = [];
     let total_height = 0;
     for(let i = 0 ; i < content.length ; i++){
-        
         total_height += content[i].clientHeight;
         let width = content[i].clientWidth;
         let height = content[i].clientHeight;

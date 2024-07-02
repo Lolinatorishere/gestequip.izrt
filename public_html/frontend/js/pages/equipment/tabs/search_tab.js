@@ -1,6 +1,5 @@
 
 async function search_controls(information){
-
     console.log(information);
     controls_location = document.getElementById(information.append_to);
     user_auth = await getUserGroupAuth(information.details.group.id);
@@ -104,6 +103,84 @@ async function generateSearchedHtml(data){
     controls_data.control_location = "results";
     ret.controls = controlsHtml(controls_data);
     return ret;
+}
+
+async function searchControler(page){
+    query = await getQueryInputs();
+    if(query === undefined){
+        alert("No Query Requested")
+        return;
+    }
+    let searched = await getSearchEquipment(page , 5 , query);
+    let equipment_types = await getEquipmentTypes();
+    let append_page_totals = document.getElementById("search-items-total");
+    let append_page_controls = document.getElementById("search-page-controls");
+    let append_items = document.getElementById("results-content");
+    let append_details = document.getElementById("info-selected");
+    if(typeof searched.information.message !== "object" || searched.information.message !== undefined){
+        document.getElementById("results-controls").innerHTML = "";
+        document.getElementById("results-content").innerHTML = "";
+        if(searched.information.message !== undefined){
+            document.getElementById("results-controls").innerHTML = searched.information.message;
+        }
+    }
+    document.getElementById("info-selected").innerHTML = "";
+    document.getElementById("update-button").style.display = "none"
+    document.getElementById("delete-button").style.display = "none"
+    for(let i = 0 ; i < searched.information.items.length ; i++){
+        item = group_equipments.information.items[i];
+        group_equipments.information.items[i].user.phone = item.user.phone_number;
+        delete(group_equipments.information.items[i].user.phone_number);
+    }
+    let encapsulate = {
+        function: encapsulateAndFilter,
+        filter: [["id","username","regional_indicator"]
+                ,["id","group_status","group_type"]
+                ,["id","equipment_id","has_battery","registration_lock","serial_brand_md5","registration_date","equipment_type", "IMEI"]
+                ],
+        conditionals:[
+            [[],[]],
+            [[],[]],
+            [
+                //[what text] , [[conditional] , [results]] 
+                /// if conditional = array creates for loop with the array 
+                // [array content] then you specify whats in the array more arays or an object
+                // ["compare array with component " , "replace  with array component"]
+                ["equipment_status","roaming","delivery_status","computer_type"],
+                [
+                    [["1"],["Active","Inactive"]],
+                    [["1"],["Active","Inactive"]],
+                    [["1"],["Active","Inactive"]],
+                    [[equipment_types.information.items] , ["id" , "equipment_type"]]
+                ]
+            ]
+        ]
+    }
+    appends = [["grp"],["group_name","users_name","equipment_type","brand","model","purchase_date"]];
+    custom_data = {
+            group_equipments: group_equipments.information
+           ,control_location: "group"
+           ,appends: appends
+           ,title: ["group" , "user" , "type" , "brand" , "model" , "purchase date" ]
+           ,equipment_types: equipment_types.information
+    };
+    append_items.innerHTML = "";
+    append_page_controls.innerHTML = "";
+    htmlData = await generateInventoryHtml(custom_data);
+    console.log(htmlData.controls);
+    append_items.innerHTML = htmlData.items;
+    append_page_controls.innerHTML = htmlData.controls.pageControl;
+    append_page_totals.innerHTML = htmlData.controls.totalItems;
+    console.log(append_page_controls);
+    await setFetchedItemsUI("items-content" , 20 , custom_data.equipment_types.items , 5);
+    information = {
+        function: equipment_controls,
+        append_to: "group-details-controls",
+        equipment_types: equipment_types
+    }
+    appends_to = ["grp" , "info-selected"]
+    itemReadDetails("#items-content" , appends_to , group_equipments.information , ["user" , "group" , "equipment"] , encapsulate , information)
+    pageControlsFunctionality("#page-controls-group" , inventoryControler , getAuthEquipments);
 }
 
 async function tabLoadUi(tab , request , content_id , highlight_id , tab_html , callback){
@@ -722,13 +799,7 @@ async function getQueryInputs(){
 async function createSearchButton(){
     document.getElementById("search-button")
     .addEventListener("click" , async function(){
-        query = await getQueryInputs();
-        if(query === undefined){
-            alert("No Query Requested")
-            return;
-        }
-        searched = await getSearchEquipment(1 , 5 , query);
-        return searched;
+        searchControler(1);
     });
 }
 

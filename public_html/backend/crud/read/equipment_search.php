@@ -89,6 +89,14 @@ function equipment_search_query_user_group_id($queries , &$db_responses , $pdo ,
         $info_from_server = "No Queries";
         return;
     }
+    $parsed_items = array();
+    foreach($db_responses["from_id"]["items"] as $key => $value){
+        $specific_info = get_equipment(" * " , $value["equipment_id"], $pdo)["items"][0];
+        printLog($specific_info);
+        foreach($specific_info as $s_key => $s_value){
+            $db_responses["from_id"]["items"][$key][$s_key] = $s_value;
+        }
+    }
     $info_from_server = "Found Queries";
     return;
 }
@@ -179,6 +187,7 @@ function equipment_search_query_equipment_type($queries , &$db_responses , $pdo 
     foreach($equipment_types["items"] as $item){
         if($queries["equipment_type"] === $item["equipment_type"]){
             $specific_item = $item["id"];
+            $specific_type = $item["equipment_type"];
             $db_responses_eq_type = $item;
         }
     }
@@ -198,6 +207,14 @@ function equipment_search_query_equipment_type($queries , &$db_responses , $pdo 
             $request["total_items"] = $total_items;
         }
         $db_responses["equipment_type"] = get_queries($request , $pdo);
+        foreach($db_responses["equipment_type"]["items"] as $key => $value ){
+            $request = array("fetch" => " * " , "table" => $specific_type , "specific" => " equipment_id=" . $value["id"]);
+            $specific_info = get_queries($request , $pdo)["items"][0];
+            printLog($specific_info);
+            foreach($specific_info as $s_key => $s_value){
+                $db_responses["equipment_type"]["items"][$key][$s_key] = $s_value;
+            }
+        }
         if($db_responses["equipment_type"]["total_items"] === 0){
             $info_from_server = "No Queries";
             return;
@@ -219,6 +236,14 @@ function equipment_search_query_equipment_type($queries , &$db_responses , $pdo 
             $request["total_items"] = $total_items;
         }
         $db_responses["equipment_type"] = get_queries($request , $pdo);
+        foreach($db_responses["equipment_type"]["items"] as $key => $value ){
+            $request = array("fetch" => " * " , "table" => $specific_type , "specific" => " equipment_id=" . $value["id"]);
+            $specific_info = get_queries($request , $pdo)["items"][0];
+            printLog($specific_info);
+            foreach($specific_info as $s_key => $s_value){
+                $db_responses["equipment_type"]["items"][$key][$s_key] = $s_value;
+            }
+        }
         if($db_responses["equipment_type"]["total_items"] === 0){
             $info_from_server = "No Queries";
             return;
@@ -329,6 +354,7 @@ function equipment_search_query($queries , $pdo , $page_check , $limit , $total_
             $parsed_search["pages"] = ceil($auth_total_items / 20);
             $parsed_search["items"] = $items_parsed;
         }
+        printLog($parsed_search);
         $ret["message"] = "Found " . $parsed_search["total_items"];
         if($parsed_search["total_items"] !== 1){
             $ret["message"] .= " queries";
@@ -386,8 +412,9 @@ function equipment_search($data_request , $pdo){
     $response = equipment_search_query($query , $pdo , $page , $limit , $total_items);
     $server_message["message"] = $response["message"];
     if(isset($response["result"])){
+        unset($server_message["message"]);
         $server_message["server_message"] = $response["message"];
-        $server_message["message"] = $response["result"];
+        $server_message["items"] = $response["result"];
     }
     return $server_message;
 }

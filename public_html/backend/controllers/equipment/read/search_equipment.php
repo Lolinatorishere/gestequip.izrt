@@ -7,7 +7,8 @@ function read_searched_query($data_request , $pdo){
     if(!isset($data_request["limit"])){
         $data_request["limit"] = 8;
     }
-    return equipment_search($data_request , $pdo);
+    $all_references = equipment_search($data_request , $pdo);
+    return $all_references;
 }
 
 ?>

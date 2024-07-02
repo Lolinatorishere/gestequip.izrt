@@ -340,3 +340,17 @@
     flex-direction: column;
 }
 
+.search-results{
+    height: 40%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.results-controls{
+    height: 15%;
+    flex-direction: row;
+    border-width: 2px;
+    border-color: rgb(170, 170, 170);
+    border-style: none none solid none;
+}
