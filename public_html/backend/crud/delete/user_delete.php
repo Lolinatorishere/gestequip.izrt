@@ -128,7 +128,7 @@ try{
                 throw new PDOException($update["PDOException"]);
             $loggable["message"]["default"] = $delete_default_request;
         }catch(PDOException $e){
-            $loggable["exception"]["default"] = $e->getMessage();
+            $loggable["exception"]["specific"] = $e->getMessage();
             $loggable["type"] = "Server_Error";
             $loggable["status"] = "Error";
             $ret["message"]["title"] =  "Issue Deleting The Equipment";

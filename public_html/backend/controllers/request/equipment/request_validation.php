@@ -119,6 +119,10 @@ function validate_external_delete_inputs($request , $pdo , &$error_message){
     return 1;
 }
 
+function validate_equipment_delete($request , $pdo , &$error_message){
+
+}
+
 function equipment_request_validation($tab){
     $trim_req = trim($tab);
     if(strlen($trim_req) !== 6){

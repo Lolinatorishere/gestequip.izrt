@@ -66,7 +66,6 @@ async function encapsulateSearchAndFilter(encapsulation_location , filter , cond
     let content_height = [];
     let total_height = 0;
     for(let i = 0 ; i < content.length ; i++){
-        console.log(content[i]);
         let width = content[i].clientWidth;
         let height = content[i].clientHeight;
         content[i].style.marginTop = 16 + "px";

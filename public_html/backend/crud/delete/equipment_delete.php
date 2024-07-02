@@ -61,7 +61,7 @@ try{
         if(equipment_authentication($data_request , $pdo) !== 1)
             throw new Exception("Authentication");
     }
-    $validation_guard = validate_external_delete_inputs($data_request , $pdo , $error_message);
+    $validation_guard = validate_equipment_in_db($data_request["equipment_id"] , $pdo );
     if($validation_guard !== 1){
         switch($validation_guard){
         case 0:
@@ -75,12 +75,12 @@ try{
         case -1:
             if(isset($data_request["response"])){
                 switch($data_request["response"]){
-                case 'user':
-                    $deletion_guard = 1;
-                    break;
-                case 'equipment':
+                case 'yes':
                     $deletion_guard = 0;
                     break;
+                case 'no':
+                    $deletion_guard = -1;
+                    return "Canceled Opperation";
                 default:
                     throw new Exception("Question");
                 }

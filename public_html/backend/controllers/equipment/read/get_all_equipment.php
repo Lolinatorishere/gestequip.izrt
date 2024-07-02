@@ -3,7 +3,7 @@
 function read_all_equipment($data_request , $pdo){
     if($_SESSION["user_type"] !== "Admin")
         return "Unauthorised Request";
-    $request = array("fetch" => " equipment_id DESTINCT"
+    $request = array("fetch" => " DISTINCT equipment_id "
                     ,"table" => " users_inside_groups_equipments "
                     ,"specific" => " user_id > 0 "
                     );
@@ -22,12 +22,7 @@ function read_all_equipment($data_request , $pdo){
     $all_references = get_queries($request , $pdo);
     $parsed_items = array();
     foreach($all_references["items"]  as $key => $value){
-        $query = array("user_id" => $value["user_id"]
-                      ,"group_id" => $value["group_id"]
-                      ,"equipment_id" => $value["equipment_id"]
-                      );
-        $request = array("query" => $query);
-        array_push($parsed_items , read_equipment($request , $pdo));
+        array_push($parsed_items , get_equipment(" * " , $value["equipment_id"] , $pdo)["items"][0]);
     }
     $all_references["items"] = $parsed_items;
     if(isset($all_references["total_items"])){

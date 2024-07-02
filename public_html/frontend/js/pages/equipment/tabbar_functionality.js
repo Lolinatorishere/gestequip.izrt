@@ -48,9 +48,12 @@ function onTabLoad(tab){
                 console.log("nuh uh Tab");
             }
             break;
-
-            break;
         case "all_eq":
+            if(typeof allTabFunctionality === "function"){
+                allTabFunctionality();
+            }else{
+                console.log("nuh uh Tab");
+            }
             break;
         case "add_eq":
             break;
@@ -61,7 +64,6 @@ function onTabLoad(tab){
         case "log_eq":
             break;
         default:
-            console.log("Invalid Tab");
             break;
     }
 }

@@ -8,7 +8,6 @@ function internalTabSetter(tab_id , functionality){
             continue;
         tab_row[i].children[0].style.paddingleft = 1 + 'rem';
         tab_row[i].children[0].style.paddingright = 1 + 'rem';
-        console.log(tab_row[i].children[0]);
         functionality(tab_row[i].children[0]);
     }
 }
@@ -488,7 +487,6 @@ function itemReadDetails(content_location , append_to , information , informatio
     let htmlInformation = [];
     let html = [];
     let title = 0;
-    console.log(information);
     for(let i = 0 ; i < total_controls.length ; i++){
         controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
         if(total_controls[i].attributes.id.nodeValue === "title-bar-"+append_to[0]){
@@ -500,7 +498,6 @@ function itemReadDetails(content_location , append_to , information , informatio
             htmlInformation[j] = createDetailsHtml(information.items[i-title][information_types[j]] , information_types[j]);
             html[i-title] += htmlInformation[j].innerHTML;
         }
-        console.log(html);
         controls.addEventListener('click' , async function(){
             append_details.innerHTML = html[i-title];
             if(typeof encapsulate.function === "function"){
@@ -525,7 +522,7 @@ function pageControlsFunctionality(control_location , controlerFunction , loadin
             continue;
         controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
         controls.addEventListener('click' , async function(){
-            if(typeof loadingFunction === "function"){pageControlsFun
+            if(typeof loadingFunction === "function"){
                 controlerFunction(loadingFunction , total_controls[i].attributes.page.nodeValue);
             }else{
                 controlerFunction(total_controls[i].attributes.page.nodeValue);

@@ -1,4 +1,23 @@
 
+async function getAllEquipments(page , limit){
+    let request = {
+             type: 'equipment'
+            ,custom: {
+                 tab: 'all_eq'
+                ,type: 'data' 
+                ,crud: 'read'
+                ,pgng: 1
+                }
+            }
+    if(typeof page !== 'undefined' && page !== null) 
+        request.custom.page = page;
+    if(typeof limit !== 'undefined' && limit !== null) 
+        request.custom.lmit = limit;
+    let user_request = await fetch(await urlCreateBackendRequest(request));
+    let user_info = await user_request.json();
+    return user_info;
+}
+
 async function getSpecificEquipment(user_id , group_id , equipment_id){
     let request = {
              type: 'equipment'
@@ -170,7 +189,24 @@ async function postEquipmentReferenceDelete(user_id , group_id , equipment_id){
         }
     }
 
-    if(Object.keys(edit_tables.information.specific) !== 0){
+    return await fetchPOST(request , post);
+}
+
+
+async function postEquipmentDelete(equipment_id , response){
+    let request = {
+        type: 'equipment'
+        ,custom: {
+            type: 'data' 
+            ,crud: 'delete'
+            ,rgin: 'equipment'
+        }
+    }
+    let post = {
+        data:{
+            equipment_id:equipment_id,
+            response:"yes"
+        }
     }
     return await fetchPOST(request , post);
 }

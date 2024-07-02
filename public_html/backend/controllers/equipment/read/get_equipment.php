@@ -12,7 +12,7 @@
                                      . " AND group_id=" . $data_request["query"]["group_id"]
                                      . " AND equipment_id=" . $data_request["query"]["equipment_id"]
                         );
-        $reference = get_query($request , $pdo)["items"];
+        $reference = get_queries($request , $pdo)["items"][0];
         $full_info["auth_level"] = $reference["user_permission_level"];
         $full_info["status"] = $reference["status"];
         $request = array("fetch" => " id , users_name , username , email , phone_number , regional_indicator "
@@ -20,13 +20,13 @@
                         ,"counted" => 1
                         ,"specific" => " id=" . $reference["user_id"]
                         );
-        $full_info["user"] = get_query($request , $pdo)["items"];
+        $full_info["user"] = get_queries($request , $pdo)["items"][0];
         $request = array("fetch" => " * "
                         ,"table" => " user_groups "
                         ,"counted" => 1
                         ,"specific" => " id=" . $reference["group_id"]
                         );
-        $full_info["group"] = get_query($request , $pdo)["items"];
+        $full_info["group"] = get_queries($request , $pdo)["items"][0];
         $full_info["equipment"] = get_equipment(" * " , $reference["equipment_id"] , $pdo)["items"][0];
         return $full_info;
     }

@@ -43,7 +43,6 @@ async function htmlEquipmentGenerate(information){
     itemHtml = "";
     items = information.items;
     for(i = 0 ; i < items.length ; i++){
-        console.log(items[i]);
         let eq_type = "";
         let status = "";
         innerHtml = "";

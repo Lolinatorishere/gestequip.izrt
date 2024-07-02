@@ -34,7 +34,7 @@ function update_request($data_request , $tab , $user_id , $pdo){
 
 function delete_request($data_request , $tab , $user_id , $pdo , $origin){
     switch($origin) {
-        case 'group':
+        case 'equipment':
             return delete_equipment($data_request , $pdo);
         case 'reference':
             $data_request["reference"] = "user_group_equipment";

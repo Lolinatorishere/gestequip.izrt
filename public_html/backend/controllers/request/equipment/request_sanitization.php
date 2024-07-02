@@ -46,7 +46,7 @@ function delete_information_sanitize($tab , $user_id , $pdo){
     if(isset($_GET["rgin"])){// origin of refresh
         $origin = preg_replace('/[^a-zA-Z0-9]/s' , '' , $_GET["rgin"]);
     }else{
-        return "Create origin has not been set";
+        return "Delete origin has not been set";
     }
     if(isset($_POST["group_id"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["group_id"]);
