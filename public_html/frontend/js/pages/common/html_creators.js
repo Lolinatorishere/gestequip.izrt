@@ -140,6 +140,9 @@ function createDetailsHtml(data , div_name){
     html_div.className = div_name;
     html_div.id = div_name;
     let i = 0;
+    if(data === undefined){
+        return "";
+    }
     for(let [key , value] of Object.entries(data)){
         let key_parse = key.replace("_" , " ");
         html = `

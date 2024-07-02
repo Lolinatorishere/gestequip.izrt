@@ -38,9 +38,7 @@ async function generateInventoryHtml(data){
         item = createItemHTML(htmlData , data.appends , highlight , i);
         itemsDiv.appendChild(item);
     }
-    console.log(data);
     ret.items = itemsDiv.innerHTML;
-    // todo probably removing this and replacing it outside the function may fix the lack of controls Ui updating
     controls_data = data.group_equipments;
     controls_data.control_location = "group";
     ret.controls = controlsHtml(controls_data);
@@ -48,7 +46,6 @@ async function generateInventoryHtml(data){
 }
 
 async function equipment_controls(information){
-    console.log(information);
     controls_location = document.getElementById(information.append_to);
     user_auth = await getUserGroupAuth(information.details.group.id);
     control_location = document.getElementById("group-details-info");
@@ -156,11 +153,9 @@ async function inventoryControler(datarequest , page , limit){
     append_items.innerHTML = "";
     append_page_controls.innerHTML = "";
     htmlData = await generateInventoryHtml(custom_data);
-    console.log(htmlData.controls);
     append_items.innerHTML = htmlData.items;
     append_page_controls.innerHTML = htmlData.controls.pageControl;
     append_page_totals.innerHTML = htmlData.controls.totalItems;
-    console.log(append_page_controls);
     await setFetchedItemsUI("items-content" , 20 , custom_data.equipment_types.items , 5);
     information = {
         function: equipment_controls,

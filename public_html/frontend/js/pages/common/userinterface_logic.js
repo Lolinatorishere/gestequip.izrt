@@ -47,6 +47,9 @@ function getWidthsForUI(set_items , title , title_properties , individual_item_h
         set_items[itempos].style.height = individual_item_height;
         for(let j = 0 ; j < total_children ; j++){
             item = set_items[itempos].children[j];
+            if(item === undefined){
+                break;
+            }
             if((item.attributes.class.nodeValue) === "equipment_type"){
                 for(let k = 0 ; k < equipment_type.length ; k++){
                     if(parseInt(item.innerText) === equipment_type[k].id){
@@ -160,6 +163,9 @@ async function setFetchedItemsUI(item_set_id , limit , equipment_type , padding)
     for(let i = 0 ; i < set_items.length-title ; i++){
         for(let j = 0 ; j < total_children ; j++){
             item = set_items[i+title].children[j];
+            if(item === undefined){
+                break;
+            }
             item.style.height = individual_item_height + "px";
             item.style.width = aligned_percentage[j]*100 + "%";
             item.style.textAlign = "";
@@ -482,6 +488,7 @@ function itemReadDetails(content_location , append_to , information , informatio
     let htmlInformation = [];
     let html = [];
     let title = 0;
+    console.log(information);
     for(let i = 0 ; i < total_controls.length ; i++){
         controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
         if(total_controls[i].attributes.id.nodeValue === "title-bar-"+append_to[0]){
@@ -493,14 +500,17 @@ function itemReadDetails(content_location , append_to , information , informatio
             htmlInformation[j] = createDetailsHtml(information.items[i-title][information_types[j]] , information_types[j]);
             html[i-title] += htmlInformation[j].innerHTML;
         }
+        console.log(html);
         controls.addEventListener('click' , async function(){
             append_details.innerHTML = html[i-title];
             if(typeof encapsulate.function === "function"){
                 await encapsulate.function(append_details , encapsulate.filter , encapsulate.conditionals);
             }
-            if(typeof callback.function === "function"){
-                callback.details = information.items[i-title]
-                await callback.function(callback);
+            if(callback !== undefined){
+                if(typeof callback.function === "function"){
+                    callback.details = information.items[i-title]
+                    await callback.function(callback);
+                }
             }
         });
         controls.style.cursor = "pointer";
@@ -515,10 +525,10 @@ function pageControlsFunctionality(control_location , controlerFunction , loadin
             continue;
         controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
         controls.addEventListener('click' , async function(){
-            if(typeof loadingFunction === "function"){
+            if(typeof loadingFunction === "function"){pageControlsFun
                 controlerFunction(loadingFunction , total_controls[i].attributes.page.nodeValue);
             }else{
-                controlerFunction(controls.attributes.page.nodeValue);
+                controlerFunction(total_controls[i].attributes.page.nodeValue);
             }
         });
         controls.style.cursor = "pointer";

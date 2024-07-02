@@ -1,66 +1,19 @@
 
 async function search_controls(information){
-    console.log(information);
     controls_location = document.getElementById(information.append_to);
-    user_auth = await getUserGroupAuth(information.details.group.id);
-    control_location = document.getElementById("group-details-info");
+    control_location = document.getElementById("search-details-info");
     let table_info = {
         description_func: getEquipmentTableDescription,
         update_info: information.details.equipment.equipment_type, 
-    }
-    switch(user_auth.information.items.user_permission_level){
-        case 0:
-            document.getElementById("update-button").style.display = "none";
-            document.getElementById("delete-button").style.display = "none";
-            break
-        case 1:
-            control_location.appendChild(createButtonHtml(button)); 
-            setUpdateableInfo(table_info);
-            document.getElementById("update-button")
-            .addEventListener("click" , async function(){
-                user_id = information.details.user.id
-                group_id = information.details.group.id
-                equipment_id = information.details.equipment.equipment_id
-                user_input = await getInputInformation();
-                parsed_user_input = await prepareInputForEquipment(user_input , user_id , group_id , equipment_id , information.details.equipment.equipment_type);
-                server_response = await postEquipmentUpdate(parsed_user_input);
-                setServerResponse(server_response.information , "server-response");
-                inventoryControler(getAuthEquipments , 1 );
-            });
-            document.getElementById("update-button").style.display = "flex";
-            document.getElementById("delete-button").style.display = "none";
-            break
-        case 2:
-            setUpdateableInfo(table_info);
-            document.getElementById("update-button")
-            .addEventListener("click" , async function(){
-                user_id = information.details.user.id
-                group_id = information.details.group.id
-                equipment_id = information.details.equipment.equipment_id
-                user_input = await getInputInformation();
-                parsed_user_input = await prepareInputForEquipment(user_input , user_id , group_id , equipment_id , information.details.equipment.equipment_type);
-                server_response = await postEquipmentUpdate(parsed_user_input);
-                setServerResponse(server_response.information , "server-response");
-                inventoryControler(getAuthEquipments , 1 );
-            });
-            document.getElementById("delete-button")
-            .addEventListener("click" , async function(){
-                user_id = information.details.user.id
-                group_id = information.details.group.id
-                equipment_id = information.details.equipment.equipment_id
-                server_response = await postEquipmentReferenceDelete(user_id , group_id , equipment_id);
-                setServerResponse(server_response.information , "server-response");
-                inventoryControler(getAuthEquipments , 1 );
-            });
-            document.getElementById("update-button").style.display = "flex";
-            document.getElementById("delete-button").style.display = "flex";
-            break
     }
 }
 
 async function generateSearchedHtml(data){
     let itemsDiv = document.createElement('div')
     let search_items = data.search_equipments.items;
+    if(search_items === undefined){
+        return;
+    }
     let equipment_type = ""
     let highlight = "";
     let ret = {};
@@ -70,23 +23,22 @@ async function generateSearchedHtml(data){
     }
     for(i = 0 ; i < search_items.length ; i++){
         for(j = 0 ; j < data.equipment_types.items.length ; j++){
-            if(search_items[i].equipment.equipment_type === data.equipment_types.items[j].id){
+            if(search_items[i].equipment_type === data.equipment_types.items[j].id){
                 equipment_type = data.equipment_types.items[j].equipment_type;
                 break;
             }
         }
-        if(search_items[i].equipment.status === "1"){
+        if(search_items[i].status === "1"){
             equipment_status = "Active";
         }else{
             equipment_status = "Inactive";
         }
         htmlData = {
-            group_name: search_items[i].group.group_name,
-            users_name: search_items[i].user.users_name,
             equipment_type: equipment_type,
-            brand: search_items[i].equipment.brand,
-            model: search_items[i].equipment.model,
-            purchase_date: search_items[i].equipment.purchase_date,
+            business_unit: search_items[i].business_unit,
+            brand: search_items[i].brand,
+            model: search_items[i].model,
+            purchase_date: search_items[i].purchase_date,
             equipment_status: equipment_status
         }
         if(i%2 === 0){
@@ -99,10 +51,160 @@ async function generateSearchedHtml(data){
     }
     ret.items = itemsDiv.innerHTML;
     // todo probably removing this and replacing it outside the function may fix the lack of controls Ui updating
+    let controls_data = {}
     controls_data = data.search_equipments;
-    controls_data.control_location = "results";
+    controls_data.control_location = "search";
     ret.controls = controlsHtml(controls_data);
     return ret;
+}
+
+
+async function encapsulateSearchAndFilter(encapsulation_location , filter , conditionals){
+    content = encapsulation_location.children;
+    let content_width = [];
+    let parent_height = encapsulation_location.clientHeight;
+    let content_height = [];
+    let total_height = 0;
+    for(let i = 0 ; i < content.length ; i++){
+        console.log(content[i]);
+        let width = content[i].clientWidth;
+        let height = content[i].clientHeight;
+        content[i].style.marginTop = 16 + "px";
+        content[i].style.paggingBottom = -32 + "px";
+        content[i].style.marginBottom = 16 + "px";
+        content[i].style.marginLeft = 16 + "px";
+        content[i].style.marginRight = 16 + "px";
+        content[i].style.paggingRight = -32 + "px";
+        content[i].style.borderWidth = "2px";
+        content[i].style.borderStyle = "solid";
+        content[i].style.borderColor = "rgb(170, 170, 170)";
+        content[i].style.display = "flex";
+        content[i].style.flexDirection = "column";
+        content[i].style.justifyContent = "center";
+        content[i].style.backgroundColor = "rgb(239, 239, 239)";
+        let children_width = [[],[]];
+        let children_height = 0;
+        let displaying_children = 0;
+        let title_width = 0;
+        let value_width = 0;
+        for(let j = 0 ; j < content[i].children.length ; j++){
+            let continue_guard = 0;
+            item_content = content[i].children[j]
+            for(let k = 0 ; k < filter[i].length ; k++){
+                if(item_content.children[1].attributes.id.nodeValue === filter[i][k]){
+                    item_content.style.display = "none";
+                    continue_guard = 1;
+                    break;
+                }
+            }
+            if(continue_guard === 1){
+                continue;
+            }
+            //checking conditionals
+            if(conditionals[i][0].length !== 0){
+                let string_check = item_content.children[1].attributes.id.nodeValue;
+                let string_value = item_content.children[1].innerText;
+                conditions_length = conditionals[i][0].length
+                condition_check = conditionals[i][0];
+                conditions = conditionals[i][1];
+                for(let k = 0 ; k < conditions_length ; k++){
+                    if(string_check !== condition_check[k])
+                        continue;
+                    if(typeof conditions[k][0][0] === "object" || typeof conditions[k][0][0] === "array"){
+                        let object_length = conditions[k][0][0].length;
+                        let equal = conditions[k][1][0]
+                        let replace = conditions[k][1][1]
+                        for(let l = 0 ; l < object_length ; l++){
+                            if(string_value == conditions[k][0][0][l][equal]){
+                                item_content.children[1].innerText = conditions[k][0][0][l][replace];
+                            }
+                        }
+                    }else{
+                        if(string_value == conditions[k][0]){
+                            item_content.children[1].innerText = conditions[k][1][0]
+                        }else{
+                            item_content.children[1].innerText = conditions[k][1][1]
+                        }
+                    }
+                }
+            }
+            children_height += parseInt(item_content.clientHeight);
+            children_width[0][displaying_children] = item_content.children[0].clientWidth;
+            children_width[1][displaying_children] = item_content.children[1].clientWidth;
+            displaying_children++;
+        }
+        total_height = children_height;
+        if(displaying_children !== 0){
+            child_height_multiplier = ((parseFloat(children_height/height)-1)*-1);
+            child_height_px = (parseFloat(children_height/displaying_children*(1+child_height_multiplier)));
+            title_width = findMinMaxAttributeFromList(children_width[0] , "max");
+            value_width = findMinMaxAttributeFromList(children_width[1] , "max");
+            combo_width = (title_width+value_width);
+            title_width = parseFloat(title_width/combo_width)*100;
+            value_width = parseFloat(value_width/combo_width)*100;
+        }
+        for(let j = 0 ; j < content[i].children.length ; j++){
+            item_content = content[i].children[j]
+            item_content.style.height = child_height_px + "px";
+            item_content.children[0].style.width = title_width+"%";
+            item_content.children[0].style.fontSize = "0.8rem";
+            item_content.children[0].style.display = "flex";
+            item_content.children[0].style.flexDirection = "column";
+            item_content.children[0].style.justifyContent = "center";
+            item_content.children[0].style.textWrap = "wrap";
+            item_content.children[0].style.marginLeft = "6px";
+            item_content.children[0].style.paddingRight = "-6px";
+            item_content.children[0].style.borderWidth = "2px";
+            item_content.children[0].style.borderStyle = "none dotted dotted none";
+            item_content.children[0].style.borderColor = "rgb(170, 170, 170)";
+            item_content.children[1].style.width = value_width+"%";
+            item_content.children[1].style.textWrap = "wrap";
+            item_content.children[1].style.fontSize = "0.8rem";
+            item_content.children[1].style.marginLeft = "6px";
+            item_content.children[1].style.paddingRight = "-6px";
+            item_content.children[1].style.borderWidth = "2px";
+            item_content.children[1].style.borderStyle = "none none dotted none";
+            item_content.children[1].style.borderColor = "rgb(170, 170, 170)";
+            item_content.children[1].style.display = "flex";
+            item_content.children[1].style.flexDirection = "column";
+            item_content.children[1].style.justifyContent = "center";
+        }
+    }
+    content[0].style.height = total_height*1.1 + "px";
+}
+
+function itemSearchedDetails(content_location , append_to , information , encapsulate , callback){
+    let control_div = document.querySelectorAll(content_location);
+    let append_details = document.getElementById(append_to[1]);
+    let total_controls = control_div[0].children
+    let htmlInformation;
+    let html = [];
+    let title = 0;
+    for(let i = 0 ; i < total_controls.length ; i++){
+        controls = document.getElementById(total_controls[i].attributes.id.nodeValue);
+        html[i] = ""
+        if(total_controls[i].attributes.id.nodeValue === "title-bar-"+append_to[0]){
+            title = 1;
+            continue;
+        }
+        information.items[parseInt(i)-parseInt(title)];
+        htmlInformation = createDetailsHtml(information.items[i-title] , "searched-equipment");
+        html[i-title] += htmlInformation.innerHTML;
+
+        controls.addEventListener('click' , async function(){
+            append_details.innerHTML = html[i-title];
+            if(typeof encapsulate.function === "function"){
+                await encapsulate.function(append_details , encapsulate.filter , encapsulate.conditionals);
+            }
+            if(callback !== undefined){
+                if(typeof callback.function === "function"){
+                    callback.details = information.items[i-title]
+                    await callback.function(callback);
+                }
+            }
+        });
+        controls.style.cursor = "pointer";
+    }
 }
 
 async function searchControler(page){
@@ -111,36 +213,24 @@ async function searchControler(page){
         alert("No Query Requested")
         return;
     }
-    let searched = await getSearchEquipment(page , 5 , query);
+    let searched_equipments = await getSearchEquipment(page , 4 , query);
     let equipment_types = await getEquipmentTypes();
     let append_page_totals = document.getElementById("search-items-total");
     let append_page_controls = document.getElementById("search-page-controls");
     let append_items = document.getElementById("results-content");
     let append_details = document.getElementById("info-selected");
-    if(typeof searched.information.message !== "object" || searched.information.message !== undefined){
-        document.getElementById("results-controls").innerHTML = "";
+    if(searched_equipments.information.items === undefined){
+        document.getElementById("search-page-controls").innerHTML = "";
+        document.getElementById("search-items-total").innerHTML = "";
         document.getElementById("results-content").innerHTML = "";
-        if(searched.information.message !== undefined){
-            document.getElementById("results-controls").innerHTML = searched.information.message;
-        }
+        document.getElementById("search-page-controls").innerHTML = searched_equipments.information.message;
+        return;
     }
     document.getElementById("info-selected").innerHTML = "";
-    document.getElementById("update-button").style.display = "none"
-    document.getElementById("delete-button").style.display = "none"
-    for(let i = 0 ; i < searched.information.items.length ; i++){
-        item = group_equipments.information.items[i];
-        group_equipments.information.items[i].user.phone = item.user.phone_number;
-        delete(group_equipments.information.items[i].user.phone_number);
-    }
     let encapsulate = {
-        function: encapsulateAndFilter,
-        filter: [["id","username","regional_indicator"]
-                ,["id","group_status","group_type"]
-                ,["id","equipment_id","has_battery","registration_lock","serial_brand_md5","registration_date","equipment_type", "IMEI"]
-                ],
+        function: encapsulateSearchAndFilter,
+        filter: [["id","equipment_id","has_battery","registration_lock","serial_brand_md5","registration_date","equipment_type", "IMEI"]],
         conditionals:[
-            [[],[]],
-            [[],[]],
             [
                 //[what text] , [[conditional] , [results]] 
                 /// if conditional = array creates for loop with the array 
@@ -156,31 +246,29 @@ async function searchControler(page){
             ]
         ]
     }
-    appends = [["grp"],["group_name","users_name","equipment_type","brand","model","purchase_date"]];
+    appends = [["sch"],["equipment_type", "business_unit" ,"brand","model","purchase_date"]];
     custom_data = {
-            group_equipments: group_equipments.information
-           ,control_location: "group"
+            search_equipments: searched_equipments.information.items
+           ,control_location: "search"
            ,appends: appends
-           ,title: ["group" , "user" , "type" , "brand" , "model" , "purchase date" ]
+           ,title: ["type" , "business unit" , "brand" , "model" , "purchase date" ]
            ,equipment_types: equipment_types.information
     };
     append_items.innerHTML = "";
     append_page_controls.innerHTML = "";
-    htmlData = await generateInventoryHtml(custom_data);
-    console.log(htmlData.controls);
+    htmlData = await generateSearchedHtml(custom_data);
     append_items.innerHTML = htmlData.items;
     append_page_controls.innerHTML = htmlData.controls.pageControl;
     append_page_totals.innerHTML = htmlData.controls.totalItems;
-    console.log(append_page_controls);
-    await setFetchedItemsUI("items-content" , 20 , custom_data.equipment_types.items , 5);
+    await setFetchedItemsUI("results-content" , 5 , custom_data.search_equipments.items , 5);
     information = {
-        function: equipment_controls,
+        function: search_controls,
         append_to: "group-details-controls",
         equipment_types: equipment_types
     }
-    appends_to = ["grp" , "info-selected"]
-    itemReadDetails("#items-content" , appends_to , group_equipments.information , ["user" , "group" , "equipment"] , encapsulate , information)
-    pageControlsFunctionality("#page-controls-group" , inventoryControler , getAuthEquipments);
+    appends_to = ["sch" , "info-selected"]
+    itemSearchedDetails("#results-content" , appends_to , searched_equipments.information.items ,  encapsulate)
+    pageControlsFunctionality("#page-controls-search" , searchControler);
 }
 
 async function tabLoadUi(tab , request , content_id , highlight_id , tab_html , callback){
@@ -316,7 +404,6 @@ async function searchTypesFechedFunctionality(information , item_location){
     items = document.getElementById(item_location);
     for(let i = 0 ; i < items.children.length ; i++){
         item = items.children[i];
-        console.log(item);
         item.style.cursor = "pointer";
         item.addEventListener('click' , async function(){
             onclickEventListenerEquipmentType(information[i]);
@@ -671,7 +758,6 @@ async function searchTabGroupControler(page){
     append_page_controls.innerHTML = htmlData.controls.pageControl;
     let group_controls = document.getElementById("groups-controls")
     group_controls.children[0].style.fontSize = "0.8rem";
-    ///console.log(document.getElementById("title-bar"));
     await setFetchedItemsUI("groups-items" , 10 , groups , 5);
     await searchItemsFetchedFunctionality(groups.information.items , "groups-items" , selectedGroupFromControler , "callback");
     await pageControlsFunctionality("#page-controls-group" , searchTabGroupControler);
@@ -803,10 +889,31 @@ async function createSearchButton(){
     });
 }
 
+async function createWipeButton(){
+    document.getElementById("clear-button")
+    .addEventListener("click" , async function(){
+        document.getElementById("search-query-full").innerHTML = "";
+        document.getElementById("query-content").innerHTML = "";
+        document.getElementById("results-content").innerHTML = "";
+        document.getElementById("search-items-total").innerHTML = ""
+        document.getElementById("search-page-controls").innerHTML = ""
+        document.getElementById("info-selected").innerHTML = "";
+    });
+}
+
+
+async function createSearchButton(){
+    document.getElementById("search-button")
+    .addEventListener("click" , async function(){
+        searchControler(1);
+    });
+}
+
 async function searchTabFunctionality(){
     defaultSearchTab();
     internalTabSetter("#parameter-tabbar" , searchTabbarFunctionality)
     createSearchButton();
+    createWipeButton();
 }
 
 
