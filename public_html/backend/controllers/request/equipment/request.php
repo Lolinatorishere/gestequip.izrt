@@ -25,6 +25,8 @@ function read_request($tab , &$data_request , $user_id , $pdo){
 }
 
 function create_request($data_request , $tab , $user_id , $pdo){
+    $data_request["user_id"] = 1;
+    $data_request["group_id"] = 1;
     return create_equipment($data_request , $pdo);
 }
 

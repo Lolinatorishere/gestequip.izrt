@@ -3,11 +3,7 @@
 function create_information_sanitize($tab , $user_id , $pdo){
     $data_request = array();
     $data_request = sanitize_query($_POST);
-    if(isset($_GET["rgin"])){// origin of refresh
-        $origin = preg_replace('/[^a-zA-Z0-9]/s' , '' , $_GET["rgin"]);
-    }else{
-        return "Create origin has not been set";
-    }
+    
     if(isset($_POST["group_id"])){
         $data_request["group_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["group_id"]);
     }
@@ -15,7 +11,7 @@ function create_information_sanitize($tab , $user_id , $pdo){
         $data_request["user_id"] = preg_replace('/[^0-9]/s' , '' , $_POST["user_id"]);
     }
     if(isset($_POST["equipment_auth_level"])){
-        $data_request["eqiupment_auth_level"] = preg_replace('/[^0-1]/s' , '' , $_POST["equipment_auth_level"]);
+        $data_request["equipment_auth_level"] = preg_replace('/[^0-1]/s' , '' , $_POST["equipment_auth_level"]);
     }
     return create_request($data_request , $tab , $user_id , $pdo , $origin);
 }

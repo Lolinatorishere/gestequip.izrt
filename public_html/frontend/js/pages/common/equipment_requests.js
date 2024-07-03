@@ -155,15 +155,49 @@ async function getUserEquipments(page){
     return user_info;
 }
 
+async function createEquipments(data){
+    if(typeof data !== "object")
+        return;
+    let request = {
+        type: 'equipment'
+        ,custom: {
+            type: 'data' 
+            ,crud: 'update'
+            }
+        }
+    let post = {
+        data:data
+    }
+    return await fetchPOST(request , post);
+}
+
+
 async function postEquipmentUpdate(data){
+    if(typeof data !== "object")
+        return;
+    let request = {
+        type: 'equipment'
+        ,custom: {
+            type: 'data' 
+            ,crud: 'update'
+            }
+        }
+    let post = {
+        data:data
+    }
+    return await fetchPOST(request , post);
+}
+
+
+async function postEquipmenCreate(data){
     if(typeof data !== "object")
         return;
     
     let request = {
         type: 'equipment'
         ,custom: {
-            type: 'data' 
-            ,crud: 'update'
+            type: 'data',
+            crud: 'create'
             }
         }
     let post = {

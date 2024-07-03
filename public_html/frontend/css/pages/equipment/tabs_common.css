@@ -179,3 +179,56 @@
     color: white;
 }
 
+.create-button{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    cursor:pointer;
+    user-select: none;
+    width: 100%;
+    background-color: rgb(239, 239, 239);
+    border-radius: 0.5rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    display:flex;
+}
+
+.create-button:hover{
+    background-color: rgb(23, 212, 89);
+    color: white;
+}
+
+.title-create-button{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
+.generic-button{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    cursor:pointer;
+    user-select: none;
+    width: 100%;
+    background-color: rgb(239, 239, 239);
+    border-radius: 0.5rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    display:flex;
+}
+
+.generic-button:hover{
+    background-color: rgb(180, 180, 180);
+    color: white;
+}
+
+.title-generic-button{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
+

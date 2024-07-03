@@ -3,11 +3,13 @@
 include_once query_generator_dir;
 
 function create_equipment_users_groups_insertion($request , $equipment_id){
+    printLog($request);
+    printLog($eqipment_id);
     $columns = array(" `user_id`, `group_id`, `equipment_id`, `user_permission_level`, `status`");
     $values = array();
     $eq_id = " '" . $equipment_id . "' ";
-    $us_id = " '" . $request["user_id"] . "' ";
-    $gp_id = " '" . $request["group_id"] . "' ";
+    $us_id = " ' 1 ' ";
+    $gp_id = " ' 1 ' ";
     if(!isset($request["user_permission_level"])){
         $perm_lvl = " '0' ";
     }else{
@@ -51,6 +53,7 @@ try{
             throw new Exception("Authentication");
     }
     // Validates inputs
+    printLog($request);
     $validation_guard = validate_external_create_inputs($request , $pdo , $error_message);
     if($validation_guard !== 1){
         $loggable["type"] = "Input_Error";
@@ -80,6 +83,7 @@ try{
         $request["specific"]["equipment_id"] = $equipment_id;
         $sql = create_insertion_generator($request , " " . $request["equipment_type"] , "specific" , 0);
         $statement = $pdo->prepare($sql);
+        printLog($sql);
         $statement->execute();
         $specifics_id = $pdo->lastInsertId();
         $loggable["message"]["specific_sql"] = $sql;
@@ -122,6 +126,7 @@ try{
     try{
         $sql = create_equipment_users_groups_insertion($request , $equipment_id);
         $statement = $pdo->prepare($sql);
+        printLog($sql);
         $statement->execute();
         $loggable["message"]["users_inside_groups_equipments_ids"] = array($request["user_id"] , $request["group_id"] , $equipment_id);
         $loggable["message"]["users_inside_groups_equipments_sql"] = $sql;
@@ -131,16 +136,6 @@ try{
         $loggable["exception"]["PDOMessage"] = $e->getMessage();
         throw new Exception("equipment_Group query not made");
     }
-        $request["reference"] = array("user_id" => "1"
-                        ,"group_id" => "1"
-                        ,"group_id" => $equipment_id
-                        ,"user_permission_level" => "0"
-                        ,"status" => "1"
-                        );
-        $sql = create_insertion_generator($request , " users_inside_groups_equipment " , "reference" , 0);
-        $statement = $pdo->prepare($sql);
-        $statement->execute();
-
     $loggable["type"] = "Created_Equipment";
     $loggable["group_id"] = $group_id;
     $ret["server_message"] = "Equipment Created";

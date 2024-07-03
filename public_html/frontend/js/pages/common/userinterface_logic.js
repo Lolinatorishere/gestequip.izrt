@@ -361,9 +361,15 @@ async function prepareInputForEquipment(user_input , user_id , group_id , equipm
     information = {
         default:{},
         specific:{},
-        user_id:user_id,
-        group_id:group_id,
-        equipment_id:equipment_id,
+    }
+    if(user_id !== undefined){
+        information["user_id"] = user_id;
+    }
+    if(group_id !== undefined){
+        information["group_id"] = group_id;
+    }
+    if(equipment_id !== undefined){
+        information["equipment_id"] = equipment_id;
     }
     desc_response = await getEquipmentTableDescription(equipment_type);
     table_description = desc_response.information;

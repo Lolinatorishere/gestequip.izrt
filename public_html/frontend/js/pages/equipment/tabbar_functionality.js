@@ -55,12 +55,6 @@ function onTabLoad(tab){
                 console.log("nuh uh Tab");
             }
             break;
-        case "add_eq":
-            break;
-        case "adeqty":
-            break;
-        case "rem_eq":
-            break;
         case "log_eq":
             break;
         default:

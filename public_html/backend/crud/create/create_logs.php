@@ -83,7 +83,7 @@ function log_create(&$ret , $success , $e , $loggable , $error_message , $pdo ){
     switch($e->getMessage()){
         case $success:
             $loggable["status"] = "OK";
-            $ret["server_message"] = "Group Created";
+            $ret["server_message"] = $success . " Created";
             break;
         case 'Authentication':
             $loggable["type"] = "Auth_Error";

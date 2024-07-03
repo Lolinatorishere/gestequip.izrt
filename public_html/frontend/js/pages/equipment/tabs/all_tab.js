@@ -124,9 +124,145 @@ async function all_equipment_controls(information){
         current_page = page[0].innerText.replace("Page: " , "");
         allInventoryControler(getAllEquipments , parseInt(current_page));
     });
+    
+    document.getElementById("create-button").style.display = "flex";
     document.getElementById("update-button").style.display = "flex";
     document.getElementById("delete-button").style.display = "flex";
 }
+
+async function createEquipmentCreationArea(equipment_type){
+    let table_request = await getEquipmentTableDescription(equipment_type)
+    let table_description = table_request.information;
+    create_new_equipment_html = `
+                                <div class="input-new-equipment">
+                                    <div class="new-equipment-title">
+                                        New Equipment:
+                                    </div>
+                                    <div class="new-equipiment-input-area" id="new-equipiment-input-area">`;
+    for(let [key , value] of Object.entries(table_description.default)){
+        input_type = parseTableType(value.Type);
+        create_new_equipment_html += `<div class="input-new-equipment" style="display:flex; flex-direction:row;">
+                                        <div id="input-new-equipment-title">
+                                            ${value.Field}
+                                        </div>
+                                        <div>
+                                            <input id="${value.Field}" input_table="default" type="${input_type}">
+                                        </div>
+                                    </div>`
+    }
+    for(let [key , value] of Object.entries(table_description.specific)){
+        input_type = parseTableType(value.Type);
+        create_new_equipment_html += `<div class="input-new-equipment" style="display:flex; flex-direction:row;">
+                                        <div id="input-new-equipment-title">
+                                            ${value.Field}
+                                        </div>
+                                        <div>
+                                            <input id="${value.Field}" input_table="specific" type="${input_type}">
+                                        </div>
+                                    </div>`
+    }
+    create_new_equipment_html += `
+                                </div>`;
+    return create_new_equipment_html;
+}
+
+async function createEquipmentButton(){
+    document.getElementById("create-button")
+    .addEventListener("click" , async function(){
+    document.getElementById("update-button").style.display = "none";
+    document.getElementById("delete-button").style.display = "none";
+    let equipment_request = await getEquipmentTypes();
+    let equipment_types = equipment_request.information.items
+    let information_append = document.getElementById("info-selected");
+    information_append.innerHTML = "";
+    select_equipment = `<div class="equipment-types-selection-types">
+                            <div class="select-equipment-type">
+                                Select Equipment Type:
+                            </div>
+                            <div class="equipment-type-selection-area" id="equipment-type-selection-area">`
+    for(let i = 0 ; i < equipment_types.length ; i++){
+        select_equipment += `<div id="${equipment_types[i].equipment_type}" class="generic-button"> 
+                                <div class="title-generic-button">
+                                    ${equipment_types[i].equipment_type} 
+                                </div>
+                            </div>`
+    }
+    select_equipment += `</div></div>`;
+    information_append.innerHTML = select_equipment;
+    equipment_buttons = document.getElementById("equipment-type-selection-area").children
+    for(let i = 0 ; i < equipment_buttons.length ; i++){
+        equipment_buttons[i]
+        .addEventListener("click" , async function(){
+            information_append.innerHTML = "";
+            html = await createEquipmentCreationArea(equipment_types[i].equipment_type);
+            information_append.innerHTML = html;
+            information_append.innerHTML += `
+                            <div class="generic-button" id="send-equipment">
+                                <div class="title-generic-button">
+                                    Add Equipment
+                                </div>
+                            </div>`
+            document.getElementById("send-equipment")
+            .addEventListener("click" , async function(){
+                input_settings = {Get_Input_table:"true"}
+                info = await getInputNewEquipment(input_settings);
+                let default_info = {};
+                let specific_info = {};
+                let equipment_type = equipment_types[i];
+                let parsed_info = {};
+                for(let [key , value] of Object.entries(info)){
+                    if(value.table === "default"){
+                        if(value.value === undefined){
+                            continue;
+                        }
+                        default_info[key] = value.value;
+                    }
+                    if(value.table === "specific"){
+                        if(value.value === undefined){
+                            continue;
+                        }
+                        specific_info[key] = value.value;
+                    }
+                }
+                parsed_info["default"] = default_info;
+                parsed_info["specific"] = specific_info;
+                parsed_info["equipment_type"] = equipment_type.equipment_type;
+                server_response = await postEquipmenCreate(parsed_info);
+                setServerResponse(server_response.information , "server-response");
+                if(server_response.information.message.success === "success"){
+                    allInventoryControler(getAllEquipments , 1);
+                }
+            });
+        });
+    }
+    });
+}
+
+async function getInputNewEquipment(){
+    let information = {};
+    let inputs = document.getElementsByTagName('input');
+    for(let i = 0 ; i < inputs.length ; i++){
+        info = {};
+        if(inputs[i].attributes.type.nodeValue === "checkbox"){
+            let checkBoxValue = undefined;
+            if(inputs[i].value === "on"){
+                checkBoxValue = 1;
+            }else{
+                checkBoxValue = 0;
+            }
+            if(checkBoxValue === undefined){
+                continue;
+            }
+            info["value"] = checkBoxValue; 
+        }else if(inputs[i].value !== ""){
+            info["value"] = inputs[i].value;
+        }
+        info["table"] = inputs[i].attributes.input_table.nodeValue;
+        information[inputs[i].attributes.id.nodeValue] = info;
+    }
+    return information;
+}
+
 
 async function allInventoryControler(datarequest , page , limit){
     limit = 19;
@@ -172,7 +308,7 @@ async function allInventoryControler(datarequest , page , limit){
     append_items.innerHTML = htmlData.items;
     append_page_controls.innerHTML = htmlData.controls.pageControl;
     append_page_totals.innerHTML = htmlData.controls.totalItems;
-    await setFetchedItemsUI("items-content" , 20 , custom_data.equipment_types.items , 5);
+    await setFetchedItemsUI("items-content" , 19 , custom_data.equipment_types.items , 5);
     information = {
         function: all_equipment_controls,
         append_to: "group-details-controls",
@@ -185,4 +321,5 @@ async function allInventoryControler(datarequest , page , limit){
 
 async function allTabFunctionality(){
     allInventoryControler(getAllEquipments , 1 );
+    createEquipmentButton();
 }

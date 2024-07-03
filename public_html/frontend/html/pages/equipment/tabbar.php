@@ -16,24 +16,12 @@ session_start();
   </div>
 
   <?php
-  if($_SESSION["user_type"] === "Manager" || $_SESSION["user_type"] === "Admin") 
-  echo '<div class="tabbar-item">
-    <div class="tabbar-content">
-      <div id="add_equipment">Create</div>
-    </div>
-  </div>';
 
   if($_SESSION["user_type"] === "Admin")
   echo '
   <div class="tabbar-item">
     <div class="tabbar-content">
       <div id="all_equipment">Full Inventory</div>
-    </div>
-  </div>
-
-  <div class="tabbar-item">
-    <div class="tabbar-content">
-      <div id="remove_equipment">Delete</div>
     </div>
   </div>
 
